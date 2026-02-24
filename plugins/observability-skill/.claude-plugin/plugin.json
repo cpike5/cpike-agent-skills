@@ -1,0 +1,5 @@
+{
+  "name": "observability-skill",
+  "description": "Comprehensive .NET observability knowledge base covering Serilog, Seq, Elastic APM, OpenTelemetry, and instrumentation best practices",
+  "version": "1.0.0"
+}

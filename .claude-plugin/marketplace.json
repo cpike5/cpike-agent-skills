@@ -1,0 +1,23 @@
+{
+  "name": "cpike-agent-skills",
+  "owner": {
+    "name": "cpike5"
+  },
+  "plugins": [
+    {
+      "name": "blazor-skill",
+      "source": "./plugins/blazor-skill",
+      "description": "Comprehensive Blazor knowledge base for building functional, visually distinctive pages, components, and applications"
+    },
+    {
+      "name": "observability-skill",
+      "source": "./plugins/observability-skill",
+      "description": "Comprehensive .NET observability knowledge base covering Serilog, Seq, Elastic APM, OpenTelemetry, and instrumentation best practices"
+    },
+    {
+      "name": "elasticsearch-skill",
+      "source": "./plugins/elasticsearch-skill",
+      "description": "Comprehensive Elasticsearch and Kibana knowledge base for querying, indexing, .NET client integration, dashboard management, log pipelines, and observability"
+    }
+  ]
+}

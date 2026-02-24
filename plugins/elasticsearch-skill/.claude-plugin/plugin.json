@@ -1,0 +1,5 @@
+{
+  "name": "elasticsearch-skill",
+  "description": "Comprehensive Elasticsearch and Kibana knowledge base for querying, indexing, .NET client integration, dashboard management, log pipelines, and observability",
+  "version": "1.0.0"
+}
