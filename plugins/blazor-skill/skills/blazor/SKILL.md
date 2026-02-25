@@ -1,6 +1,6 @@
 ---
 name: blazor
-description: "Use this skill when implementing Blazor pages, components, forms, or any Blazor UI work. Covers render modes (InteractiveServer, InteractiveWebAssembly, InteractiveAuto, Static SSR), component lifecycle, state management, JS interop, routing, styling (CSS isolation, .razor.css), design aesthetics, DI, auth (AuthorizeView, Identity), EditForm, and common UX patterns (modals, toasts, Virtualize). Produces visually distinctive output that avoids generic AI aesthetics. Invoke when: creating or modifying .razor files, working with EditForm or input components, configuring render modes, debugging Blazor-specific issues (event handlers not working, prerendering problems, auth issues), or when the user asks about Blazor patterns."
+description: "Use this skill when implementing Blazor pages, components, forms, or any Blazor UI work. Covers render modes (InteractiveServer, InteractiveWebAssembly, InteractiveAuto, Static SSR), component lifecycle, state management, JS interop, routing, styling (CSS isolation, .razor.css), design aesthetics, DI, auth (AuthorizeView, Identity), EditForm, security (CSRF, XSS, CSP, secure token storage, SignalR circuit security), external authentication providers (OAuth, Google, Microsoft, Entra, GitHub, Discord), two-factor authentication (2FA, TOTP, QR codes, authenticator apps, recovery codes), logging (structured logging, ErrorBoundary, circuit diagnostics, WASM log relay), and common UX patterns (modals, toasts, Virtualize). Produces visually distinctive output that avoids generic AI aesthetics. Invoke when: creating or modifying .razor files, working with EditForm or input components, configuring render modes, debugging Blazor-specific issues (event handlers not working, prerendering problems, auth issues), setting up security (CSRF protection, CSP headers, XSS prevention), configuring OAuth/OIDC providers, implementing 2FA/TOTP with QR codes, adding structured logging to components, or when the user asks about Blazor patterns."
 ---
 
 # Blazor Development Knowledge Base
@@ -41,6 +41,14 @@ Read the relevant docs based on your task:
 
 ### Design & Aesthetics
 - ${CLAUDE_PLUGIN_ROOT}/docs/12-design-aesthetics.md — Typography, color systems, motion/animation, spatial composition, anti-patterns, Blazor-specific design tips
+
+### Security & Authentication
+- ${CLAUDE_PLUGIN_ROOT}/docs/13-security.md — CSRF/antiforgery, XSS prevention, Content Security Policy, secure token storage, BFF pattern, SignalR circuit security
+- ${CLAUDE_PLUGIN_ROOT}/docs/14-external-authentication-providers.md — OAuth/OIDC setup for Google, Microsoft/Entra ID, GitHub, Discord; claims mapping, account linking
+- ${CLAUDE_PLUGIN_ROOT}/docs/15-two-factor-authentication.md — TOTP authenticator apps, QR code generation (QRCoder server-side, qrcodejs client-side), recovery codes, setup flow
+
+### Logging
+- ${CLAUDE_PLUGIN_ROOT}/docs/16-logging.md — ILogger in components, prerender noise avoidance, ErrorBoundary logging, circuit diagnostics, WASM log relay pattern. For Serilog, Elastic APM, and OpenTelemetry details, see the observability-skill plugin.
 
 ## Critical Rules (Common Mistakes)
 

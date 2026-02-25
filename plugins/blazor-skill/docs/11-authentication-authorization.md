@@ -65,6 +65,8 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 }
 ```
 
+> **WARNING — localStorage is vulnerable to XSS.** If an attacker achieves cross-site scripting in your app, they can read tokens from localStorage. For sensitive applications, prefer **httpOnly cookies** or the **BFF (Backend for Frontend) pattern** where tokens never reach the browser. See `13-security.md` for secure token storage patterns.
+
 ## Setup
 
 ### Program.cs (Blazor Web App with Identity)
@@ -343,3 +345,9 @@ public class AuthTokenHandler : DelegatingHandler
 | Checking auth in `OnInitialized` without null guard | NullReferenceException | Check `AuthState is not null` first |
 | Expecting role changes to take effect immediately | User still has old roles during circuit | Roles update on next circuit (page refresh) |
 | Global interactive mode breaking Identity pages | `HttpContext` null on login page | Use `[ExcludeFromInteractiveRouting]` or per-page render modes |
+
+## See Also
+
+- `13-security.md` — CSRF, XSS prevention, CSP, secure token storage, SignalR circuit security
+- `14-external-authentication-providers.md` — Google, Microsoft/Entra, GitHub, Discord OAuth setup
+- `15-two-factor-authentication.md` — TOTP authenticator apps, QR code generation, recovery codes
