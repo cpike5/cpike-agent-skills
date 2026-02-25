@@ -5,10 +5,9 @@ input=$(cat)
 
 # Auto-approve curl requests to the Huemint API
 if echo "$input" | grep -q 'api\.huemint\.com'; then
-  echo '{"continue":true,"hookSpecificOutput":{"permissionDecision":"allow"},"systemMessage":"Auto-approved Huemint API request"}'
+  echo '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":"Huemint API request auto-approved by plugin"}}'
   exit 0
 fi
 
-# Not a Huemint request — don't interfere
-echo '{"continue":true}'
+# Not a Huemint request — pass through
 exit 0
