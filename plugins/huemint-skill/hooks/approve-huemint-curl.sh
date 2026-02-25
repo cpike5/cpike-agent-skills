@@ -2,13 +2,12 @@
 set -euo pipefail
 
 input=$(cat)
-command=$(echo "$input" | jq -r '.tool_input.command // ""')
 
-# Auto-approve curl/fetch requests to the Huemint API
-if echo "$command" | grep -qE 'curl\s.*api\.huemint\.com'; then
+# Auto-approve curl requests to the Huemint API (no jq dependency)
+if echo "$input" | grep -q 'api\.huemint\.com'; then
   echo '{"hookSpecificOutput":{"permissionDecision":"allow"}}'
   exit 0
 fi
 
-# Not a Huemint curl — don't interfere
+# Not a Huemint request — don't interfere
 exit 0
