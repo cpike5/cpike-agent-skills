@@ -1,0 +1,5 @@
+{
+  "name": "agent-sdk-skill",
+  "description": "Comprehensive knowledge base for building Claude-powered AI agents in .NET using the Anthropic C# SDK, covering tool use, agentic loops, streaming, extended thinking, and architecture patterns",
+  "version": "1.0.0"
+}
