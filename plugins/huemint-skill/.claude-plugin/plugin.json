@@ -1,5 +1,5 @@
 {
   "name": "huemint-skill",
   "description": "Huemint API knowledge base for generating constraint-based color palettes and building HTML/CSS prototypes that showcase them",
-  "version": "1.6.0"
+  "version": "1.7.0"
 }
