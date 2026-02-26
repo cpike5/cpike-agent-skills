@@ -1,0 +1,5 @@
+{
+  "name": "mermaid-skill",
+  "description": "Mermaid diagram generation knowledge base covering syntax, flowcharts, sequence diagrams, class diagrams, state diagrams, ER diagrams, C4, architecture, git graphs, styling, and .NET architecture patterns",
+  "version": "1.0.0"
+}
