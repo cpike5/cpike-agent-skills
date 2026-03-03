@@ -33,6 +33,11 @@
       "name": "mermaid-skill",
       "source": "./plugins/mermaid-skill",
       "description": "Mermaid diagram generation knowledge base covering syntax, flowcharts, sequence diagrams, class diagrams, state diagrams, ER diagrams, C4, architecture, git graphs, styling, and .NET architecture patterns"
+    },
+    {
+      "name": "avalonia-skill",
+      "source": "./plugins/avalonia-skill",
+      "description": "Comprehensive Avalonia UI knowledge base for building cross-platform desktop applications covering controls, styling, MVVM, data binding, animations, platform integration, desktop UI design, and deployment"
     }
   ]
 }
