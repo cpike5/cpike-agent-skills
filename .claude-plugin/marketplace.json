@@ -38,6 +38,11 @@
       "name": "avalonia-skill",
       "source": "./plugins/avalonia-skill",
       "description": "Comprehensive Avalonia UI knowledge base for building cross-platform desktop applications covering controls, styling, MVVM, data binding, animations, platform integration, desktop UI design, and deployment"
+    },
+    {
+      "name": "frontend-design-skill",
+      "source": "./plugins/frontend-design-skill",
+      "description": "Frontend design knowledge base for engineering distinctive, non-generic interfaces with architectural CSS, editorial typography, and high-fidelity interactions"
     }
   ]
 }
