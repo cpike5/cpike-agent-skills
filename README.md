@@ -1,14 +1,14 @@
 # cpike-agent-skills
 
-A multi-plugin Claude Code repository bundling three domain-specific skill plugins for .NET development. Each plugin provides a comprehensive knowledge base that Claude Code can invoke on demand — no executable code ships with this repo.
+A multi-plugin Claude Code repository bundling domain-specific skill plugins for development. Each plugin provides a comprehensive knowledge base that Claude Code can invoke on demand — no executable code ships with this repo.
 
 ## Plugins
 
-### blazor-skill (v2.2.0)
+### blazor-skill (v2.3.0)
 
-Blazor UI development knowledge base covering render modes, component lifecycle, forms, state management, JS interop, routing, styling, DI, authentication, and design aesthetics. Targets .NET 8+ Blazor with an emphasis on distinctive, non-generic UI output.
+Blazor UI development knowledge base covering render modes, component lifecycle, forms, state management, JS interop, routing, styling, DI, authentication, security, and design aesthetics. Targets .NET 8+ Blazor with an emphasis on distinctive, non-generic UI output.
 
-**12 docs** — render modes, component lifecycle, forms & validation, state management, components, JS interop, routing & navigation, styling, DI, event handling & performance, auth, design aesthetics.
+**16 docs** — render modes, component lifecycle, forms & validation, state management, components, JS interop, routing & navigation, styling, DI, event handling & performance, auth, design aesthetics, security, external auth providers, two-factor authentication, logging & diagnostics.
 
 ### observability-skill (v1.0.0)
 
@@ -22,6 +22,42 @@ Elasticsearch and Kibana knowledge base covering ES 8.x REST API, Query DSL, agg
 
 **13 docs** — Query DSL, search & pagination, index management, document CRUD, aggregations, .NET client, .NET patterns, Kibana API, Kibana visualizations, KQL syntax, ECS logging, data streams & ILM, ingest & alerting.
 
+### agent-sdk-skill (v1.0.0)
+
+Knowledge base for building Claude-powered AI agents in .NET using the Anthropic C# SDK, covering tool use, agentic loops, streaming, extended thinking, context management, and architecture patterns.
+
+**13 docs** — SDK setup, chat completions, tool use, agentic loops, streaming, extended thinking, context management, system prompts, error handling, multi-cloud deployment, MCP integration, Semantic Kernel, architecture patterns.
+
+### huemint-skill (v1.7.0)
+
+Huemint API knowledge base for generating constraint-based color palettes and building HTML/CSS prototypes that showcase them.
+
+**8 docs** — API basics, adjacency matrices, color locking, model selection, palette refinement, natural language translation, HTML/CSS showcases, advanced patterns.
+
+### mermaid-skill (v1.0.0)
+
+Mermaid diagram generation knowledge base covering syntax, flowcharts, sequence diagrams, class diagrams, state diagrams, ER diagrams, C4, architecture diagrams, git graphs, styling, and .NET architecture patterns.
+
+**11 docs** — flowcharts, sequence diagrams, class diagrams, state diagrams, ER diagrams, C4 diagrams, architecture diagrams, git graphs, styling & theming, .NET patterns, diagram selection guide.
+
+### avalonia-skill (v1.0.0)
+
+Avalonia UI knowledge base for building cross-platform desktop applications with MVVM, styling, theming, data binding, animations, platform integration, and deployment.
+
+**16 docs** — controls, layouts, styling & theming, MVVM, data binding, animations, platform integration, desktop UI design, deployment, dialogs & windowing, data templates, commands & interactions, custom controls, performance, accessibility, testing.
+
+### frontend-design-skill (v1.0.0)
+
+Frontend design knowledge base for engineering distinctive, non-generic interfaces with architectural CSS, editorial typography, and high-fidelity interactions.
+
+**8 docs** — design language selection, architectural typography, advanced CSS layout, surface & depth, motion & micro-interactions, CSS custom property systems, anti-pattern avoidance, implementation workflow.
+
+### roundtable (v1.0.0)
+
+Structured roundtable brainstorming facilitation with a BA chair, domain experts, and user persona panels for feature ideation, UX design, and enhancement planning.
+
+**4 docs** — facilitation framework, expert panel design, user persona panels, session management.
+
 ## Repository Structure
 
 ```
@@ -29,19 +65,24 @@ cpike-agent-skills/
 ├── .claude-plugin/
 │   └── marketplace.json          # Marketplace manifest listing all plugins
 ├── plugins/
+│   ├── agent-sdk-skill/
+│   ├── avalonia-skill/
 │   ├── blazor-skill/
-│   │   ├── .claude-plugin/plugin.json
-│   │   ├── docs/01-12.md
-│   │   └── skills/blazor/SKILL.md
+│   ├── elasticsearch-skill/
+│   ├── frontend-design-skill/
+│   ├── huemint-skill/
+│   ├── mermaid-skill/
 │   ├── observability-skill/
-│   │   ├── .claude-plugin/plugin.json
-│   │   ├── docs/01-12.md
-│   │   └── skills/observability/SKILL.md
-│   └── elasticsearch-skill/
-│       ├── .claude-plugin/plugin.json
-│       ├── docs/01-13.md
-│       └── skills/elasticsearch/SKILL.md
+│   └── roundtable/
 └── CLAUDE.md
+```
+
+Each plugin follows the same structure:
+```
+plugin-name/
+├── .claude-plugin/plugin.json    # Plugin manifest with version
+├── docs/01-NN.md                 # Numbered knowledge base docs
+└── skills/<name>/SKILL.md        # Skill router with trigger phrases
 ```
 
 ## Installation
@@ -54,3 +95,4 @@ Install from the Claude Code plugin marketplace, or add manually by cloning this
 - Docs use sequential numbering (`01-NN`). Preserve ordering when adding new docs.
 - New docs must be referenced in the plugin's `SKILL.md` to be discoverable.
 - Bump the version in each plugin's `plugin.json` on meaningful changes.
+- Update `.claude-plugin/marketplace.json` when adding or removing plugins.
