@@ -43,6 +43,11 @@
       "name": "frontend-design-skill",
       "source": "./plugins/frontend-design-skill",
       "description": "Frontend design knowledge base for engineering distinctive, non-generic interfaces with architectural CSS, editorial typography, and high-fidelity interactions"
+    },
+    {
+      "name": "roundtable",
+      "source": "./plugins/roundtable",
+      "description": "Structured roundtable brainstorming facilitation with a BA chair, domain experts, and user persona panels for feature ideation, UX design, and enhancement planning"
     }
   ]
 }
