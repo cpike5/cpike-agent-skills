@@ -48,6 +48,11 @@
       "name": "roundtable",
       "source": "./plugins/roundtable",
       "description": "Structured roundtable brainstorming facilitation with a BA chair, domain experts, and user persona panels for feature ideation, UX design, and enhancement planning"
+    },
+    {
+      "name": "dev-workflow",
+      "source": "./plugins/dev-workflow",
+      "description": "Development workflow commands for GitHub issue management, requirements gathering, orchestration, release management, and project instruction maintenance"
     }
   ]
 }

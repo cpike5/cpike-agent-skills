@@ -1,0 +1,50 @@
+#!/bin/bash
+# Remove a sub-issue relationship between two GitHub issues
+# Usage: gh-unlink -Parent NUMBER -Child NUMBER
+
+set -e
+
+PARENT=""
+CHILD=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -Parent|--parent|-p)
+            PARENT="$2"
+            shift 2
+            ;;
+        -Child|--child|-c)
+            CHILD="$2"
+            shift 2
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+
+if [ -z "$PARENT" ] || [ -z "$CHILD" ]; then
+    echo "Usage: gh-unlink -Parent NUMBER -Child NUMBER"
+    exit 1
+fi
+
+# Get issue IDs
+PARENT_ID=$(gh issue view "$PARENT" --json id --jq '.id')
+CHILD_ID=$(gh issue view "$CHILD" --json id --jq '.id')
+
+if [ -z "$PARENT_ID" ]; then
+    echo "Error: Failed to get parent issue #$PARENT"
+    exit 1
+fi
+
+if [ -z "$CHILD_ID" ]; then
+    echo "Error: Failed to get child issue #$CHILD"
+    exit 1
+fi
+
+# Remove the sub-issue relationship
+QUERY='mutation { removeSubIssue(input: {issueId: "'"$PARENT_ID"'", subIssueId: "'"$CHILD_ID"'"}) { issue { title } subIssue { title } } }'
+
+gh api graphql -H "GraphQL-Features: sub_issues" -f query="$QUERY" > /dev/null
+
+echo "Successfully unlinked issue #$CHILD from #$PARENT"

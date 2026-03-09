@@ -1,0 +1,47 @@
+#!/bin/bash
+# View a GitHub issue with its parent and sub-issues
+# Usage: gh-view -Issue NUMBER
+
+set -e
+
+# Parse arguments
+ISSUE=""
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -Issue|--issue|-i)
+            ISSUE="$2"
+            shift 2
+            ;;
+        *)
+            ISSUE="$1"
+            shift
+            ;;
+    esac
+done
+
+if [ -z "$ISSUE" ]; then
+    echo "Usage: gh-view -Issue NUMBER"
+    exit 1
+fi
+
+# Get owner and repo from current directory using gh's built-in --jq
+OWNER=$(gh repo view --json owner --jq '.owner.login' 2>/dev/null)
+REPO=$(gh repo view --json name --jq '.name' 2>/dev/null)
+
+if [ -z "$OWNER" ] || [ -z "$REPO" ]; then
+    echo "Error: Not in a git repository"
+    exit 1
+fi
+
+# Build and execute GraphQL query (single call)
+QUERY='query { repository(owner: "'"$OWNER"'", name: "'"$REPO"'") { issue(number: '"$ISSUE"') { number title state url parent { number title state } subIssues(first: 50) { nodes { number title state } } } } }'
+
+# Single API call, format output using gh's --jq
+echo ""
+gh api graphql -H "GraphQL-Features: sub_issues" -f query="$QUERY" --jq '
+  .data.repository.issue |
+  "Issue #\(.number): \(.title)\nState: \(.state)\nURL: \(.url)" +
+  (if .parent then "\n\nParent Issue:\n  #\(.parent.number): \(.parent.title) [\(.parent.state)]" else "" end) +
+  (if (.subIssues.nodes | length) > 0 then "\n\nSub-Issues:" + (.subIssues.nodes | map("\n  #\(.number): \(.title) [\(.state)]") | join("")) else "" end)
+'
+echo ""
