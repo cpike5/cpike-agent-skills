@@ -1,0 +1,5 @@
+{
+  "name": "dev-agents",
+  "description": "Specialized development agent definitions for .NET projects including code review, architecture, database, testing, UI, documentation, and implementation specialists",
+  "version": "1.0.0"
+}

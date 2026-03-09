@@ -53,6 +53,11 @@
       "name": "dev-workflow",
       "source": "./plugins/dev-workflow",
       "description": "Development workflow commands for GitHub issue management, requirements gathering, orchestration, release management, and project instruction maintenance"
+    },
+    {
+      "name": "dev-agents",
+      "source": "./plugins/dev-agents",
+      "description": "Specialized development agent definitions for .NET projects including code review, architecture, database, testing, UI, documentation, and implementation specialists"
     }
   ]
 }
