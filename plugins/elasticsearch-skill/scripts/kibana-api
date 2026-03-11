@@ -1,6 +1,7 @@
 #!/bin/bash
 # Kibana REST API wrapper.
-# Usage: kibana-api METHOD /api/path [body]
+# Usage: kibana-api [METHOD] /api/path [body]
+# If METHOD is omitted, infers GET (no body) or POST (with body).
 # Body can be a JSON string or "-" for stdin.
 # Automatically adds kbn-xsrf header for POST/PUT/DELETE.
 # When KIBANA_SPACE is set, inserts /s/<space> into the URL.
@@ -18,9 +19,31 @@ if [[ -z "${KIBANA_URL:-}" ]]; then
   exit 1
 fi
 
-METHOD="${1:?Usage: kibana-api METHOD /api/path [body]}"
-PATH_ARG="${2:?Usage: kibana-api METHOD /api/path [body]}"
-BODY="${3:-}"
+# Parse arguments: detect whether first arg is a method or a path
+ARG1="${1:?Usage: kibana-api [METHOD] /api/path [body]}"
+shift
+
+case "$ARG1" in
+  GET|POST|PUT|DELETE|PATCH|HEAD)
+    METHOD="$ARG1"
+    PATH_ARG="${1:?Usage: kibana-api METHOD /api/path [body]}"
+    shift
+    BODY="${1:-}"
+    ;;
+  /*)
+    PATH_ARG="$ARG1"
+    BODY="${1:-}"
+    if [[ -n "$BODY" ]]; then
+      METHOD="POST"
+    else
+      METHOD="GET"
+    fi
+    ;;
+  *)
+    echo "Error: first argument must be an HTTP method or a path starting with /" >&2
+    exit 1
+    ;;
+esac
 
 # Build space-aware URL
 if [[ -n "${KIBANA_SPACE:-}" ]]; then
@@ -52,4 +75,10 @@ if [[ -n "$BODY" ]]; then
   fi
 fi
 
-curl "${CURL_ARGS[@]}"
+OUTPUT=$(curl "${CURL_ARGS[@]}")
+
+if command -v jq &> /dev/null && [[ -t 1 ]]; then
+  echo "$OUTPUT" | jq .
+else
+  echo "$OUTPUT"
+fi

@@ -40,25 +40,45 @@ Before using the API scripts, walk the user through this setup:
 
 > **Important:** The `.env` file contains credentials and is git-ignored. Never commit it.
 
+> **Tip:** Define a short alias at the start of your session to avoid repeating the full path:
+> ```bash
+> ES="${CLAUDE_PLUGIN_ROOT}/scripts"
+> ```
+> Then use `$ES/es-api`, `$ES/kibana-api`, etc.
+
 | Script | Usage | Notes |
 |--------|-------|-------|
-| `es-api` | `${CLAUDE_PLUGIN_ROOT}/scripts/es-api METHOD /path [body]` | Adds `Authorization: ApiKey` + `Content-Type: application/json` |
-| `kibana-api` | `${CLAUDE_PLUGIN_ROOT}/scripts/kibana-api METHOD /api/path [body]` | Same as es-api + `kbn-xsrf: true` for POST/PUT/DELETE. Space-aware when `KIBANA_SPACE` is set |
-| `es-check-env` | `${CLAUDE_PLUGIN_ROOT}/scripts/es-check-env` | Validates `.env` exists and required vars are set |
+| `es-api` | `$ES/es-api [METHOD] /path [body]` | Adds `Authorization: ApiKey` + `Content-Type: application/json`. METHOD is optional — infers GET (no body) or POST (with body) |
+| `kibana-api` | `$ES/kibana-api [METHOD] /api/path [body]` | Same as es-api + `kbn-xsrf: true` for POST/PUT/DELETE. Space-aware when `KIBANA_SPACE` is set |
+| `es-indices` | `$ES/es-indices [filter]` | Lists indices (`_cat/indices`). Optional filter greps by name |
+| `es-datastreams` | `$ES/es-datastreams [filter]` | Lists data streams. Optional filter greps by name |
+| `es-check-env` | `$ES/es-check-env` | Validates `.env` exists and required vars are set |
 
 **Examples:**
 ```bash
-# Check cluster health
-${CLAUDE_PLUGIN_ROOT}/scripts/es-api GET /_cat/health
+ES="${CLAUDE_PLUGIN_ROOT}/scripts"
 
-# Search an index
-${CLAUDE_PLUGIN_ROOT}/scripts/es-api POST /my-index/_search '{"query":{"match_all":{}}}'
+# Check cluster health (method inferred as GET)
+$ES/es-api /_cat/health
+
+# Search an index (method inferred as POST because body is provided)
+$ES/es-api /my-index/_search '{"query":{"match_all":{}}}'
+
+# Explicit method still works
+$ES/es-api GET /_cat/health
 
 # Kibana saved objects (kbn-xsrf added automatically)
-${CLAUDE_PLUGIN_ROOT}/scripts/kibana-api POST /api/saved_objects/_find '{"type":"dashboard"}'
+$ES/kibana-api /api/saved_objects/_find '{"type":"dashboard"}'
+
+# List all indices, or filter by name
+$ES/es-indices
+$ES/es-indices logs
+
+# List data streams
+$ES/es-datastreams
 
 # Pipe body from stdin
-echo '{"query":{"match":{"message":"error"}}}' | ${CLAUDE_PLUGIN_ROOT}/scripts/es-api POST /logs/_search -
+echo '{"query":{"match":{"message":"error"}}}' | $ES/es-api POST /logs/_search -
 ```
 
 ## Reference Documentation
