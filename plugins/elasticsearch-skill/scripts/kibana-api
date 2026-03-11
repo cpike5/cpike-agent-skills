@@ -1,0 +1,55 @@
+#!/bin/bash
+# Kibana REST API wrapper.
+# Usage: kibana-api METHOD /api/path [body]
+# Body can be a JSON string or "-" for stdin.
+# Automatically adds kbn-xsrf header for POST/PUT/DELETE.
+# When KIBANA_SPACE is set, inserts /s/<space> into the URL.
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PLUGIN_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Validate environment
+source "$SCRIPT_DIR/es-check-env" > /dev/null
+
+if [[ -z "${KIBANA_URL:-}" ]]; then
+  echo "Error: KIBANA_URL is not set in $PLUGIN_ROOT/.env" >&2
+  exit 1
+fi
+
+METHOD="${1:?Usage: kibana-api METHOD /api/path [body]}"
+PATH_ARG="${2:?Usage: kibana-api METHOD /api/path [body]}"
+BODY="${3:-}"
+
+# Build space-aware URL
+if [[ -n "${KIBANA_SPACE:-}" ]]; then
+  URL="${KIBANA_URL}/s/${KIBANA_SPACE}${PATH_ARG}"
+else
+  URL="${KIBANA_URL}${PATH_ARG}"
+fi
+
+CURL_ARGS=(
+  -s
+  -X "$METHOD"
+  -H "Authorization: ApiKey $ES_API_KEY"
+  -H "Content-Type: application/json"
+  "$URL"
+)
+
+# Add kbn-xsrf header for mutating methods
+case "$METHOD" in
+  POST|PUT|DELETE|PATCH)
+    CURL_ARGS+=(-H "kbn-xsrf: true")
+    ;;
+esac
+
+if [[ -n "$BODY" ]]; then
+  if [[ "$BODY" == "-" ]]; then
+    CURL_ARGS+=(-d @-)
+  else
+    CURL_ARGS+=(-d "$BODY")
+  fi
+fi
+
+curl "${CURL_ARGS[@]}"
