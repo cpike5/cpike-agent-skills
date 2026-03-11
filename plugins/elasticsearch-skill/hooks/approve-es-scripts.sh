@@ -2,8 +2,8 @@
 
 input=$(cat)
 
-# Auto-approve calls to es-api and kibana-api wrapper scripts
-if [[ "$input" == *"/scripts/es-api"* ]] || [[ "$input" == *"/scripts/kibana-api"* ]]; then
+# Auto-approve calls to es-* and kibana-* wrapper scripts
+if [[ "$input" == *"/scripts/es-"* ]] || [[ "$input" == *"/scripts/kibana-"* ]]; then
   echo '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":"ES/Kibana API script auto-approved by plugin"}}'
 fi
 

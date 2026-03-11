@@ -1,0 +1,24 @@
+#!/bin/bash
+# List Elasticsearch data streams with optional grep filter.
+# Usage: es-datastreams [filter]
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+FILTER="${1:-}"
+
+OUTPUT=$("$SCRIPT_DIR/es-api" GET /_data_stream)
+
+if [[ -n "$FILTER" ]]; then
+  if command -v jq &> /dev/null; then
+    echo "$OUTPUT" | jq --arg f "$FILTER" '.data_streams | map(select(.name | test($f; "i")))'
+  else
+    echo "$OUTPUT" | grep -i "$FILTER" || true
+  fi
+else
+  if command -v jq &> /dev/null; then
+    echo "$OUTPUT" | jq '.data_streams[].name'
+  else
+    echo "$OUTPUT"
+  fi
+fi
