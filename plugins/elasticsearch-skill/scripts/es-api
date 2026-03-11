@@ -1,0 +1,34 @@
+#!/bin/bash
+# Elasticsearch REST API wrapper.
+# Usage: es-api METHOD /path [body]
+# Body can be a JSON string or "-" for stdin.
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PLUGIN_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Validate environment
+source "$SCRIPT_DIR/es-check-env" > /dev/null
+
+METHOD="${1:?Usage: es-api METHOD /path [body]}"
+PATH_ARG="${2:?Usage: es-api METHOD /path [body]}"
+BODY="${3:-}"
+
+CURL_ARGS=(
+  -s
+  -X "$METHOD"
+  -H "Authorization: ApiKey $ES_API_KEY"
+  -H "Content-Type: application/json"
+  "${ES_URL}${PATH_ARG}"
+)
+
+if [[ -n "$BODY" ]]; then
+  if [[ "$BODY" == "-" ]]; then
+    CURL_ARGS+=(-d @-)
+  else
+    CURL_ARGS+=(-d "$BODY")
+  fi
+fi
+
+curl "${CURL_ARGS[@]}"

@@ -1,3 +1,4 @@
 samples/
 temp/
 *.tmp
+.env

@@ -22,6 +22,31 @@ You are working with Elasticsearch 8.x and Kibana 8.x. Read the relevant referen
 | Create Kibana dashboard via API | Saved Objects API with NDJSON import |
 | Manage log retention | ILM policy on data streams |
 
+## API Scripts
+
+Wrapper scripts that handle auth headers, content-type, and base URLs. Requires a `.env` file at the plugin root (copy `.env.example`).
+
+| Script | Usage | Notes |
+|--------|-------|-------|
+| `es-api` | `${CLAUDE_PLUGIN_ROOT}/scripts/es-api METHOD /path [body]` | Adds `Authorization: ApiKey` + `Content-Type: application/json` |
+| `kibana-api` | `${CLAUDE_PLUGIN_ROOT}/scripts/kibana-api METHOD /api/path [body]` | Same as es-api + `kbn-xsrf: true` for POST/PUT/DELETE. Space-aware when `KIBANA_SPACE` is set |
+| `es-check-env` | `${CLAUDE_PLUGIN_ROOT}/scripts/es-check-env` | Validates `.env` exists and required vars are set |
+
+**Examples:**
+```bash
+# Check cluster health
+${CLAUDE_PLUGIN_ROOT}/scripts/es-api GET /_cat/health
+
+# Search an index
+${CLAUDE_PLUGIN_ROOT}/scripts/es-api POST /my-index/_search '{"query":{"match_all":{}}}'
+
+# Kibana saved objects (kbn-xsrf added automatically)
+${CLAUDE_PLUGIN_ROOT}/scripts/kibana-api POST /api/saved_objects/_find '{"type":"dashboard"}'
+
+# Pipe body from stdin
+echo '{"query":{"match":{"message":"error"}}}' | ${CLAUDE_PLUGIN_ROOT}/scripts/es-api POST /logs/_search -
+```
+
 ## Reference Documentation
 
 ### Always Read First
