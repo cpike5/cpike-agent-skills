@@ -29,7 +29,7 @@ description: |
   Fixing compile errors is a quick, targeted task.
   </commentary>
   </example>
-model: sonnet
+model: haiku
 color: cyan
 ---
 

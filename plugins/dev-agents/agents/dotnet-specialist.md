@@ -29,7 +29,7 @@ description: |
   Complex Blazor component development is within scope.
   </commentary>
   </example>
-model: opus
+model: sonnet
 color: red
 ---
 
