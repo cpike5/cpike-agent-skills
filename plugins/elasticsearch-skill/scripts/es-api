@@ -39,7 +39,9 @@ case "$ARG1" in
 esac
 
 CURL_ARGS=(
-  -s
+  -sS
+  --connect-timeout "${ES_CONNECT_TIMEOUT:-10}"
+  --max-time "${ES_MAX_TIME:-120}"
   -X "$METHOD"
   -H "Authorization: ApiKey $ES_API_KEY"
   -H "Content-Type: application/json"
