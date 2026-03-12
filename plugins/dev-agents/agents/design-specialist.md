@@ -1,34 +1,6 @@
 ---
 name: design-specialist
-description: |
-  Use this agent when establishing design systems, creating style guides, defining design tokens, or auditing accessibility. Examples:
-
-  <example>
-  Context: Project needs a design system
-  user: "Create a design system with color palette and typography scale"
-  assistant: "I'll use the design-specialist to establish a comprehensive design system with tokens and documentation."
-  <commentary>
-  Creating design systems is this agent's primary purpose.
-  </commentary>
-  </example>
-
-  <example>
-  Context: Existing designs need consistency audit
-  user: "Audit our components for design consistency"
-  assistant: "I'll use the design-specialist to review components against the established design tokens."
-  <commentary>
-  Design consistency auditing is a core capability.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User needs accessible color choices
-  user: "Check our color palette for WCAG compliance"
-  assistant: "I'll use the design-specialist to audit the palette for contrast ratios and accessibility."
-  <commentary>
-  Accessibility auditing is within scope.
-  </commentary>
-  </example>
+description: Use this agent when establishing design systems, creating style guides, defining design tokens, or auditing accessibility. For building UI prototypes, use html-prototyper instead.
 tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, Edit, Write, NotebookEdit
 model: sonnet
 color: yellow

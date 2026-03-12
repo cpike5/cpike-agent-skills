@@ -1,32 +1,14 @@
 ---
 name: dotnet-specialist
 description: |
-  Use this agent when implementing .NET features, building service layers, creating Blazor components, or writing backend code spanning multiple files. Examples:
+  Use this agent when implementing .NET features, building service layers, creating Blazor components, or writing backend code spanning multiple files. For single-file fixes, use dotnet-fixer instead.
 
   <example>
   Context: User needs a new feature implemented
   user: "Implement the order management CRUD operations"
   assistant: "I'll use the dotnet-specialist to build the service layer, repository, and Blazor components for order management."
   <commentary>
-  Multi-file .NET implementation requiring services, DTOs, and UI components.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User needs backend API work
-  user: "Add an API endpoint for exporting reports"
-  assistant: "I'll use the dotnet-specialist to implement the API endpoint with proper service layer integration."
-  <commentary>
-  Backend implementation with service layer is this agent's core capability.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User needs a Blazor component built
-  user: "Create a reusable data grid component with sorting and filtering"
-  assistant: "I'll use the dotnet-specialist to build the Blazor component with proper parameter design and state management."
-  <commentary>
-  Complex Blazor component development is within scope.
+  Multi-file .NET implementation requiring services, DTOs, and UI components — too broad for dotnet-fixer.
   </commentary>
   </example>
 model: sonnet

@@ -1,34 +1,6 @@
 ---
 name: database-specialist
-description: |
-  Use this agent when designing database schemas, optimizing queries, creating migrations, or troubleshooting EF Core performance. Examples:
-
-  <example>
-  Context: New feature needs database design
-  user: "Design the schema for the notification system"
-  assistant: "I'll use the database-specialist to design the entity relationships and EF Core configuration."
-  <commentary>
-  Schema design with EF Core configuration is this agent's primary purpose.
-  </commentary>
-  </example>
-
-  <example>
-  Context: Performance issue with database queries
-  user: "The orders page is loading slowly, I think it's an N+1 problem"
-  assistant: "I'll use the database-specialist to diagnose and optimize the query performance."
-  <commentary>
-  N+1 detection and query optimization is a core capability.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User needs a new migration
-  user: "Add a CreatedAt column to the Orders table"
-  assistant: "I'll use the database-specialist to create the migration with proper UTC default."
-  <commentary>
-  Migration creation with correct conventions is within scope.
-  </commentary>
-  </example>
+description: Use this agent when designing database schemas, optimizing queries, creating migrations, or troubleshooting EF Core performance.
 tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, Edit, Write
 model: sonnet
 color: teal

@@ -1,32 +1,14 @@
 ---
 name: dotnet-fixer
 description: |
-  Use this agent for quick, small-scope fixes in .NET projects — typos, config tweaks, single-file bug fixes. Examples:
+  Use this agent for quick, small-scope fixes in .NET projects — typos, config tweaks, single-file bug fixes. For multi-file features, use dotnet-specialist instead.
 
   <example>
   Context: User found a small bug in a single method
   user: "Fix the null reference in OrderService.GetById"
-  assistant: "I'll use the dotnet-fixer for this targeted bug fix."
+  assistant: "I'll use the dotnet-fixer for this targeted single-file bug fix."
   <commentary>
-  Single-method bug fix is a small-scope task ideal for the fixer.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User needs a configuration change
-  user: "Change the default page size from 10 to 25"
-  assistant: "I'll use the dotnet-fixer to update the configuration value."
-  <commentary>
-  Simple config change - single-file modification.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User has a compile error
-  user: "Fix the build error in UserDto.cs"
-  assistant: "I'll use the dotnet-fixer to resolve the compile error."
-  <commentary>
-  Fixing compile errors is a quick, targeted task.
+  Single-method bug fix is a small-scope task ideal for the fixer, not the specialist.
   </commentary>
   </example>
 model: haiku

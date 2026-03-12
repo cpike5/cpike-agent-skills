@@ -1,34 +1,6 @@
 ---
 name: html-prototyper
-description: |
-  Use this agent when creating HTML/CSS/JS prototypes, building interactive UI mockups, or designing page layouts. Examples:
-
-  <example>
-  Context: User needs a visual prototype for a feature
-  user: "Create a prototype for the settings page"
-  assistant: "I'll use the html-prototyper to build an interactive HTML prototype for the settings page."
-  <commentary>
-  Creating UI prototypes is this agent's primary purpose.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User wants to explore a dashboard layout
-  user: "Build me a dashboard with charts showing order metrics"
-  assistant: "I'll use the html-prototyper to create a working dashboard prototype with Chart.js visualizations."
-  <commentary>
-  Dashboard prototyping with interactive elements is a core capability.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User needs a form layout designed
-  user: "Prototype the user registration form with validation"
-  assistant: "I'll use the html-prototyper to create a form prototype with client-side validation."
-  <commentary>
-  Form design with interactive validation is within scope.
-  </commentary>
-  </example>
+description: Use this agent when creating HTML/CSS/JS prototypes, building interactive UI mockups, or designing page layouts.
 tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, Edit, Write, NotebookEdit
 model: opus
 color: purple

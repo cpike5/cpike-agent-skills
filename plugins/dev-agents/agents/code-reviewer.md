@@ -1,34 +1,6 @@
 ---
 name: code-reviewer
-description: |
-  Use this agent when reviewing pull requests, evaluating code quality, or identifying code smells and technical debt. Examples:
-
-  <example>
-  Context: User has a PR open and wants feedback
-  user: "Review this pull request"
-  assistant: "I'll use the code-reviewer to evaluate the PR for code quality, patterns, and potential issues."
-  <commentary>
-  Explicit request for code review - core use case.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User just finished implementing a feature
-  user: "Check my changes for any issues before I push"
-  assistant: "I'll use the code-reviewer to review your staged changes for bugs, code smells, and adherence to project conventions."
-  <commentary>
-  Pre-commit review is a code review task.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User suspects quality issues in a module
-  user: "This service feels messy, can you review it?"
-  assistant: "I'll use the code-reviewer to evaluate the service for SOLID violations, code smells, and improvement opportunities."
-  <commentary>
-  Code quality evaluation and technical debt identification.
-  </commentary>
-  </example>
+description: Use this agent when reviewing pull requests, evaluating code quality, or identifying code smells and technical debt.
 tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell
 model: sonnet
 color: magenta

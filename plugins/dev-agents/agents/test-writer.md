@@ -1,34 +1,6 @@
 ---
 name: test-writer
-description: |
-  Use this agent when writing unit tests, integration tests, or test infrastructure for .NET applications. Examples:
-
-  <example>
-  Context: New service was implemented and needs tests
-  user: "Write tests for the OrderService"
-  assistant: "I'll use the test-writer to create comprehensive unit tests for OrderService."
-  <commentary>
-  Writing tests for a service is this agent's primary purpose.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User wants to improve test coverage
-  user: "Add integration tests for the orders API endpoints"
-  assistant: "I'll use the test-writer to create integration tests using WebApplicationFactory."
-  <commentary>
-  Integration test creation is a core capability.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User needs test infrastructure set up
-  user: "Create a test data builder for the Order entity"
-  assistant: "I'll use the test-writer to build a fluent test data builder for Order."
-  <commentary>
-  Test infrastructure and data builders are within scope.
-  </commentary>
-  </example>
+description: Use this agent when writing unit tests, integration tests, or test infrastructure for .NET applications.
 model: sonnet
 color: orange
 ---
