@@ -1,34 +1,6 @@
 ---
 name: git-project-manager
-description: |
-  Use this agent when converting implementation plans into GitHub issues, managing GitHub Projects, or organizing development workflows. Examples:
-
-  <example>
-  Context: An implementation plan has been created and needs to be tracked
-  user: "Create GitHub issues from this implementation plan"
-  assistant: "I'll use the git-project-manager to convert the plan into structured GitHub issues with proper hierarchy and labels."
-  <commentary>
-  Converting plans to issues is this agent's primary purpose.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User needs to organize their GitHub project
-  user: "Set up labels and milestones for the next sprint"
-  assistant: "I'll use the git-project-manager to create appropriate labels and milestones."
-  <commentary>
-  GitHub project organization is within this agent's scope.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User wants to track a spec as issues
-  user: "Break this spec down into trackable issues with dependencies"
-  assistant: "I'll use the git-project-manager to create a hierarchy of issues with proper parent-child relationships."
-  <commentary>
-  Structuring work into issue hierarchies with dependencies is a core capability.
-  </commentary>
-  </example>
+description: Use this agent when converting implementation plans into GitHub issues, managing GitHub Projects, or organizing development workflows.
 tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, Edit, Write, Bash
 model: sonnet
 color: green

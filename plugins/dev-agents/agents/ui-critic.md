@@ -1,32 +1,14 @@
 ---
 name: ui-critic
 description: |
-  Use this agent when reviewing UI screenshots, evaluating designs against style guides, or auditing visual consistency. Examples:
+  Use this agent when reviewing UI screenshots, evaluating designs against style guides, or auditing visual consistency. For creating design systems, use design-specialist instead.
 
   <example>
   Context: User has a screenshot of an implemented page
   user: "Review this screenshot of the new dashboard"
   assistant: "I'll use the ui-critic to evaluate the dashboard against the design system."
   <commentary>
-  Visual review of implemented UI is this agent's primary purpose.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User wants to check prototype quality
-  user: "Does this prototype follow our design tokens?"
-  assistant: "I'll use the ui-critic to audit the prototype against documented design tokens."
-  <commentary>
-  Design system compliance checking is a core capability.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User wants consistency feedback across pages
-  user: "Compare the styling of these two pages for consistency"
-  assistant: "I'll use the ui-critic to identify visual inconsistencies between the pages."
-  <commentary>
-  Cross-page consistency auditing is within scope.
+  Visual review of existing UI — critic evaluates, design-specialist creates.
   </commentary>
   </example>
 tools: Glob, Grep, Read, WebFetch, TodoWrite

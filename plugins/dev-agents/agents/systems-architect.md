@@ -1,32 +1,14 @@
 ---
 name: systems-architect
 description: |
-  Use this agent when planning feature implementations, coordinating multiple agents, or designing architectural approaches. Examples:
+  Use this agent when planning feature implementations, coordinating multiple agents, or designing architectural approaches. Produces plans, not code. For converting plans into GitHub issues, use git-project-manager instead.
 
   <example>
   Context: User wants to add a new feature to their .NET application
   user: "I need to add user notifications to the app"
   assistant: "I'll use the systems-architect to create an implementation plan for user notifications, identifying which agents and files are involved."
   <commentary>
-  New feature requiring coordination across layers (UI, services, database) - architect designs the plan, then implementation agents execute.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User has a complex requirement spanning multiple components
-  user: "Plan out how we'd implement multi-tenant support"
-  assistant: "I'll use the systems-architect to analyze the codebase and design a multi-tenancy implementation plan."
-  <commentary>
-  Architectural decision requiring analysis of existing patterns and coordination of multiple specialists.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User wants to understand what work is needed for a change
-  user: "What would it take to add a reporting dashboard?"
-  assistant: "I'll use the systems-architect to assess the scope and create a detailed implementation plan."
-  <commentary>
-  Scoping and planning exercise - architect produces the plan, not code.
+  New feature requiring coordination across layers — architect designs the plan, then implementation agents execute.
   </commentary>
   </example>
 model: opus

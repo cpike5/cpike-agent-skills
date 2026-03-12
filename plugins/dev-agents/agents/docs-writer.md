@@ -1,34 +1,6 @@
 ---
 name: docs-writer
-description: |
-  Use this agent when creating or updating technical documentation, specifications, or API docs. Examples:
-
-  <example>
-  Context: A new feature was implemented and needs documentation
-  user: "Write documentation for the new notification system"
-  assistant: "I'll use the docs-writer to create technical documentation for the notification system."
-  <commentary>
-  Creating feature documentation is this agent's primary purpose.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User needs a specification before implementation
-  user: "Write a spec for the reporting module"
-  assistant: "I'll use the docs-writer to create a detailed specification document."
-  <commentary>
-  Writing specifications with acceptance criteria is a core capability.
-  </commentary>
-  </example>
-
-  <example>
-  Context: Existing documentation is outdated
-  user: "Update the API docs to reflect the new endpoints"
-  assistant: "I'll use the docs-writer to update the API documentation."
-  <commentary>
-  Maintaining existing documentation is within scope.
-  </commentary>
-  </example>
+description: Use this agent when creating or updating technical documentation, specifications, or API docs.
 tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, Edit, Write, NotebookEdit
 model: sonnet
 color: blue
