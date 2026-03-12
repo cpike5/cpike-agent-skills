@@ -7,7 +7,7 @@
 - **Naming convention**: `<type>-<dataset>-<namespace>` — e.g., `logs-myapp-production`
 - **Backing index pattern**: `.ds-<name>-<generation>-<date>` — e.g., `.ds-logs-myapp-production-2024.01.15-000001`
 - **Write index**: Always the most recent backing index; receives all new documents
-- Documents **cannot be updated or deleted** in place — use `_delete_by_query` or `_update_by_query` with `op_type=index`
+- Documents **cannot be updated or deleted** in place — use `_update_by_query` or `_delete_by_query` for corrections
 
 ### Creating a Data Stream (Step-by-Step)
 
@@ -223,7 +223,7 @@ POST _ilm/move/logs-myapp-production
 - **Using plain indices instead of data streams for logs** — Plain indices require manual rollover management. Data streams handle this automatically.
 - **Forgetting `@timestamp` field** — Data streams **require** `@timestamp`. Documents without it are rejected.
 - **Not attaching ILM policy to index template** — The policy must be set in `index.lifecycle.name` in the template settings. Creating the policy alone does nothing.
-- **Expecting update/delete to work on data streams** — Data streams are **append-only**. Use `_delete_by_query` or `_update_by_query` with `op_type=index` for corrections.
+- **Expecting update/delete to work on data streams** — Data streams are **append-only**. Use `_update_by_query` or `_delete_by_query` for corrections.
 - **Assuming rollover conditions are AND'd** — Trigger conditions (`max_age`, `max_primary_shard_size`, `max_docs`) are **OR'd**. Any single trigger fires rollover. Only `min_*` conditions act as floors.
 - **Setting `min_age` relative to "now"** — `min_age` in each phase is relative to **rollover time** (or index creation if no rollover), not the current time.
 - **Forgetting `"data_stream": {}`** — The index template must include this empty object to enable data stream behavior. Without it, a regular index is created.

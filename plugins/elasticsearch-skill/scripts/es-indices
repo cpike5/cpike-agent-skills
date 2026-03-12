@@ -12,7 +12,7 @@ OUTPUT=$("$SCRIPT_DIR/es-api" GET /_cat/indices?v)
 if [[ -n "$FILTER" ]]; then
   # Keep header line, then grep the rest
   echo "$OUTPUT" | head -1
-  echo "$OUTPUT" | tail -n +2 | grep -i "$FILTER" || true
+  echo "$OUTPUT" | tail -n +2 | grep -i -- "$FILTER" || true
 else
   echo "$OUTPUT"
 fi

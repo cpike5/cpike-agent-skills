@@ -13,7 +13,7 @@ if [[ -n "$FILTER" ]]; then
   if command -v jq &> /dev/null; then
     echo "$OUTPUT" | jq --arg f "$FILTER" '.data_streams | map(select(.name | test($f; "i")))'
   else
-    echo "$OUTPUT" | grep -i "$FILTER" || true
+    echo "$OUTPUT" | grep -i -- "$FILTER" || true
   fi
 else
   if command -v jq &> /dev/null; then
