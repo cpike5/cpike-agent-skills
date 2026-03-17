@@ -1,6 +1,6 @@
-# Design Languages
+# Design Language Examples
 
-Select **one** design language before writing any markup. Each system below includes a complete CSS variable foundation and key structural patterns.
+The following are **example** aesthetic systems with complete CSS variable foundations and structural patterns. Use these as starting points or inspiration — you are not limited to these five. The best designs commit to a specific aesthetic direction and execute it with precision, whether it matches one of these or charts its own course.
 
 ---
 

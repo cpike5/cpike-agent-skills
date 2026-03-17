@@ -2,6 +2,20 @@
 
 ---
 
+## Banned by Default
+
+These patterns are **banned unless the user explicitly requests them**:
+
+- Gradient backgrounds, gradient text, gradient buttons, gradient anything
+- Hero sections with centered heading + subheading + CTA button
+- Card grids as the primary layout pattern
+- Glassmorphism / frosted blur panels
+- Purple, indigo, or teal as primary brand colors
+- Rounded-everything (border-radius on every element)
+- The "dark dashboard with glowing accent" pattern
+
+---
+
 ## The "Never" List (Slop Signals)
 
 These patterns immediately identify output as generic AI-generated:
@@ -25,6 +39,7 @@ These patterns immediately identify output as generic AI-generated:
 - **NO** purple-to-blue gradients (`#6366f1` → `#3b82f6`)
 - **NO** "Brand Blue" `#007bff` as the accent color
 - **NO** pure `#000` on pure `#fff` without color temperature consideration
+- **NO** gradient backgrounds, gradient text, gradient buttons as a default polish move
 
 ### Interaction Slop
 - **NO** `transition: all 0.3s ease` — specify properties, tune duration, use custom easing
@@ -35,6 +50,20 @@ These patterns immediately identify output as generic AI-generated:
 - **NO** "Lorem ipsum" placeholder text — write context-appropriate copy
 - **NO** "Click here" or "Learn more" as the only button labels
 - **NO** stock photo placeholder URLs — use real or descriptive alt text
+
+---
+
+## Forced Variation Triggers
+
+When starting a design, pick one that fits and commit hard:
+
+- *Typographic-led*: The layout IS the typography. No decorative UI chrome. Text size contrast does all the visual work.
+- *Editorial/print*: Newspaper columns, ruled lines, masthead-style headers, ink-black on newsprint or vice versa.
+- *Utilitarian/brutalist*: No border-radius, visible structure, functional colors only, borders instead of shadows.
+- *Monochrome + one*: Strictly black/white/grey plus exactly one non-neutral color used sparingly.
+- *Dense/data-rich*: Small type, tight spacing, information density as an aesthetic choice.
+- *Handcrafted*: Organic shapes, rough edges, imperfect geometry, texture-forward.
+- *Period-specific*: Commit to a real design era (90s web, 70s print, Bauhaus, Swiss International) with accuracy.
 
 ---
 
@@ -135,7 +164,7 @@ Use `<main>`, `<section>`, `<article>`, `<aside>`, `<header>`, `<nav>`, `<footer
 
 ### Step 4: The "Vibe" Layer
 
-Apply the core aesthetic from the chosen design language:
+Apply the core aesthetic from the chosen direction:
 - Font assignments (display, body, mono)
 - Color application (backgrounds, text colors, borders)
 - Spacing (section padding, component gaps)
@@ -143,7 +172,7 @@ Apply the core aesthetic from the chosen design language:
 ### Step 5: Refinement (The "Unexpected" Layer)
 
 Add the details that separate professional from generic:
-- Noise/grain textures (if appropriate to the design language)
+- Noise/grain textures (if appropriate to the aesthetic)
 - Staggered entrance animations
 - One intentional overlap or asymmetric element
 - Custom hover/focus states
@@ -151,22 +180,16 @@ Add the details that separate professional from generic:
 
 ---
 
-## Self-Review Checklist
+## Pre-Finalization Litmus Test
 
-Before delivering, verify:
+Answer each honestly before considering the design done:
 
-| Check | Question |
-|-------|----------|
-| Design language | Can you name the specific aesthetic system in use? |
-| Typography | Are there at least 2 imported fonts (display + body)? |
-| Type scale | Are headings using `clamp()` for fluid sizing? |
-| Color | Does the palette avoid the "generic" colors listed above? |
-| Layout | Is there at least one asymmetric or overlapping element? |
-| Shadows | Are shadows layered (multiple values) or intentionally hard? |
-| Motion | Is there custom easing (not `ease-in-out`)? |
-| Motion a11y | Is `prefers-reduced-motion` handled? |
-| Spacing | Are values from a consistent scale (not arbitrary numbers)? |
-| Content | Is all copy context-appropriate (no Lorem ipsum)? |
-| Semantic HTML | Are `<main>`, `<section>`, `<nav>`, etc. used correctly? |
-| CSS variables | Is the `:root` block established before component styles? |
-| Radius | Is `border-radius` intentional per design language, not uniform? |
+1. **The swap test** — Could you swap the color scheme and fonts for a different project's and have it still look fine? If yes, the design isn't specific enough to this context.
+2. **The screenshot test** — If someone posted a screenshot on Twitter/X, would anyone comment on the design itself — for any reason? If the answer is "probably not," it's too forgettable.
+3. **The gradient audit** — Count the gradients. If the answer is more than zero and they weren't explicitly chosen for a reason you can articulate, remove them.
+4. **The font gut-check** — Say the font name out loud. Is it one of the first five fonts you'd think of? If yes, go find something else.
+5. **The layout test** — Cover all the content and look at just the layout skeleton. Does it have any structural personality, or is it just stacked rectangles?
+6. **The "what era / what world" test** — Could you describe in one sentence what design world this belongs to? (e.g. "1970s technical manual", "brutalist Eastern European poster", "dense Bloomberg terminal"). If you can't, it doesn't have a clear enough point of view.
+7. **The detail pass** — Zoom into one small area. Is there anything there that shows craft — a subtle rule, a considered spacing choice, an unexpected typographic detail? Or is it just filler?
+
+**If you fail more than two:** Restart with a different aesthetic direction, not a revision of the current one. Iteration on a bad direction produces a polished bad direction.
