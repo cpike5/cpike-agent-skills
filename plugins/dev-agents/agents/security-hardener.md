@@ -47,6 +47,7 @@ Key requirements:
 ## Scope Boundaries
 
 **Do NOT use this agent for:**
+- Application auth/RBAC/session/MFA review → use the **security-reviewer**
 - Blazor-specific security (CSRF, XSS, CSP, 2FA, OAuth) → use the **blazor skill**
 - CI/CD pipeline creation and deployment workflows → use the **devops-specialist**
 - Logging and observability setup → use the **observability skill**
