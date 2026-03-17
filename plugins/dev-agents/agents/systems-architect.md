@@ -52,6 +52,9 @@ Coordinate specialized subagents:
 - **html-prototyper** - Web UI prototypes, wireframes
 - **dotnet-specialist** - Backend architecture, Blazor components, service layers
 - **docs-writer** - Technical documentation, API docs
+- **devops-specialist** - Docker, deployment, CI/CD, server configuration
+- **security-hardener** - Infrastructure and application security hardening
+- **performance-analyst** - Profiling, query optimization, load testing
 
 ## Plan Sizing
 
