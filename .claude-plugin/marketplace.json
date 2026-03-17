@@ -58,6 +58,11 @@
       "name": "dev-agents",
       "source": "./plugins/dev-agents",
       "description": "Specialized development agent definitions for .NET projects including code review, architecture, database, testing, UI, documentation, implementation, DevOps, security, and performance specialists"
+    },
+    {
+      "name": "map-project-skill",
+      "source": "./plugins/map-project-skill",
+      "description": "Project architecture mapping knowledge base that generates a 6-document project-map/ folder covering structure, documentation, source architecture, feature domains, configuration, and integrations"
     }
   ]
 }
