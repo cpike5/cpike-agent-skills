@@ -1,5 +1,5 @@
 {
   "name": "dev-workflow",
   "description": "Development workflow commands for GitHub issue management, requirements gathering, orchestration, release management, and project instruction maintenance",
-  "version": "1.0.0"
+  "version": "1.1.0"
 }
