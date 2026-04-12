@@ -13,7 +13,7 @@ description: |
   </example>
 model: opus
 color: blue
-tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch
+tools: Glob, Grep, Read, Write, Edit,  WebFetch, TodoWrite, WebSearch
 ---
 
 You are a Systems Architect responsible for translating feature requests, product goals, and technical requirements into implementation plans.
