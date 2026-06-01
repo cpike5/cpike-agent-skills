@@ -58,6 +58,12 @@ Structured roundtable brainstorming facilitation with a BA chair, domain experts
 
 **4 docs** — facilitation framework, expert panel design, user persona panels, session management.
 
+### obsidian-skill (v1.0.0)
+
+Obsidian vault knowledge base for reading, creating, editing, and maintaining Markdown notes safely — frontmatter/properties, wikilinks, embeds, block references, callouts, tags, Dataview, Templater, link integrity, and surgical editing that doesn't break Obsidian-specific syntax.
+
+**1 doc** — syntax & tooling reference (frontmatter, links/embeds/block refs, callouts, tags, formatting extras, Dataview, Templater, git/`.obsidian/`, editing pitfalls).
+
 ## Repository Structure
 
 ```
@@ -73,6 +79,7 @@ cpike-agent-skills/
 │   ├── huemint-skill/
 │   ├── mermaid-skill/
 │   ├── observability-skill/
+│   ├── obsidian-skill/
 │   └── roundtable/
 └── CLAUDE.md
 ```

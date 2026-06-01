@@ -63,6 +63,11 @@
       "name": "map-project-skill",
       "source": "./plugins/map-project-skill",
       "description": "Project architecture mapping knowledge base that generates a 6-document project-map/ folder covering structure, documentation, source architecture, feature domains, configuration, and integrations"
+    },
+    {
+      "name": "obsidian-skill",
+      "source": "./plugins/obsidian-skill",
+      "description": "Obsidian vault knowledge base for reading, creating, editing, and maintaining Markdown notes — frontmatter/properties, wikilinks, embeds, block references, callouts, tags, Dataview, Templater, link integrity, and safe surgical editing"
     }
   ]
 }
