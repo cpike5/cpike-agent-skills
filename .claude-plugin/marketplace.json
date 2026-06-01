@@ -68,6 +68,11 @@
       "name": "obsidian-skill",
       "source": "./plugins/obsidian-skill",
       "description": "Obsidian vault knowledge base for reading, creating, editing, and maintaining Markdown notes — frontmatter/properties, wikilinks, embeds, block references, callouts, tags, Dataview, Templater, link integrity, and safe surgical editing"
+    },
+    {
+      "name": "tdd-skill",
+      "source": "./plugins/tdd-skill",
+      "description": "Test-Driven Development workflow for .NET: implement features and fix bugs through the Red-Green-Refactor cycle, detecting the project's existing test stack (xUnit/NUnit/MSTest) and driving implementation from failing tests"
     }
   ]
 }
