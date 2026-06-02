@@ -6,11 +6,11 @@ Multi-plugin Claude Code marketplace. Every plugin under `plugins/<name>/` is a 
 
 ## Plugin Shapes
 
-Plugins come in three shapes — identify which one you're editing before changing structure:
+Plugins are built from three building blocks. Most use one; some combine them (e.g. `frontend-design-skill` and `obsidian-skill` ship **both** a skill and agents). Identify what a plugin contains before changing its structure:
 
-1. **Skill + docs** (most plugins): `skills/<name>/SKILL.md` is a compact router whose `description` frontmatter controls when the skill triggers; `docs/01-NN.md` hold the detail. The skill directory name often differs from the plugin name (`blazor-skill` plugin → `skills/blazor/`). SKILL.md references docs as `${CLAUDE_PLUGIN_ROOT}/docs/filename.md`.
-2. **Commands** (`dev-workflow`): `commands/<name>.md` — each file is one slash command (e.g. `/release`, `/fix-issue`). No SKILL.md, no docs/.
-3. **Agents** (`dev-agents`): `agents/<name>.md` — each file is one subagent with `name`, `description`, `tools`, `model` frontmatter followed by the system prompt. `obsidian-skill` also ships an agent alongside its skill.
+1. **Skill + docs**: `skills/<name>/SKILL.md` is a compact router whose `description` frontmatter controls when the skill triggers; `docs/01-NN.md` hold the detail. The skill directory name often differs from the plugin name (`blazor-skill` plugin → `skills/blazor/`). SKILL.md references docs as `${CLAUDE_PLUGIN_ROOT}/docs/filename.md`.
+2. **Commands** (`dev-workflow` only): `commands/<name>.md` — each file is one slash command (e.g. `/release`, `/fix-issue`).
+3. **Agents**: `agents/<name>.md` — each file is one subagent with `name`, `description`, `tools`, `model` frontmatter followed by the system prompt. `dev-agents` is the general .NET roster; the UI-focused agents (`design-specialist`, `html-prototyper`, `ui-critic`) live in `frontend-design-skill/agents/`, and `vault-docs-maintainer` in `obsidian-skill/agents/` — agents sit with the domain they serve, not all in `dev-agents`.
 
 `hooks/hooks.json` + a script (elasticsearch-skill, huemint-skill) auto-approve specific Bash calls via `PreToolUse`. Hook commands invoke `${CLAUDE_PLUGIN_ROOT}/hooks/<script>`.
 
