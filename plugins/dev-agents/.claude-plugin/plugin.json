@@ -1,5 +1,5 @@
 {
   "name": "dev-agents",
-  "description": "Specialized development agent definitions for .NET projects including code review, architecture, database, testing, UI, documentation, implementation, DevOps, security hardening, performance, marketing, legal compliance review, and application security review specialists",
-  "version": "1.4.0"
+  "description": "Specialized development agent definitions for .NET projects including code review, architecture, database, testing, documentation, implementation, DevOps, security hardening, performance, marketing, legal compliance review, and application security review specialists",
+  "version": "1.5.0"
 }
