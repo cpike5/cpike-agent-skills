@@ -79,6 +79,7 @@ Links are the connective tissue of a vault. The most damaging thing an agent can
 - **"Make a MOC / index note"** → a note that is mostly `[[links]]` to others; confirm each link resolves.
 - **"Clean up / find broken links"** → grep all `[[...]]` targets against actual filenames; report orphans and dangling links before changing anything.
 - **"Set up a Dataview query"** → fenced ` ```dataview ` block; requires the Dataview community plugin and consistent property names. See `${CLAUDE_PLUGIN_ROOT}/docs/01-syntax.md`.
+- **"Add a diagram / Mermaid chart to a note"** → use the **`mermaid` skill** for the syntax, diagram-type choice, and styling rather than hand-writing it. Obsidian renders fenced ` ```mermaid ` blocks natively, so the diagram lives inline in the note.
 
 ## Sanity check before finishing
 
