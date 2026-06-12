@@ -73,6 +73,11 @@
       "name": "tdd-skill",
       "source": "./plugins/tdd-skill",
       "description": "Test-Driven Development workflow for .NET: implement features and fix bugs through the Red-Green-Refactor cycle, detecting the project's existing test stack (xUnit/NUnit/MSTest) and driving implementation from failing tests"
+    },
+    {
+      "name": "summarizer-skill",
+      "source": "./plugins/summarizer-skill",
+      "description": "Versatile content summarization skill and agent for distilling documents, emails, social media posts, technical specs, stories, and any pasted text into clear, audience-appropriate summaries"
     }
   ]
 }
