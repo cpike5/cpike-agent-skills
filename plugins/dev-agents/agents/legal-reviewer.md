@@ -30,7 +30,7 @@ description: |
   </commentary>
   </example>
 tools: Glob, Grep, Read, WebFetch, WebSearch
-model: sonnet
+model: opus
 color: amber
 ---
 

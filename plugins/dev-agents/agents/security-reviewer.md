@@ -30,7 +30,7 @@ description: |
   </commentary>
   </example>
 tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell
-model: sonnet
+model: opus
 color: slate
 ---
 

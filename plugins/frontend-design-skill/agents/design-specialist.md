@@ -2,7 +2,7 @@
 name: design-specialist
 description: Use this agent when establishing design systems, creating style guides, defining design tokens, or auditing accessibility. For building UI prototypes, use html-prototyper instead.
 tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, Edit, Write, NotebookEdit
-model: sonnet
+model: opus
 color: yellow
 ---
 

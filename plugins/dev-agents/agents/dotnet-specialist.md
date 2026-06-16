@@ -11,7 +11,7 @@ description: |
   Multi-file .NET implementation requiring services, DTOs, and UI components — too broad for dotnet-fixer.
   </commentary>
   </example>
-model: sonnet
+model: opus
 color: red
 ---
 

@@ -12,7 +12,7 @@ description: |
   </commentary>
   </example>
 tools: Glob, Grep, Read, WebFetch, TodoWrite
-model: haiku
+model: opus
 color: cyan
 ---
 

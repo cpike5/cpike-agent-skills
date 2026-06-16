@@ -11,7 +11,7 @@ description: |
   Single-method bug fix is a small-scope task ideal for the fixer, not the specialist.
   </commentary>
   </example>
-model: haiku
+model: sonnet
 color: cyan
 ---
 
