@@ -78,6 +78,11 @@
       "name": "summarizer-skill",
       "source": "./plugins/summarizer-skill",
       "description": "Versatile content summarization skill and agent for distilling documents, emails, social media posts, technical specs, stories, and any pasted text into clear, audience-appropriate summaries"
+    },
+    {
+      "name": "blazor-design-impl",
+      "source": "./plugins/blazor-design-impl",
+      "description": "Bootstrap a Blazor component library from a Claude Design export — creates a three-project solution with CSS design tokens, Razor components, and a TestApp showcase"
     }
   ]
 }

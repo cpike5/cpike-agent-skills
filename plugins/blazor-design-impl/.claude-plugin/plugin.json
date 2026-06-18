@@ -1,0 +1,5 @@
+{
+  "name": "blazor-design-impl",
+  "description": "Bootstrap a Blazor component library from a Claude Design export — creates a three-project solution with CSS design tokens, Razor components, and a TestApp showcase",
+  "version": "1.0.0"
+}
