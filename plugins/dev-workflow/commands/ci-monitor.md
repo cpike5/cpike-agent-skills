@@ -1,4 +1,9 @@
-# CI Monitor Instructions
+---
+description: Monitor a PR's CI checks, dispatch fix agents, and loop until green
+argument-hint: "<pr-number> [--max-iterations N]"
+---
+
+# CI Monitor
 
 Monitor a PR's CI checks, diagnose failures, dispatch specialist sub-agents to fix them, and loop until CI passes or max iterations are reached.
 
@@ -8,76 +13,49 @@ Monitor a PR's CI checks, diagnose failures, dispatch specialist sub-agents to f
 
 ```
 <pr-number> [--max-iterations N]
-
-Examples:
-  /ci-monitor 123
-  /ci-monitor 123 --max-iterations 5
-  /ci-monitor 456 --max-iterations 1
 ---
 $ARGUMENTS
 ```
 
-**Parsing:** First token = PR number (required). `--max-iterations` (optional, default 3) sets the fix-loop cap. Aliases: `--max`, `-n`.
+First token = PR number (required). `--max-iterations` (aliases `--max`, `-n`) caps the fix loop; default 3.
 
 ## Orchestrator Rules
 
-**CRITICAL: You are a lightweight coordinator. Follow these rules:**
-
-1. **Never read source files directly** — sub-agents do that
-2. **Never write code or edit files yourself** — sub-agents implement all fixes
-3. **Keep sub-agent prompts focused** — include only the failure context they need
-4. **Track attempted fixes** — avoid infinite loops on the same failure
+1. **Never read source files or write code yourself** — sub-agents do that
+2. **Keep sub-agent prompts focused** — include only the failure context they need
+3. **Track attempted fixes** — avoid infinite loops on the same failure
 
 ## Phase 1: Initialize
 
-1. Fetch PR metadata:
-   ```bash
-   gh pr view {number} --json headRefName,baseRefName,title,url,state
-   ```
-2. If the PR is not open, abort: "PR #{number} is {state} — nothing to monitor."
-3. Check out the PR's head branch:
-   ```bash
-   git fetch origin {headRefName} && git checkout {headRefName} && git pull origin {headRefName}
-   ```
-4. Read the project's `CLAUDE.md` for architecture context (pass to sub-agents later).
-5. Initialize tracking state:
-   - `iteration = 0`
-   - `max_iterations` from args (default 3)
-   - `attempted_fixes = []` — list of `{check_name, failure_signature}` tuples
-   - `fix_history = []` — list of `{iteration, check, category, description}` records
+1. Fetch PR metadata: `gh pr view {number} --json headRefName,baseRefName,title,url,state`. If the PR is not open, abort: "PR #{number} is {state} — nothing to monitor."
+2. Check out the PR's head branch: `git fetch origin {headRefName} && git checkout {headRefName} && git pull origin {headRefName}`
+3. Read the project's `CLAUDE.md` for architecture context (pass a summary to sub-agents later).
+4. Initialize tracking: `iteration = 0`, `max_iterations` from args, `attempted_fixes = []` (list of `{check_name, failure_signature}` tuples), `fix_history = []`.
 
-## Phase 2: Poll CI Checks
+## Phase 2: Wait for Checks
 
-1. Fetch current check status:
+1. Block until checks reach a terminal state:
+   ```bash
+   gh pr checks {number} --watch
+   ```
+   Run in the background if checks are long-running. If checks remain pending with no state change for ~30 minutes, treat as stalled → Phase 6.
+
+2. Fetch the structured result:
    ```bash
    gh pr checks {number} --json name,state,conclusion,detailsUrl
    ```
+   - **Passed**: conclusion is `SUCCESS`, `NEUTRAL`, or `SKIPPED`
+   - **Failed**: conclusion is `FAILURE`, `TIMED_OUT`, `ACTION_REQUIRED`, or `CANCELLED`
 
-2. Categorize each check:
-   - **Pending**: `state` is `PENDING`, `IN_PROGRESS`, or `QUEUED`
-   - **Passed**: `conclusion` is `SUCCESS`, `NEUTRAL`, or `SKIPPED`
-   - **Failed**: `conclusion` is `FAILURE`, `TIMED_OUT`, `ACTION_REQUIRED`, or `CANCELLED`
-
-3. Decision logic:
-   - **All passed** → proceed to Phase 6 (success exit).
-   - **Any pending, none failed** → report "Waiting for {N} pending checks: {names}..." and re-poll.
-   - **Any pending AND any failed** → wait for pending checks to complete before proceeding (batch all failures in one iteration).
-   - **All terminal, some failed** → proceed to Phase 3.
-
-4. **Stall guard**: If checks remain pending with no state change for 30 minutes, proceed to Phase 6 (stalled exit).
+3. All passed → Phase 6 (success). Any failed → Phase 3, batching **all** failures into one iteration.
 
 ## Phase 3: Diagnose Failures
 
 For each failed check:
 
-1. Extract the run ID from `detailsUrl` (parse the GitHub Actions URL pattern: `.../actions/runs/{run-id}`).
+1. Extract the run ID from `detailsUrl` (pattern `.../actions/runs/{run-id}`) and fetch failed logs: `gh run view {run-id} --log-failed`
 
-2. Fetch failed logs:
-   ```bash
-   gh run view {run-id} --log-failed
-   ```
-
-3. **Categorize the failure** using log content:
+2. **Categorize the failure** using log content:
 
    | Category | Signal Patterns | Sub-agent |
    |----------|----------------|-----------|
@@ -87,22 +65,17 @@ For each failed check:
    | **Security scan** | `CVE-`, `vulnerability`, `security advisory`, `Dependabot`, `snyk`, `trivy` | `security-hardener` |
    | **Workflow/infra** | `docker`, `Dockerfile`, `action`, `workflow`, `yaml`, `runner`, `timeout`, `service unavailable` | `devops-specialist` |
 
-4. **Sub-category disambiguation** for Build/Test:
-   - Build error mentioning a single file with a clear error code → `dotnet-fixer`
-   - Build error spanning multiple files or involving project references → `dotnet-specialist`
-   - Test failure where the test assertion is wrong → `test-writer`
-   - Test failure where the implementation is buggy → `dotnet-fixer`
-   - If ambiguous → default to `dotnet-fixer`
+   Specialist agents come from the **dev-agents** plugin. If a named agent type is unavailable, or the project isn't .NET (e.g. a Python one-off), map the category to the equivalent stack tooling and use `general-purpose`.
 
-5. **Batch related failures**: Group failures from the same category that share a root cause into a single fix unit.
+3. **Disambiguation** for Build/Test: single file with a clear error code → `dotnet-fixer`; multiple files or project references → `dotnet-specialist`; wrong test assertion → `test-writer`; buggy implementation → `dotnet-fixer`; ambiguous → `dotnet-fixer`.
 
-6. **Dedup against attempted_fixes**: If a failure has the same `check_name` AND the same `failure_signature` (first 200 chars of error) as a previous attempt, mark it **unfixable** — the prior fix didn't resolve it. Do not retry.
+4. **Batch** same-category failures that share a root cause into a single fix unit.
 
-7. If ALL failures are marked unfixable → proceed to Phase 6 (unfixable exit).
+5. **Dedup against attempted_fixes**: same `check_name` AND same `failure_signature` (first 200 chars of error) as a previous attempt → mark **unfixable** (the prior fix didn't resolve it); do not retry. If ALL failures are unfixable → Phase 6.
 
 ## Phase 4: Dispatch Fix Sub-agents
 
-For each failure group (deduplicated, not previously attempted), dispatch the appropriate specialist sub-agent.
+Failures in different categories → dispatch in **parallel**. Multiple failures in the same category → one batched sub-agent. A test failure that depends on a build fix → **sequential**: build fix first.
 
 ### Sub-agent Prompt Template
 
@@ -119,8 +92,7 @@ Fix CI failure in PR #{number}: {pr_title}
 
 ## Context
 - Project: {summary from CLAUDE.md}
-- PR branch: {headRefName}
-- Base branch: {baseRefName}
+- PR branch: {headRefName} | Base: {baseRefName}
 - Iteration: {current_iteration} of {max_iterations}
 
 ## Constraints
@@ -130,67 +102,36 @@ Fix CI failure in PR #{number}: {pr_title}
 - If the fix requires architectural changes beyond your scope, report back with what's needed instead of making partial changes
 ```
 
-### Dispatch Rules
+### Per-agent prompt additions
 
-- Failures in **different categories** → dispatch sub-agents in **parallel**.
-- Multiple failures in the **same category** → batch into a **single sub-agent** dispatch.
-- If a test failure depends on a build error being fixed first → dispatch **sequentially**: build fix first, then test fix.
-
-### Agent-Specific Prompt Additions
-
-**For `dotnet-fixer`:**
-- Include exact error codes (CS####) and file paths from the log.
-
-**For `dotnet-specialist`:**
-- Include broader context about which projects are affected and any project/package reference issues.
-
-**For `test-writer`:**
-- Include the test name, expected vs actual values.
-- Clarify whether the test or the implementation needs updating.
-
-**For `security-hardener`:**
-- Include CVE numbers, affected packages, and suggested remediation from scan output.
-
-**For `devops-specialist`:**
-- Include the workflow file path (e.g., `.github/workflows/ci.yml`).
-- Include the full step output where the failure occurred.
+- `dotnet-fixer`: exact error codes (CS####) and file paths from the log
+- `dotnet-specialist`: which projects are affected and any project/package reference issues
+- `test-writer`: test name, expected vs actual values, and whether the test or the implementation should change
+- `security-hardener`: CVE numbers, affected packages, suggested remediation from scan output
+- `devops-specialist`: the workflow file path and the full step output where the failure occurred
 
 ## Phase 5: Commit, Push, and Loop
 
-1. **Verify changes exist**: Run `git status`. If no files were modified, treat the failure as unfixable for this iteration and note it.
-
-2. **Stage and commit**:
+1. Run `git status` — if no files were modified, treat the failure as unfixable for this iteration and note it.
+2. Stage and commit:
    ```
    fix(ci): {brief description of what was fixed}
 
    CI monitor iteration {N}/{max}
-   Fixes: {comma-separated list of check names addressed}
+   Fixes: {comma-separated check names addressed}
    ```
-
-3. **Push**:
-   ```bash
-   git push origin {headRefName}
-   ```
-
-4. **Update tracking**:
-   - Increment `iteration`.
-   - Append each `{check_name, failure_signature}` to `attempted_fixes`.
-   - Append fix details to `fix_history`.
-
-5. **Loop decision**:
-   - If `iteration >= max_iterations` → proceed to Phase 6 (max iterations exit).
-   - Otherwise → return to Phase 2.
+3. Push: `git push origin {headRefName}`
+4. Increment `iteration`; append to `attempted_fixes` and `fix_history`.
+5. `iteration >= max_iterations` → Phase 6; otherwise → Phase 2.
 
 ## Phase 6: Report Results
 
-Display a summary based on the exit condition.
-
-### Success — All Checks Passing
+One summary format — the result line and conditional sections vary by exit condition:
 
 ```
 ## CI Monitor — PR #{number}: {title}
 
-**Result:** ALL CHECKS PASSING
+**Result:** {ALL CHECKS PASSING | MAX ITERATIONS REACHED ({max}) | UNFIXABLE FAILURE DETECTED | CI CHECKS STALLED}
 **Iterations:** {N} fix iteration(s)
 **PR:** {url}
 
@@ -198,69 +139,12 @@ Display a summary based on the exit condition.
 | Iteration | Check | Category | Fix Applied |
 |-----------|-------|----------|-------------|
 | 1 | build | Build error | Added missing using in OrderService.cs |
-| 2 | tests | Test failure | Updated assertion in OrderTests.cs |
 
-All CI checks are now green.
-```
+### Remaining Failures        ← omit on success
+- **{check_name}**: {description — for unfixable, note the same failure persisted after the fix in iteration {N}; for stalled, the pending state and duration}
 
-### Max Iterations Reached
-
-```
-## CI Monitor — PR #{number}: {title}
-
-**Result:** MAX ITERATIONS REACHED ({max})
-**PR:** {url}
-
-### Remaining Failures
-- **{check_name}**: {brief description}
-
-### Fix History
-| Iteration | Check | Category | Fix Applied |
-|-----------|-------|----------|-------------|
-
-### Recommendation
+### Recommendation            ← omit on success
 {Specific advice on what to investigate manually}
 ```
 
-### Unfixable Failure Detected
-
-```
-## CI Monitor — PR #{number}: {title}
-
-**Result:** UNFIXABLE FAILURE DETECTED
-**PR:** {url}
-
-### Unfixable Failures
-- **{check_name}**: {description} — Same failure persisted after fix attempt in iteration {N}.
-
-### Fix History
-| Iteration | Check | Category | Fix Applied |
-|-----------|-------|----------|-------------|
-
-### Recommendation
-{Specific advice}
-```
-
-### CI Checks Stalled
-
-```
-## CI Monitor — PR #{number}: {title}
-
-**Result:** CI CHECKS STALLED
-**PR:** {url}
-
-### Stalled Checks
-- **{check_name}**: {state} for >{duration}
-
-No fixes were attempted. CI checks may be queued or experiencing infrastructure issues.
-```
-
-## Output
-
-Report to the user:
-- Final result status (PASSING / MAX_ITERATIONS / UNFIXABLE / STALLED)
-- Number of iterations executed
-- Fix history table with categories
-- Any remaining failures with recommendations
-- PR URL
-- Any sub-agent errors that occurred
+Also report any sub-agent errors that occurred.

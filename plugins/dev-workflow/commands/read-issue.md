@@ -1,3 +1,8 @@
+---
+description: Gather focused context about a GitHub issue to prepare for follow-up work
+argument-hint: "<issue-number> [more issue numbers...]"
+---
+
 # Read Issue Instructions
 
 Gather focused context about a GitHub issue to prepare for follow-up work.
@@ -71,7 +76,7 @@ If `docs/lessons-learned/` exists, scan for relevant entries.
 - **Scope estimate:** Trivial | Small | Medium | Large
 
 ## CLAUDE.md References
-- **Layer:** [Core | Infrastructure | Application]
+- **Layer:** [affected layer — e.g. Core | Infrastructure | Application on .NET projects; adapt to the project's stack]
 - **Related docs:** [links from Key Documentation table]
 - **Config options:** [exact class name if applicable]
 - **Page route:** [if UI change, from UI Page Routes table]

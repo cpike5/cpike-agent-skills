@@ -1,6 +1,13 @@
+---
+description: Version bump, tag, push, and GitHub release with changelog
+argument-hint: "[version]"
+---
+
 # Release Instructions
 
 Create and publish a new release version for the project.
+
+Version-file references below assume .NET (`Directory.Build.props`); on other stacks use the project's equivalent (`pyproject.toml`, `package.json`, etc.).
 
 ## Usage
 

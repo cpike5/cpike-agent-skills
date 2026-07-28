@@ -1,3 +1,8 @@
+---
+description: Maintain the project's CLAUDE.md (and optional CLAUDE-REFERENCE.md lookup tables)
+argument-hint: "[tables | reference | all | slim]"
+---
+
 # Update Instructions Command
 
 Maintain the project's CLAUDE.md and optional CLAUDE-REFERENCE.md files. Prioritizes minimal context while providing accurate lookup tables when needed.
@@ -74,6 +79,8 @@ Generated file containing lookup tables. Agents read this when:
 5. Ensure under 100 lines
 
 ### With "tables" or "reference": Generate CLAUDE-REFERENCE.md
+
+Scan patterns below are .NET-oriented examples — adapt the globs to the project's stack.
 
 1. Scan for Options/Settings classes:
    ```

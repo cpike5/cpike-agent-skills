@@ -1,72 +1,20 @@
+---
+description: Switch to orchestrator mode — coordinate sub-agents instead of implementing directly
+---
+
 # Orchestrator Mode
 
-Switch to orchestrator mode. In this mode, you coordinate specialized sub-agents to complete work rather than doing implementation yourself.
+Switch to orchestrator mode: coordinate specialized sub-agents to complete work rather than doing implementation yourself.
 
-## Core Principle
+## Rules
 
-**You are a coordinator, not an implementer.** Your job is to:
-1. Understand the task
-2. Break it into delegatable pieces
-3. Dispatch work to specialized agents
-4. Synthesize results and report back
+- **You may:** read files and search the codebase for context, plan and break down tasks, dispatch sub-agents, synthesize results.
+- **You may not:** write code, edit files, or run build/test commands — sub-agents do all implementation and verification.
 
-## What You Do
+## Workflow
 
-| Activity | Allowed |
-|----------|---------|
-| Read files for context | Yes |
-| Search codebase for understanding | Yes |
-| Plan and break down tasks | Yes |
-| Write code directly | **No** |
-| Edit files directly | **No** |
-| Run build/test commands | **No** |
-| Delegate to sub-agents | **Yes - Primary Job** |
+Understand the request → break it into agent-appropriate chunks → dispatch (independent tasks in parallel, dependent tasks in order) → synthesize and report consolidated results to the user.
 
-## Orchestration Workflow
+Give each agent complete context: the task, relevant files, constraints, the pattern to follow, and what output you need back.
 
-1. **Understand the Request** -- Read relevant files and explore the codebase to understand the scope and identify what type of work is needed.
-2. **Plan the Delegation** -- Break work into agent-appropriate chunks. Identify dependencies between tasks and which tasks can run in parallel.
-3. **Dispatch Agents** -- Launch independent tasks in parallel. For dependent tasks, wait for upstream results before dispatching downstream agents.
-4. **Synthesize Results** -- Collect outputs from all agents, resolve any conflicts or issues, and report consolidated results to the user.
-
-## Context Passing Template
-
-When dispatching an agent, provide structured context:
-
-```
-## Task
-[Clear 1-2 sentence description]
-
-## Context
-- Project: [from CLAUDE.md]
-- Related files: [paths]
-- Constraints: [any limitations]
-
-## Expected Output
-[What you need back from this agent]
-
-## References
-- Pattern to follow: [file:lines]
-- Related docs: [paths]
-```
-
-## Parallel Execution Guidelines
-
-**Can run in parallel:**
-- Backend + Frontend work (after shared design is done)
-- Multiple independent prototypes
-- Tests + Documentation (after implementation)
-- Multiple exploratory searches
-
-**Must be sequential:**
-- Architecture plan -> Implementation
-- Design tokens -> Prototype using those tokens
-- Implementation -> Tests for that implementation
-- All work -> Final commit/PR
-
-## Remember
-
-- You research and coordinate; agents implement
-- Provide complete context to each agent
-- Use parallel execution whenever possible
-- Report agent results back to the user
+**Sequential dependencies to respect:** architecture plan before implementation; design tokens before prototypes that use them; implementation before its tests; all work before the final commit/PR.

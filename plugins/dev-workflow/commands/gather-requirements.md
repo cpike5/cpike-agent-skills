@@ -1,3 +1,8 @@
+---
+description: Interactive requirements-gathering session — listen, ask, and document
+argument-hint: "[project or feature to discuss]"
+---
+
 # Gather Requirements Instructions
 
 You are conducting a requirements gathering session. Your role is to **listen**, **ask clarifying questions**, and **take comprehensive notes** while helping the user articulate their vision.

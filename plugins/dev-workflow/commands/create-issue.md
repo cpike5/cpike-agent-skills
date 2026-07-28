@@ -1,6 +1,11 @@
-# Create Issue Instructions
+---
+description: Create a well-structured GitHub issue with implementation context
+argument-hint: "<description of the issue>"
+---
 
-Create a GitHub issue with proper structure and context for efficient implementation.
+# Create Issue
+
+Create a GitHub issue with enough structure and context that an implementation agent can work without extensive exploration.
 
 ## User Arguments
 
@@ -10,45 +15,18 @@ $ARGUMENTS
 
 ## Process
 
-### 1. Understand the Issue
-
-Get a brief understanding of what the issue is about:
-- What problem does it solve or feature does it add?
-- Is it a bug, feature, task, or enhancement?
-- What's the expected scope (trivial, small, medium, large)?
-
-### 2. Read CLAUDE.md
-
-**CRITICAL:** Before creating the issue, read the project's CLAUDE.md to:
-- Understand which architectural layer is affected
-- Identify relevant configuration options or page routes
-- Find related documentation to reference
-- Understand existing patterns
-
-### 3. Gather Context for Implementation
-
-Include enough detail that an implementation agent can work without extensive exploration:
-
-- **For bugs:** Include steps to reproduce, expected vs actual behavior
-- **For features:** Include acceptance criteria, affected components
-- **For UI changes:** Reference the page route from CLAUDE.md
-- **For config changes:** Reference the exact Options class name
-
-### 4. Check Existing Labels
-
-Review the repository's existing labels to ensure consistency:
-```bash
-gh label list
-```
-
-### 5. Create the Issue
-
-Use `gh issue create` with:
-- Clear, descriptive title
-- Structured body with implementation hints
-- Appropriate labels
+1. **Understand the issue** — what problem it solves or feature it adds; bug, feature, task, or enhancement; rough scope.
+2. **Read the project's CLAUDE.md first** — identify the affected architectural layer, relevant configuration options, page routes, related docs, and existing patterns to reference.
+3. **Gather implementation context:**
+   - Bugs: steps to reproduce, expected vs actual behavior
+   - Features: acceptance criteria, affected components
+   - UI changes: the page route; config changes: the exact options/settings class name
+4. **Check existing labels** with `gh label list` and apply consistent ones.
+5. **Create the issue** with `gh issue create` — clear title, structured body, appropriate labels.
 
 ## Issue Body Template
+
+Adapt layer names and stack-specific references to the project — the template assumes .NET-style Core/Infrastructure/Application layering, but this command may also be used on Python or other stacks.
 
 ```markdown
 ## Description
@@ -56,40 +34,28 @@ Use `gh issue create` with:
 
 ## Acceptance Criteria
 - [ ] [Specific, testable criteria]
-- [ ] [Specific, testable criteria]
 
 ## Technical Context
-- **Layer:** [Core | Infrastructure | Application]
+- **Layer:** [affected layer]
 - **Files likely affected:** [paths from CLAUDE.md lookup]
 - **Related docs:** [links to relevant documentation]
 - **Pattern to follow:** [reference to existing similar implementation]
 
 ## Additional Notes
-[Any constraints, related issues, or implementation hints]
+[Constraints, related issues, or implementation hints]
 ```
 
-## When to Escalate
+## Larger Features
 
-If the issue isn't straightforward:
-- Complex bugs: Investigate root cause before creating issue
-- Architectural questions: Have systems-architect assess scope
-- Large features: Consider breaking into sub-issues
-
-## Creating Sub-Issues
-
-For larger features, create a parent issue then sub-issues:
+Create a parent issue (label `epic`), then sub-issues, linking each to the parent:
 
 ```bash
-# Create parent issue
-gh issue create --title "Feature: [name]" --label "epic"
-
-# Create sub-issues and link them
-gh issue create --title "Task: [subtask]" --label "task"
-${CLAUDE_PLUGIN_ROOT}/scripts/gh-link -Parent [parent-number] -Child [child-number]
+${CLAUDE_PLUGIN_ROOT}/scripts/gh-link -Parent <parent-number> -Child <child-number>
 ```
 
-## Expected Output
+If the issue isn't straightforward — complex bug, open architectural question — investigate the root cause or assess scope before creating it.
 
-- Issue URL
-- Summary of what was created
-- Any sub-issues if applicable
+## Output
+
+- Issue URL and summary of what was created
+- Any sub-issues created

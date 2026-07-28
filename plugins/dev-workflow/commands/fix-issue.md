@@ -1,3 +1,8 @@
+---
+description: Fix a GitHub issue, milestone phase, or discussed problem end-to-end — implement, review, commit, PR
+argument-hint: "[issue-number | phase <name>] [base-branch] [-- extra context]"
+---
+
 # Fix Issue Instructions
 
 Fix a problem: understand it, implement the fix, review, then commit and PR.
@@ -76,7 +81,7 @@ Use exploration results to inform implementation.
 - After parallel agents complete, spawn **sequential agents** for dependent issues in dependency order, passing relevant output from prior agents as context.
 - Each agent receives: its issue requirements, CLAUDE.md conventions, shared exploration findings, and any context from prerequisite issues.
 
-For all modes, load appropriate skills (blazor-skill for Blazor components, frontend-design for UI) and choose the right specialist agent type (`dotnet-specialist`, `dotnet-fixer`, `database-specialist`, etc.).
+For all modes, load appropriate skills (blazor-skill for Blazor components, frontend-design for UI) and choose the right specialist agent type (`dotnet-specialist`, `dotnet-fixer`, `database-specialist`, etc.). Specialist agents come from the dev-agents plugin — if a named type is unavailable, or the project isn't .NET (e.g. a Python one-off), use `general-purpose`.
 
 ## Phase 4: Review
 

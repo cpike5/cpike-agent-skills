@@ -1,4 +1,9 @@
-# Prepare Changelog Instructions
+---
+description: Draft a categorized changelog from PRs and commits since the last release tag
+argument-hint: "[output-path]"
+---
+
+# Prepare Changelog
 
 Prepare a changelog document summarizing notable changes since the last release.
 
@@ -6,44 +11,14 @@ Prepare a changelog document summarizing notable changes since the last release.
 
 /prepare-changelog [output-path]
 
-- `output-path` (optional): Path for the changelog document. Defaults to `temp/changelog-draft.md`.
+- `output-path` (optional): defaults to `temp/changelog-draft.md`.
 
 ## Workflow
 
-1. **Find Last Release**
-   - Run `git describe --tags --abbrev=0` to get the most recent tag
-   - If no tags exist, inform the user and ask how to proceed (use initial commit or abort)
-   - Note the tag name and date for reference
-
-2. **Gather Changes Since Last Release**
-   - Get all merged PRs since the tag: `gh pr list --state merged --base main --search "merged:>YYYY-MM-DD" --json number,title,labels,author,mergedAt`
-   - Get all commits since the tag: `git log TAG..HEAD --oneline --no-merges`
-   - Cross-reference to avoid duplicate entries
-
-3. **Categorize Changes**
-   - Review each PR/commit and categorize into:
-     - **Breaking Changes**: API changes, removed features, behavior changes
-     - **New Features**: New functionality, capabilities
-     - **Enhancements**: Improvements to existing features
-     - **Bug Fixes**: Resolved issues, corrections
-     - **Documentation**: Doc updates, README changes
-     - **Internal**: Refactoring, dependency updates, CI/CD changes
-   - Focus on user-facing changes; internal changes can be summarized briefly
-
-4. **Identify Notable Changes**
-   - Highlight major features or significant improvements
-   - Note any breaking changes prominently
-   - Include any security fixes or critical bug fixes
-   - Summarize the overall theme of the release if applicable
-
-5. **Create Changelog Document**
-   - Delegate to the **docs-writer** agent to create the changelog
-   - Provide the agent with:
-     - Previous version (last tag) and tag date
-     - Categorized list of changes (Breaking, Features, Enhancements, Bug Fixes, Documentation, Internal)
-     - PR numbers and titles for each change
-     - Output path for the document
-   - The docs-writer should use this format:
+1. **Find the last release:** `git describe --tags --abbrev=0`. If no tags exist, ask the user how to proceed (use initial commit or abort).
+2. **Gather changes since the tag:** merged PRs (`gh pr list --state merged --base main --search "merged:>YYYY-MM-DD" --json number,title,labels,author,mergedAt` using the tag date) and commits (`git log TAG..HEAD --oneline --no-merges`). Cross-reference to avoid duplicate entries.
+3. **Categorize:** Breaking Changes, New Features, Enhancements, Bug Fixes, Documentation, Internal. Focus on user-facing changes; summarize internal ones briefly. Note breaking changes and security/critical fixes prominently, and capture the overall theme of the release if there is one.
+4. **Write the changelog** to the output path in this format:
 
 ```markdown
 # Changelog Draft - vX.Y.Z
@@ -84,19 +59,11 @@ Prepare a changelog document summarizing notable changes since the last release.
 *This changelog was auto-generated. Review and edit before publishing.*
 ```
 
-6. **Report Results**
-   - Display the path to the created changelog document
-   - Summarize the number of changes in each category
-   - Highlight any items that may need manual review or clarification
+Omit empty sections.
 
-## Example
-
-/prepare-changelog
-
-Finds the last tag (e.g., `v0.2.0`), gathers all PRs and commits since then, categorizes the changes, and creates `temp/changelog-draft.md` with the formatted changelog.
+5. **Report:** the changelog path, counts per category, and any items needing manual review or clarification.
 
 ## Notes
 
-- The generated changelog is a draft; review before including in a release
-- PRs with conventional commit prefixes (feat:, fix:, docs:, etc.) are easier to categorize
-- If PRs lack clear descriptions, the changelog entry may need manual improvement
+- The generated changelog is a draft; review before including it in a release.
+- PRs with conventional commit prefixes (feat:, fix:, docs:, …) categorize more reliably; entries from PRs with unclear descriptions may need manual improvement.
