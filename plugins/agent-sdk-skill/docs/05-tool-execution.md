@@ -66,7 +66,7 @@ using Anthropic;
 using Microsoft.Extensions.AI;
 
 IChatClient chatClient = new AnthropicClient()
-    .AsIChatClient("claude-opus-4-6")
+    .AsIChatClient("claude-opus-5")
     .AsBuilder()
     .UseFunctionInvocation()
     .Build();

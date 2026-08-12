@@ -35,7 +35,7 @@ using Anthropic;
 using Microsoft.Extensions.AI;
 
 IChatClient chatClient = new AnthropicClient()
-    .AsIChatClient("claude-sonnet-4-5-20250929")
+    .AsIChatClient("claude-sonnet-5")
     .AsBuilder()
     .UseFunctionInvocation()  // Enables automatic tool call loop
     .Build();
@@ -57,7 +57,7 @@ services.AddSingleton<IChatClient>(sp =>
 {
     var anthropicClient = sp.GetRequiredService<AnthropicClient>();
     return anthropicClient
-        .AsIChatClient("claude-sonnet-4-5-20250929")
+        .AsIChatClient("claude-sonnet-5")
         .AsBuilder()
         .UseFunctionInvocation()
         .Build();
@@ -72,7 +72,7 @@ services.AddSingleton<IChatClient>(sp =>
 public class AnthropicOptions
 {
     public string ApiKey { get; set; } = string.Empty;
-    public string Model { get; set; } = "claude-sonnet-4-5-20250929";
+    public string Model { get; set; } = "claude-sonnet-5";
     public int MaxRetries { get; set; } = 2;
 }
 
@@ -102,7 +102,7 @@ services.AddSingleton<IChatClient>(sp =>
 {
   "Anthropic": {
     "ApiKey": "",
-    "Model": "claude-sonnet-4-5-20250929",
+    "Model": "claude-sonnet-5",
     "MaxRetries": 3
   }
 }

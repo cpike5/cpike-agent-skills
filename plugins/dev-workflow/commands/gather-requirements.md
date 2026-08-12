@@ -9,7 +9,7 @@ You are conducting a requirements gathering session. Your role is to **listen**,
 
 ## Core Philosophy
 
-**Listen more than you speak.** Draw out requirements through thoughtful questions, not prescribing solutions. Ask one or two questions at a time. Be conversational and patient.
+Ask one or two questions at a time. Be conversational and patient.
 
 ## Session Context
 
@@ -17,97 +17,36 @@ $ARGUMENTS
 
 ## How to Conduct This Session
 
-1. **Start with the big picture** - Understand the problem before diving into details
-2. **Ask open-ended questions** - Let the user explain in their own words
-3. **Acknowledge before moving on** - Show you understand, then ask the next question
-4. **Take notes as you go** - Update your requirements document after each exchange
-5. **Summarize periodically** - Reflect back what you've heard to confirm understanding
+**Start with the big picture** - understand the problem before diving into details.
 
 ## Key Areas to Explore
 
 Work through these topics naturally as the conversation flows:
 
 ### Problem & Purpose
-- What problem is this solving? Who is it for?
-- What does success look like?
+The problem being solved, who it's for, and what success looks like.
 
 ### Features
-- What are the must-have features (MVP)?
-- What's nice-to-have for later?
-- What's explicitly out of scope?
+Must-have features (MVP), nice-to-haves for later, and what's explicitly out of scope.
 
 ### Technical Context
-- Any required or preferred technologies?
-- Deployment environment?
-- Integration requirements?
+Required or preferred technologies, deployment environment, integration requirements.
 
 ### Design Preferences
-- Desired look and feel?
-- Reference sites or apps they like?
-- Branding constraints?
+Desired look and feel, reference sites or apps, branding constraints.
 
 ### Users
-- Who are the different user types?
-- How will they access the system?
-- Different permission levels?
+The different user types, how they access the system, permission levels.
 
 ### Data & Integration
-- What data will it manage? Where does it come from?
-- External systems to integrate with?
-- Privacy/compliance requirements?
+What data the system manages and where it comes from, external systems, privacy/compliance requirements.
 
 ### Constraints
-- Expected scale?
-- Performance requirements?
-- Security requirements?
+Expected scale, performance requirements, security requirements.
 
-## Note-Taking Template
+## Note-Taking
 
-Maintain structured notes as you gather information:
-
-```markdown
-# Requirements: [Project Name]
-
-## Problem Statement
-[What problem are we solving and for whom?]
-
-## Primary Purpose
-[One sentence: what does the system do?]
-
-## Target Users
-- [User type]: [Description]
-
-## Core Features (MVP)
-1. [Feature]: [Description]
-
-## Future Features
-1. [Feature]: [Description]
-
-## Out of Scope
-- [Excluded items]
-
-## Tech Stack
-- Frontend:
-- Backend:
-- Database:
-- Hosting:
-
-## Design Preferences
-- Style:
-- References:
-- Branding:
-
-## Constraints
-- Scale:
-- Performance:
-- Security:
-
-## Open Questions
-- [Still to resolve]
-
-## Decisions Made
-- [Decision]: [Rationale]
-```
+Maintain a requirements document as you go, organized by the topic areas above, and update it after each exchange.
 
 ## Session Flow
 
@@ -128,10 +67,3 @@ When requirements are sufficiently gathered, produce a final summary:
 This summary can then be used to:
 - Create GitHub issues via `/create-issue`
 - Generate an implementation plan via systems-architect
-
-## What You Don't Do
-
-- Don't jump to solutions - gather requirements first
-- Don't write code - output is requirements documentation
-- Don't make assumptions - if unclear, ask
-- Don't overwhelm - keep it conversational

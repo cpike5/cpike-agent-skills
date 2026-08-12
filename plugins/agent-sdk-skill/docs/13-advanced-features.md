@@ -19,7 +19,7 @@ using ModelContextProtocol.Client;
 
 // Build the IChatClient
 IChatClient chatClient = new AnthropicClient()
-    .AsIChatClient("claude-opus-4-6")
+    .AsIChatClient("claude-opus-5")
     .AsBuilder()
     .UseFunctionInvocation()
     .Build();
@@ -48,7 +48,7 @@ Console.WriteLine(response.Message.Text);
 // Program.cs
 services.AddSingleton<IChatClient>(sp =>
     new AnthropicClient()
-        .AsIChatClient("claude-opus-4-6")
+        .AsIChatClient("claude-opus-5")
         .AsBuilder()
         .UseFunctionInvocation()
         .Build()
@@ -97,7 +97,7 @@ var options = new ChatOptions { Tools = [.. mcpTools, .. localTools] };
 
 A pattern where Claude writes code to orchestrate tool calls programmatically within a sandboxed execution container. Reduces token consumption for multi-tool workflows.
 
-**Available on:** Claude Opus 4.6 and Sonnet 4.5+.
+**Available on:** Claude Opus 4.5+ and Sonnet 4.5+ (including Opus 5 and Sonnet 5). No beta header required.
 
 ### How It Works
 
@@ -141,11 +141,10 @@ public class ProgrammaticToolAgent(HttpClient http, string apiKey)
     {
         http.DefaultRequestHeaders.Add("x-api-key", apiKey);
         http.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
-        http.DefaultRequestHeaders.Add("anthropic-beta", "code-execution-20260120");
 
         var request = new
         {
-            model = "claude-opus-4-6",
+            model = "claude-opus-5",
             max_tokens = 4096,
             tools = new object[]
             {
@@ -199,12 +198,13 @@ dotnet add package Anthropic.Foundry
 ```csharp
 using Anthropic.Bedrock;
 
-// Reads AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION from environment
-AnthropicBedrockClient client = new();
+// Mantle client (Messages-API Bedrock endpoint) — prefer over the legacy
+// AnthropicBedrockClient InvokeModel path for new code
+var client = new AnthropicBedrockMantleClient(new() { AwsRegion = "us-east-1" });
 
 var message = await client.Messages.Create(new()
 {
-    Model = "anthropic.claude-opus-4-6-20251101-v1:0",  // Bedrock model ARN format
+    Model = "anthropic.claude-opus-5",  // Bedrock IDs take an "anthropic." prefix
     MaxTokens = 1024,
     Messages = [new() { Role = Role.User, Content = "Hello!" }]
 });
@@ -218,12 +218,12 @@ using Anthropic.Foundry;
 AnthropicFoundryClient client = new()
 {
     ApiKey = Environment.GetEnvironmentVariable("AZURE_FOUNDRY_API_KEY"),
-    BaseUrl = "https://your-resource.services.ai.azure.com/models/claude-opus-4-6"
+    BaseUrl = "https://your-resource.services.ai.azure.com/models/claude-opus-5"
 };
 
 var message = await client.Messages.Create(new()
 {
-    Model = "claude-opus-4-6",
+    Model = "claude-opus-5",
     MaxTokens = 1024,
     Messages = [new() { Role = Role.User, Content = "Hello!" }]
 });
@@ -240,7 +240,7 @@ services.AddSingleton<AnthropicClient>(sp =>
     var config = sp.GetRequiredService<IConfiguration>();
     return config["Anthropic:Provider"] switch
     {
-        "Bedrock" => new AnthropicBedrockClient() as AnthropicClient,
+        "Bedrock" => new AnthropicBedrockMantleClient(new() { AwsRegion = config["Anthropic:AwsRegion"] }),
         "Foundry" => new AnthropicFoundryClient() { ApiKey = config["Anthropic:ApiKey"] },
         _ => new AnthropicClient() { ApiKey = config["Anthropic:ApiKey"] }
     };
@@ -305,7 +305,7 @@ using Anthropic;
 
 IChatClient CreateChatClient(IServiceProvider _)
     => new AnthropicClient()
-        .AsIChatClient("claude-opus-4-6")
+        .AsIChatClient("claude-opus-5")
         .AsBuilder()
         .UseFunctionInvocation()
         .Build();
@@ -320,9 +320,9 @@ var kernel = kernelBuilder.Build();
 | Feature | Official SDK (`Anthropic`) | Unofficial SDK (`Anthropic.SDK`) |
 |---------|--------------------------|----------------------------------|
 | IChatClient | `AsIChatClient()` | `.Messages` directly |
-| Tool use | `AIFunctionFactory` + `UseFunctionInvocation()` | Same |
-| Extended thinking | Via stream aggregation | `ThinkingParameters` |
-| Token counting | Not exposed | `CountMessageTokensAsync()` |
+| Tool use | `AIFunctionFactory` + `UseFunctionInvocation()`, or `BetaToolRunner` | `AIFunctionFactory` + `UseFunctionInvocation()` |
+| Thinking | Adaptive via `ThinkingConfigAdaptive` (streaming or non-streaming) | `ThinkingParameters` |
+| Token counting | `client.Messages.CountTokens()` | `CountMessageTokensAsync()` |
 | Semantic Kernel | Via IChatClient bridge | Documented examples |
 | MCP | Via `IChatClient` + `McpClient` | Via `IChatClient` + `McpClient` |
 | AWS Bedrock | `Anthropic.Bedrock` package | Not available |

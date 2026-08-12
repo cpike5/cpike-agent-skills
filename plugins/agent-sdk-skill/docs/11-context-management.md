@@ -2,35 +2,30 @@
 
 ## Context Window Limits by Model
 
-| Model | Context Window | Recommended Max Input |
-|-------|---------------|----------------------|
-| Claude Opus 4.6 | 200K tokens | ~180K (leave room for output) |
-| Claude Sonnet 4.5/4.6 | 200K tokens | ~180K |
-| Claude Haiku 4.5 | 200K tokens | ~180K |
+| Model | Context Window | Notes |
+|-------|---------------|-------|
+| Claude Opus 5 / Sonnet 5 | 1M tokens | 128K max output (stream for large outputs) |
+| Claude Opus 4.6–4.8 / Sonnet 4.6 | 1M tokens | |
+| Claude Haiku 4.5 | 200K tokens | 64K max output |
 
-A token is roughly 3-4 characters of English text. A typical code file of 200 lines is ~500-1,000 tokens.
+A token is roughly 3-4 characters of English text — but counts are model-specific (Sonnet 5's tokenizer produces ~30% more tokens than Sonnet 4.6 for the same text), so re-baseline with the count-tokens endpoint when switching models rather than reusing measured numbers.
 
-## Token Counting (Unofficial SDK)
+## Token Counting (Official SDK)
 
-The unofficial `Anthropic.SDK` package exposes token counting before sending a request:
+The official `Anthropic` package exposes `count_tokens` directly:
 
 ```csharp
-using Anthropic.SDK;
-using Anthropic.SDK.Messaging;
+using Anthropic.Models.Messages;
 
-var client = new AnthropicClient();
-
-var countParams = new MessageCountTokenParameters
+MessageTokensCount result = await client.Messages.CountTokens(new MessageCountTokensParams
 {
+    Model = "claude-opus-5",
     Messages = messages,
-    Model = AnthropicModels.Claude46Sonnet
-};
-
-var response = await client.Messages.CountMessageTokensAsync(countParams);
-Console.WriteLine($"Input tokens: {response.InputTokens}");
+});
+Console.WriteLine($"Input tokens: {result.InputTokens}");
 ```
 
-Use this before sending to decide whether to compact the conversation first.
+Use this before sending to decide whether to compact the conversation first. (The unofficial `Anthropic.SDK` package has an equivalent `CountMessageTokensAsync`.)
 
 ## Response Usage Fields
 
@@ -64,6 +59,10 @@ public class TokenBudget
     public bool IsOverLimit => TotalInputTokens > MaxInputTokens;
 }
 ```
+
+## Server-Side Compaction (Beta)
+
+Before building client-side compaction, note the API can now do this for you: with the `compact-2026-01-12` beta header and `context_management: {edits: [{type: "compact_20260112"}]}` on the beta messages endpoint, the API summarizes earlier context server-side when the conversation approaches the window. The critical rule is to append the full `response.Content` (including `compaction` blocks) back into history — extracting only the text silently loses the compaction state. The client-side strategies below remain useful when you need deterministic control or are off the beta surface.
 
 ## Conversation History for Long-Running Agents
 
@@ -169,7 +168,7 @@ private async Task<string> SummarizeAsync(List<Message> messages)
 
     var summaryParams = new MessageCreateParams
     {
-        Model = "claude-haiku-4-5-20251001",  // Use a fast/cheap model
+        Model = "claude-haiku-4-5",  // Use a fast/cheap model
         MaxTokens = 1024,
         System = "Summarize the following conversation concisely. Preserve all key decisions, facts, and outcomes. Use bullet points.",
         Messages =
@@ -243,7 +242,7 @@ public class ConversationManager
 
         var response = await _client.Messages.Create(new MessageCreateParams
         {
-            Model = "claude-haiku-4-5-20251001",
+            Model = "claude-haiku-4-5",
             MaxTokens = 512,
             System = "Summarize this conversation. Preserve decisions, file paths, code changes, and key facts as bullet points.",
             Messages = [new() { Role = Role.User, Content = text }]

@@ -7,7 +7,7 @@ Set the `System` property on `MessageCreateParams`. It accepts a plain string.
 ```csharp
 var parameters = new MessageCreateParams
 {
-    Model = "claude-opus-4-6",
+    Model = "claude-opus-5",
     MaxTokens = 4096,
     System = "You are a senior .NET developer assistant...",
     Messages = [new() { Role = Role.User, Content = "Fix the bug in auth.py" }],
@@ -70,31 +70,18 @@ to gather information before answering questions. Never guess at file contents
 or code structure when you can look it up with a tool.
 ```
 
-## Chain-of-Thought Prompting
+## Don't Script the Reasoning
 
-Recommended for Claude Sonnet and Haiku models handling tool use. This pattern improves tool selection accuracy:
+Older prompts added "think step by step", `<scratchpad>` instructions, or step-by-step tool-selection scripts. Current models reason natively (adaptive thinking) and plan and self-verify without being told — these scaffolds are now redundant at best, and explicit "verify your work after each change" instructions cause over-verification. Control reasoning depth with the `effort` parameter, not prose.
+
+What still earns its place in the prompt:
 
 ```
-Answer the user's request using relevant tools if they are available. Before
-calling a tool, analyze the request. First, identify which tool best addresses
-the question. Second, verify that all required parameters are present or can
-be inferred from context. If all required parameters are available, call the
-tool. If a required parameter is missing, ask the user for it — do not call
+If a required tool parameter is missing, ask the user for it — do not call
 the tool with placeholder values.
 ```
 
-## Planning Pattern
-
-For agents executing multi-step tasks:
-
-```
-When given a complex task:
-1. Outline your plan before taking any action
-2. Use tools to gather context before making changes
-3. Verify your work after each change
-4. If something goes wrong, stop and reassess before continuing
-5. Report the final outcome with a summary of what was done
-```
+State goals, constraints, and how success is measured. Leave the *method* — planning, tool ordering, self-checks — to the model, and keep numbered steps only for genuinely fragile sequences (auth flows, destructive operations) where exactly one order is safe.
 
 ## Agentic Loop Pattern
 
@@ -113,11 +100,11 @@ Never fabricate results. If a tool fails, report the failure and ask for guidanc
 
 | Agent Type | Key Prompt Elements |
 |------------|---------------------|
-| Code assistant | Role definition, tool list, "gather context before changing" |
-| Data analyst | Output format expectations, precision requirements, tool usage guidance |
-| Multi-step task runner | Planning mandate, verification steps, failure behavior |
-| Customer-facing | Tone, escalation rules, what NOT to do |
-| Autonomous (long-running) | Loop behavior, when to stop, error recovery |
+| Code assistant | Role definition, tool contracts, scope discipline ("only the changes requested") |
+| Data analyst | Output format expectations, precision requirements, data-source facts |
+| Multi-step task runner | Goal and done-criteria, failure behavior |
+| Customer-facing | Tone, escalation rules, real business constraints with their reasons |
+| Autonomous (long-running) | When to stop, error recovery, what needs human approval |
 
 ## Structuring Long System Prompts
 
@@ -138,8 +125,7 @@ string system = """
 
     <behavior>
     - Prefer minimal changes that solve the stated problem
-    - Explain your reasoning before making tool calls
-    - After completing a task, summarize what was changed and why
+    - After completing a task, briefly summarize what was changed and why
     </behavior>
 
     <restrictions>
@@ -175,7 +161,7 @@ services.AddSingleton<AgentService>(sp =>
 ## Common Mistakes
 
 - **Putting user data in the system prompt** -- use conversation history instead
-- **Overly long system prompts** -- Claude can lose track of instructions buried deep in long prompts; use XML sections to structure them
-- **Conflicting instructions** -- later instructions in the prompt tend to win; put the most critical rules at the top
-- **Missing tool guidance** -- without tool usage instructions, Claude may call tools unnecessarily or not at all
+- **Aggressive emphasis** -- current models follow the prompt literally, so `CRITICAL: You MUST use this tool` over-triggers; write `Use this tool when...` at normal volume
+- **Conflicting or duplicated instructions** -- the model spends effort reconciling wordings; say each rule once, with its reason
+- **Tool guidance in the wrong place** -- when a tool under- or over-triggers, fix its `description` (say *when* to call it), not the system prompt
 - **No failure behavior defined** -- agents without explicit failure instructions tend to hallucinate results when tools fail

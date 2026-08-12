@@ -53,12 +53,12 @@ dotnet add package Anthropic.SDK
 | Feature | Official `Anthropic` | Unofficial `Anthropic.SDK` |
 |---------|---------------------|---------------------------|
 | `IChatClient` adapter | Yes (`AsIChatClient()`) | Yes (`.Messages` implements it directly) |
-| Function calling via attributes | No | Yes (`AIFunctionFactory.Create`) |
-| Extended thinking | Yes (content block streaming) | Yes (`ThinkingParameters`) |
-| Token counting API | Not documented | Yes (`CountMessageTokensAsync`) |
-| Semantic Kernel integration | Not documented | Documented with examples |
+| Automatic tool loop | `UseFunctionInvocation()` or `BetaToolRunner` (beta) | `AIFunctionFactory.Create` + `UseFunctionInvocation()` |
+| Thinking | Adaptive (`ThinkingConfigAdaptive`) + `OutputConfig.Effort` | `ThinkingParameters` |
+| Token counting API | Yes (`client.Messages.CountTokens`) | Yes (`CountMessageTokensAsync`) |
+| Semantic Kernel integration | Via IChatClient bridge | Documented with examples |
 | Streaming method | `CreateStreaming()` | `StreamClaudeMessageAsync()` |
-| Model enum | `Model.ClaudeSonnet4_5_20250929` | `AnthropicModels.Claude46Sonnet` |
+| Model IDs | Strings (`"claude-opus-5"`) + typed constants for older models | `AnthropicModels.*` enum |
 | Multi-cloud | Bedrock, Foundry, Vertex packages | Not documented |
 | Anthropic-maintained | Yes | No |
 
@@ -88,7 +88,6 @@ The Agent SDK is Anthropic's production-grade agentic framework. It was launched
 | Scenario | Recommendation |
 |----------|---------------|
 | New project, production use | Official `Anthropic` — Anthropic-maintained, gets features first |
-| Need token counting API | Unofficial `Anthropic.SDK` |
 | Need Semantic Kernel integration | Unofficial `Anthropic.SDK` (documented examples) |
 | Need AWS Bedrock or Azure Foundry | Official `Anthropic` + cloud extension package |
 | Need `IChatClient` + `UseFunctionInvocation()` | Either (both support it) |
