@@ -1,5 +1,5 @@
 {
   "name": "obsidian-skill",
   "description": "Obsidian vault knowledge base and docs-maintainer agent for reading, creating, editing, and maintaining Markdown notes — frontmatter/properties, wikilinks, embeds, block references, callouts, tags, Dataview, Templater, link integrity, and safe surgical editing",
-  "version": "1.2.0"
+  "version": "1.3.0"
 }

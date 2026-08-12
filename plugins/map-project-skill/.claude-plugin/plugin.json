@@ -1,5 +1,5 @@
 {
   "name": "map-project-skill",
   "description": "Project architecture mapping knowledge base that generates a 6-document project-map/ folder covering structure, documentation, source architecture, feature domains, configuration, and integrations",
-  "version": "1.0.0"
+  "version": "1.1.0"
 }
