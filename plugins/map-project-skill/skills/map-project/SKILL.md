@@ -44,8 +44,7 @@ Generate a `project-map/` folder with 6 documents that give agents (and humans) 
 
 ## General Principles
 
-1. **Each step builds on the previous** — Documents A and B provide context for C, which provides context for D, etc.
-2. **Optimize for discoverability** — the map answers "where is X?" and "what does this system do?" not "how does X work internally?"
-3. **Use judgement over exhaustiveness** — include what's architecturally significant, skip noise. When in doubt, ask: would an agent need this to avoid wasting time exploring?
-4. **Group by domain consistently** — use the same domain groupings across all documents so the map is navigable.
-5. **Consult the user on priorities** — they know which parts of the system matter most. Don't map everything to equal depth.
+1. **Optimize for discoverability** — the map answers "where is X?" and "what does this system do?" not "how does X work internally?"
+2. **Use judgement over exhaustiveness** — include what's architecturally significant, skip noise. Ask: would an agent need this to avoid wasting time exploring?
+3. **Group by domain consistently** — use the same domain groupings across all documents so the map is navigable.
+4. **Consult the user on priorities** — they know which parts of the system matter most. Don't map everything to equal depth.

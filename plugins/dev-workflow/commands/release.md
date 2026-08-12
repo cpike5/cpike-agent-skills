@@ -11,8 +11,9 @@ Version-file references below assume .NET (`Directory.Build.props`); on other st
 
 ## Usage
 
+```
 /release [version]
-
+```
 
 - `version` (optional): The version to release (e.g., `0.3.0`, `1.0.0`). If not provided, will prompt for version.
 
@@ -58,10 +59,10 @@ Version-file references below assume .NET (`Directory.Build.props`); on other st
    - Commit development version bump: `chore: Bump version to vX.Y.Z-dev`
    - Push commit: `git push origin main`
 
-   
 ## Example
 
+```
 /release 0.3.0
-
+```
 
 Creates tag `v0.3.0`, pushes to remote, and creates GitHub release with auto-generated notes.

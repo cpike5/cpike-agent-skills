@@ -5,7 +5,7 @@ description: "Use this skill when generating Mermaid diagrams for software archi
 
 # Mermaid Diagram Knowledge Base
 
-You are generating Mermaid diagrams. Read the relevant reference docs below based on what you're diagramming. **Always check syntax foundations first** — parse errors are the #1 issue.
+You are generating Mermaid diagrams. Read the relevant reference docs below based on what you're diagramming.
 
 ## Quick Decision: Which Diagram Type?
 
@@ -46,10 +46,9 @@ You are generating Mermaid diagrams. Read the relevant reference docs below base
 1. **Quote labels with special characters** — Colons, parentheses, semicolons, and brackets in labels cause parse failures. Wrap in `"double quotes"` or use HTML entities (`#58;` for colon, #40; #41; for parens, #59; for semicolon).
 2. **Node IDs must be alphanumeric** — No spaces, no hyphens, no starting with numbers. Use camelCase or underscores: `orderService`, `db_main`.
 3. **Avoid reserved words as IDs** — `end`, `style`, `class`, `click`, `subgraph`, `graph`, `flowchart` are reserved. Rename: `endState`, `styleNode`.
-4. **Space after arrows** — `A-->B` may fail in some contexts. Always use `A --> B` with spaces.
-5. **Use `stateDiagram-v2`** — The v1 syntax is deprecated and has known bugs. Always declare `stateDiagram-v2`.
-6. **ER diagram requires relationship labels** — Every relationship line needs a label string: `Customer ||--o{ Order : "places"`. Omitting the label causes a parse error.
-7. **C4 aliases must be unique** — Duplicate aliases across boundaries silently break rendering. Prefix with boundary context: `api_db`, `auth_db`.
-8. **Init directive must be first line** — `%%{init: {...}}%%` must appear before any diagram declaration. Placing it after causes it to be ignored.
-9. **No empty subgraphs** — A `subgraph` block with no nodes inside causes a parse error. Add at least one node or remove the subgraph.
-10. **Backtick labels for markdown** — To use bold/italic in node labels, wrap with backticks: `` A["`**Bold** text`"] ``. Regular quotes don't support markdown formatting.
+4. **Use `stateDiagram-v2`** — the current state-diagram syntax.
+5. **ER diagram requires relationship labels** — Every relationship line needs a label string: `Customer ||--o{ Order : "places"`. Omitting the label causes a parse error.
+6. **C4 aliases must be unique** — Duplicate aliases across boundaries silently break rendering. Prefix with boundary context: `api_db`, `auth_db`.
+7. **Init directive must be first line** — `%%{init: {...}}%%` must appear before any diagram declaration. Placing it after causes it to be ignored.
+8. **No empty subgraphs** — A `subgraph` block with no nodes inside causes a parse error. Add at least one node or remove the subgraph.
+9. **Backtick labels for markdown** — To use bold/italic in node labels, wrap with backticks: `` A["`**Bold** text`"] ``. Regular quotes don't support markdown formatting.
