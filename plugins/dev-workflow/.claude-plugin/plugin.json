@@ -1,5 +1,5 @@
 {
   "name": "dev-workflow",
   "description": "Development workflow commands for GitHub issue management, requirements gathering, orchestration, release management, documentation maintenance, and project instruction maintenance. Some commands dispatch to specialist agents from the dev-agents plugin when installed (falling back to general-purpose otherwise).",
-  "version": "1.4.0"
+  "version": "1.5.0"
 }

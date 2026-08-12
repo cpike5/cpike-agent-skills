@@ -1,5 +1,5 @@
 {
   "name": "summarizer-skill",
   "description": "Versatile content summarization skill and agent for distilling documents, emails, social media posts, technical specs, stories, and any pasted text into clear, audience-appropriate summaries",
-  "version": "1.0.0"
+  "version": "1.1.0"
 }

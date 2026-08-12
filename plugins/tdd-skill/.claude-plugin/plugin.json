@@ -1,5 +1,5 @@
 {
   "name": "tdd-skill",
   "description": "Test-Driven Development workflow for .NET: implement features and fix bugs through the Red-Green-Refactor cycle, detecting the project's existing test stack (xUnit/NUnit/MSTest) and driving implementation from failing tests",
-  "version": "1.0.0"
+  "version": "1.1.0"
 }
