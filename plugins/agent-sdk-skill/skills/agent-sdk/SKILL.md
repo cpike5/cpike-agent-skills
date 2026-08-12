@@ -1,6 +1,6 @@
 ---
 name: agent-sdk
-description: "Use this skill when building Claude-powered agents in .NET, implementing tool use or function calling with the Anthropic C# SDK, creating agentic loops, engineering system prompts for agents, handling streaming responses, using extended thinking, managing conversation context and token budgets, designing agent architecture patterns (augmented LLM, prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer, autonomous agents), integrating MCP servers or Semantic Kernel, or working with the Anthropic SDK .NET patterns (AnthropicClient, IChatClient, UseFunctionInvocation, AIFunctionFactory). Invoke when: creating or configuring AnthropicClient, registering IChatClient in DI, defining tools with JSON Schema, handling tool_use/tool_result content blocks, building manual agentic loops, streaming with CreateStreaming or MessageContentAggregator, enabling extended thinking with ThinkingParameters, writing agent system prompts, implementing retry/error handling for Anthropic API, managing conversation history compaction, choosing between agent architecture patterns, connecting to MCP tool servers, or using multi-cloud (Bedrock/Foundry) deployments."
+description: "Use this skill when building Claude-powered agents in .NET, implementing tool use or function calling with the Anthropic C# SDK, creating agentic loops, engineering system prompts for agents, handling streaming responses, using adaptive thinking and the effort parameter, managing conversation context and token budgets, designing agent architecture patterns (augmented LLM, prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer, autonomous agents), integrating MCP servers or Semantic Kernel, or working with the Anthropic SDK .NET patterns (AnthropicClient, IChatClient, UseFunctionInvocation, AIFunctionFactory). Invoke when: creating or configuring AnthropicClient, registering IChatClient in DI, defining tools with JSON Schema, handling tool_use/tool_result content blocks, building manual agentic loops, streaming with CreateStreaming or MessageContentAggregator, configuring thinking (ThinkingConfigAdaptive) or effort, writing agent system prompts, implementing retry/error handling for Anthropic API, managing conversation history compaction, choosing between agent architecture patterns, connecting to MCP tool servers, or using multi-cloud (Bedrock/Foundry) deployments."
 ---
 
 # Agent SDK Knowledge Base (.NET)
@@ -15,7 +15,7 @@ You are building AI agents using the Anthropic C# SDK in .NET. There is **no .NE
 | Full control over each tool call | Manual Messages API loop | 06 |
 | Stream responses to user in real-time | Streaming agentic loop | 07 |
 | Production service with DI | DI-friendly agent service | 02, 06 |
-| Complex reasoning before acting | Extended thinking | 08 |
+| Complex reasoning before acting | Adaptive thinking + effort | 08 |
 | Choose between SDK packages | SDK comparison | 01 |
 | Connect to external tool servers | MCP integration | 13 |
 | Multi-step orchestration | Architecture patterns | 12 |
@@ -39,7 +39,7 @@ You are building AI agents using the Anthropic C# SDK in .NET. There is **no .NE
 
 ### Streaming & Thinking
 - ${CLAUDE_PLUGIN_ROOT}/docs/07-streaming.md — CreateStreaming, MessageContentAggregator, delta processing
-- ${CLAUDE_PLUGIN_ROOT}/docs/08-extended-thinking.md — ThinkingParameters, budget tokens, streaming thinking deltas
+- ${CLAUDE_PLUGIN_ROOT}/docs/08-extended-thinking.md — Adaptive thinking, effort parameter, streaming thinking deltas, legacy budget tokens
 
 ### Reliability & Context
 - ${CLAUDE_PLUGIN_ROOT}/docs/09-system-prompts.md — Agent prompt engineering, role definition, chain-of-thought, auto-generated tool prompts
@@ -56,10 +56,9 @@ You are building AI agents using the Anthropic C# SDK in .NET. There is **no .NE
 3. **Always check StopReason** — `end_turn` means done, `tool_use` means execute tools and continue. Ignoring this breaks the loop.
 4. **Return ALL tool_results together** — When Claude makes parallel tool calls, execute all tools and return all results in a single user message. Never send partial results.
 5. **Prefer UseFunctionInvocation()** — For most agents, IChatClient with `UseFunctionInvocation()` handles the tool loop automatically. Only use manual loops when you need per-iteration control.
-6. **Write 3-4 sentence tool descriptions** — This is the single most important factor in tool performance. Include what it does, when to use it, and limitations.
-7. **No string interpolation in system prompts** — Prevents prompt injection. Use parameterized tool inputs instead.
-8. **Dispose streaming resources** — `IAsyncEnumerable` streams must be properly consumed or disposed. Use `await foreach` or `ConfigureAwait(false)`.
-9. **Extended thinking needs streaming** — In the official SDK, extended thinking is only available via `CreateStreaming`, not the synchronous `Create` method.
+6. **Write detailed tool descriptions** — The most important factor in tool performance. Say what the tool does, *when* to call it, and its limitations; descriptions must match actual behavior.
+7. **Keep user content out of the system prompt** — Untrusted content belongs in conversation messages, not interpolated into the system prompt (prompt injection).
+8. **Consume streams fully** — Enumerate `CreateStreaming` results with `await foreach` so underlying resources are released.
+9. **Use adaptive thinking, not budget tokens** — `BudgetTokens` returns a 400 on current models (Opus 5, Sonnet 5, Opus 4.7/4.8). Use `ThinkingConfigAdaptive` and tune depth with `OutputConfig.Effort`.
 10. **Register AnthropicClient and IChatClient as Singleton** — Both are thread-safe. Scoped/transient registration wastes resources.
-11. **Never put API keys in code** — Use environment variables (`ANTHROPIC_API_KEY`), user secrets, or a vault.
-12. **Capture tool errors as tool_result** — When a tool throws, catch the exception and return it as a `tool_result` with `is_error: true`. Don't let tool failures crash the loop.
+11. **Capture tool errors as tool_result** — When a tool throws, catch the exception and return it as a `tool_result` with `is_error: true`. Don't let tool failures crash the loop.

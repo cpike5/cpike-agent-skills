@@ -19,7 +19,7 @@ MessageCreateParams parameters = new()
             Content = "Hello, Claude",
         },
     ],
-    Model = Model.ClaudeSonnet4_5_20250929,
+    Model = "claude-sonnet-5",
 };
 
 var message = await client.Messages.Create(parameters);
@@ -34,27 +34,26 @@ Console.WriteLine(message);
 | `MaxTokens` | `int` | Yes | Maximum output tokens |
 | `Messages` | `Message[]` | Yes | Conversation history |
 | `System` | `string` | No | System prompt |
-| `Temperature` | `double?` | No | 0.0–1.0 (default varies by model) |
-| `TopP` | `double?` | No | Nucleus sampling |
-| `TopK` | `int?` | No | Top-K sampling |
 | `StopSequences` | `string[]?` | No | Custom stop sequences |
+
+**Sampling parameters are gone on current models.** `Temperature`, `TopP`, and `TopK` are removed on Claude Opus 5 / Opus 4.8 / 4.7 (the request returns a 400), and non-default values are rejected on Claude Sonnet 5. Omit them and steer behavior through the prompt; on older models (Sonnet 4.6 and earlier) set at most one of `Temperature` or `TopP`.
 
 ## Model Selection
 
 ```csharp
-// Type-safe model constants
-Model = Model.ClaudeSonnet4_5_20250929
-
-// String model IDs (for latest or custom)
-Model = "claude-opus-4-6"
-Model = "claude-sonnet-4-5-20250929"
+// String model IDs (aliases — no date suffix needed)
+Model = "claude-opus-5"
+Model = "claude-sonnet-5"
 Model = "claude-haiku-4-5"
+
+// Typed constants exist for older models (e.g. Model.ClaudeSonnet4_6);
+// use the plain string for models without a typed constant yet.
 ```
 
 | Model | Best For | Context Window |
 |-------|----------|---------------|
-| `claude-opus-4-6` | Complex reasoning, extended thinking | 200K |
-| `claude-sonnet-4-5-20250929` | Balanced performance/cost | 200K |
+| `claude-opus-5` | Complex agentic work, deep reasoning | 1M |
+| `claude-sonnet-5` | Balanced performance/cost | 1M |
 | `claude-haiku-4-5` | Fast, low-cost tasks | 200K |
 
 ## Message Structure
@@ -72,7 +71,7 @@ Messages =
 
 **Rules:**
 - First message must be `Role.User`
-- Roles must alternate (user → assistant → user → ...)
+- Consecutive same-role messages are allowed — the API combines them into a single turn
 - Content can be a string or array of content blocks
 
 ## Content Blocks
@@ -100,7 +99,7 @@ new()
 ```csharp
 var parameters = new MessageCreateParams
 {
-    Model = "claude-sonnet-4-5-20250929",
+    Model = "claude-sonnet-5",
     MaxTokens = 4096,
     System = "You are a helpful coding assistant specializing in .NET.",
     Messages = [new() { Role = Role.User, Content = "Fix the bug in auth.py" }],
@@ -130,6 +129,8 @@ message.Usage       // Token usage
 | `tool_use` | Claude wants to call tools | Execute tools, send results, loop |
 | `max_tokens` | Hit MaxTokens limit | Increase limit or handle truncation |
 | `stop_sequence` | Hit a custom stop sequence | Handle based on your logic |
+| `pause_turn` | Server-side tool loop paused | Re-send the conversation; the server resumes automatically |
+| `refusal` | Safety classifiers declined (HTTP 200) | Check `StopDetails`; don't retry the same prompt. Content may be empty — check StopReason before reading Content |
 
 **In agentic loops, always check StopReason.** If it's `tool_use`, execute the tools and continue the loop. If `end_turn`, extract the text response and return it.
 
@@ -169,7 +170,7 @@ history.Add(new() { Role = Role.User, Content = userInput });
 // API call
 var parameters = new MessageCreateParams
 {
-    Model = "claude-sonnet-4-5-20250929",
+    Model = "claude-sonnet-5",
     MaxTokens = 4096,
     Messages = history.ToArray(),
 };

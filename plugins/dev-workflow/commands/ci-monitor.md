@@ -21,9 +21,8 @@ First token = PR number (required). `--max-iterations` (aliases `--max`, `-n`) c
 
 ## Orchestrator Rules
 
-1. **Never read source files or write code yourself** — sub-agents do that
-2. **Keep sub-agent prompts focused** — include only the failure context they need
-3. **Track attempted fixes** — avoid infinite loops on the same failure
+1. **Keep sub-agent prompts focused** — include only the failure context they need
+2. **Track attempted fixes** — avoid infinite loops on the same failure
 
 ## Phase 1: Initialize
 
@@ -96,19 +95,9 @@ Fix CI failure in PR #{number}: {pr_title}
 - Iteration: {current_iteration} of {max_iterations}
 
 ## Constraints
-- Fix ONLY the CI failure described above
-- Do NOT refactor unrelated code
-- Do NOT change test expectations unless the test is genuinely wrong
+- Fix only the CI failure described above. Don't refactor unrelated code, and don't change test expectations unless the test itself is genuinely wrong.
 - If the fix requires architectural changes beyond your scope, report back with what's needed instead of making partial changes
 ```
-
-### Per-agent prompt additions
-
-- `dotnet-fixer`: exact error codes (CS####) and file paths from the log
-- `dotnet-specialist`: which projects are affected and any project/package reference issues
-- `test-writer`: test name, expected vs actual values, and whether the test or the implementation should change
-- `security-hardener`: CVE numbers, affected packages, suggested remediation from scan output
-- `devops-specialist`: the workflow file path and the full step output where the failure occurred
 
 ## Phase 5: Commit, Push, and Loop
 

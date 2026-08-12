@@ -54,11 +54,6 @@ $ARGUMENTS
 
 Sub-issues use the same shape plus a `Part of #[parent]` footer. Keep them focused and reference the parent for shared context instead of duplicating it.
 
-## What NOT to Do
-
-- Don't start implementing — just document
-- Don't over-engineer the breakdown, and don't create sub-issues for trivial (< 1 file) tasks
-
 ## Output
 
 - Summary of changes made to the issue

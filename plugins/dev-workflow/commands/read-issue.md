@@ -36,7 +36,7 @@ Use `gh issue view NUMBER` to get the full issue body and comments. Note:
 
 ### 3. Read CLAUDE.md
 
-**CRITICAL:** Read the project's CLAUDE.md to understand:
+Read the project's CLAUDE.md to understand:
 - Which architectural layer this issue affects
 - Relevant configuration options (exact class names)
 - Relevant page routes (if UI-related)
@@ -94,13 +94,6 @@ If `docs/lessons-learned/` exists, scan for relevant entries.
 - [ ] Implementation (/fix-issue)
 - [ ] Questions/clarification needed
 ```
-
-## What NOT to Do
-
-- **Don't read entire services** - identify files, don't explore them
-- **Don't explore the codebase** - use CLAUDE.md for structure
-- **Don't provide implementation details** - just context for next steps
-- **Don't over-research** - gather enough to assess scope
 
 ## Goal
 

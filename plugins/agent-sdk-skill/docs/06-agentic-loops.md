@@ -2,7 +2,7 @@
 
 An agentic loop is the cycle of: send request → receive tool calls → execute tools → return results → repeat until `end_turn`.
 
-.NET has no Agent SDK. You build loops manually or delegate to `UseFunctionInvocation()`.
+.NET has no Agent SDK. You build loops manually or delegate the loop to middleware: `UseFunctionInvocation()` (IChatClient, shown below) or the official SDK's `BetaToolRunner` (`client.Beta.Messages.ToolRunner(...)`, beta — iterate the returned messages and the SDK executes tools for you).
 
 ## Pattern 1: IChatClient Auto-Loop (Simplest)
 
@@ -36,7 +36,7 @@ public class SimpleAgent
 // Registration
 services.AddSingleton<IChatClient>(_ =>
     new AnthropicClient()
-        .AsIChatClient("claude-opus-4-6")
+        .AsIChatClient("claude-opus-5")
         .AsBuilder()
         .UseFunctionInvocation()
         .Build());
@@ -74,7 +74,7 @@ public async Task<string> RunManualLoopAsync(
     {
         var response = await _client.Messages.Create(new MessageCreateParams
         {
-            Model = "claude-opus-4-6",
+            Model = "claude-opus-5",
             MaxTokens = 4096,
             System = systemPrompt,
             Tools = tools,
@@ -206,7 +206,7 @@ services.AddSingleton<AnthropicClient>(sp =>
 
 services.AddSingleton<IChatClient>(sp =>
     sp.GetRequiredService<AnthropicClient>()
-        .AsIChatClient("claude-opus-4-6")
+        .AsIChatClient("claude-opus-5")
         .AsBuilder()
         .UseFunctionInvocation()
         .Build());
@@ -298,6 +298,8 @@ response.StopReason
 ├── "end_turn"      → extract text, return to caller, done
 ├── "tool_use"      → dispatch tools, add results, loop
 ├── "max_tokens"    → trim history or raise MaxTokens, loop or surface error
+├── "pause_turn"    → server-side tool loop paused; append assistant turn, re-send to resume
+├── "refusal"       → safety classifiers declined (HTTP 200); surface to user, don't retry same prompt
 └── "stop_sequence" → extract text, handle as application-specific signal
 ```
 

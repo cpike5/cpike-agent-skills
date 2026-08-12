@@ -10,7 +10,7 @@ using Anthropic.Models.Messages;
 
 MessageCreateParams parameters = new()
 {
-    Model = "claude-opus-4-6",
+    Model = "claude-opus-5",
     MaxTokens = 1024,
     Messages = [new() { Role = Role.User, Content = "Explain async/await in C#." }],
 };
@@ -111,7 +111,7 @@ public async IAsyncEnumerable<string> StreamResponse(
 {
     var parameters = new MessageCreateParams
     {
-        Model = "claude-opus-4-6",
+        Model = "claude-opus-5",
         MaxTokens = 2048,
         Messages = [new() { Role = Role.User, Content = prompt }],
     };
@@ -190,7 +190,7 @@ The `IChatClient` abstraction also supports streaming:
 
 ```csharp
 IChatClient chatClient = new AnthropicClient()
-    .AsIChatClient("claude-opus-4-6")
+    .AsIChatClient("claude-opus-5")
     .AsBuilder()
     .UseFunctionInvocation()
     .Build();

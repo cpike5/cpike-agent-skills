@@ -1,36 +1,8 @@
 ---
 name: performance-analyst
-description: |
-  Use this agent when profiling performance, optimizing slow queries, tuning .NET runtime behavior, or load testing. Handles Postgres query optimization, .NET profiling, EF Core performance, Blazor render performance, Docker resource constraints, and load testing. Examples:
-
-  <example>
-  Context: User has a slow database query
-  user: "This query is taking 3 seconds, can you figure out why?"
-  assistant: "I'll use the performance-analyst to run EXPLAIN ANALYZE and identify the bottleneck."
-  <commentary>
-  Query performance diagnosis with EXPLAIN ANALYZE is this agent's core capability. Note: "this query is slow" = performance-analyst, "write the query" = database-specialist.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User wants to profile their .NET application
-  user: "Our API response times are degrading under load"
-  assistant: "I'll use the performance-analyst to profile with dotnet-counters and identify the bottleneck."
-  <commentary>
-  .NET runtime profiling and diagnostics are within scope.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User wants to load test before release
-  user: "Set up a load test to simulate 500 concurrent users"
-  assistant: "I'll use the performance-analyst to create a k6 or NBomber load test script targeting the critical endpoints."
-  <commentary>
-  Load testing setup and analysis is a core capability.
-  </commentary>
-  </example>
-tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, Edit, Write
-model: sonnet
+description: Use this agent when profiling performance, diagnosing slow queries, tuning .NET runtime behavior, or load testing; for writing queries or schema design, use database-specialist instead.
+tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, Bash, BashOutput, KillShell, Edit, Write
+model: opus
 color: gold
 ---
 
