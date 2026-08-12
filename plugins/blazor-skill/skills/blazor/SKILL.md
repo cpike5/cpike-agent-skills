@@ -9,7 +9,7 @@ You are implementing Blazor components. Read the relevant reference docs below b
 
 ## Design Thinking
 
-Before coding any UI, commit to a **bold aesthetic direction**. Consider the purpose, audience, and tone — then choose a clear visual identity (minimal, maximalist, editorial, brutalist, etc.) and execute it with precision. Unless brand guidelines dictate otherwise, avoid generic AI aesthetics: no Inter/Roboto defaults, no purple gradients on white, no cookie-cutter card grids. Every project deserves a fresh, intentional design. See `12-design-aesthetics.md` for full guidance on typography, color, motion, and spatial composition in Blazor.
+Before coding any UI, commit to a **bold aesthetic direction**. Consider the purpose, audience, and tone — then choose a clear visual identity (minimal, maximalist, editorial, brutalist, etc.) and execute it with precision. Unless brand guidelines dictate otherwise, avoid generic AI aesthetics: no Inter/Roboto defaults, no purple gradients on white, no cookie-cutter card grids. Every project deserves a fresh, intentional design. See ${CLAUDE_PLUGIN_ROOT}/docs/12-design-aesthetics.md for full guidance on typography, color, motion, and spatial composition in Blazor.
 
 ## Quick Decision: What Render Mode?
 
@@ -18,7 +18,7 @@ Before coding any UI, commit to a **bold aesthetic direction**. Consider the pur
 - Need offline/client-side? → **@rendermode InteractiveWebAssembly**
 - Want both? → **@rendermode InteractiveAuto**
 
-If event handlers don't work, CHECK THE RENDER MODE FIRST — starting with `<Routes>` in `App.razor`. Per-page `@rendermode` directives are **silently ignored** if `<Routes>` has no render mode.
+If event handlers don't work, **check the render mode first** — starting with `<Routes>` in `App.razor`. Per-page `@rendermode` directives are **silently ignored** if `<Routes>` has no render mode.
 
 ## Reference Documentation
 
@@ -52,7 +52,7 @@ Read the relevant docs based on your task:
 
 ## Critical Rules (Common Mistakes)
 
-1. **No @rendermode = Static SSR** — Event handlers (`@onclick`, `@oninput`) are INERT. Add a render mode. **Check `App.razor` first**: `<Routes @rendermode="InteractiveServer" />` must be set, or per-page `@rendermode` directives do nothing.
+1. **No @rendermode = Static SSR** — Event handlers (`@onclick`, `@oninput`) are **inert**. Add a render mode. **Check `App.razor` first**: `<Routes @rendermode="InteractiveServer" />` must be set, or per-page `@rendermode` directives do nothing.
 2. **JS interop only in OnAfterRender** — Not available during OnInitialized or prerendering.
 3. **OnInitializedAsync runs TWICE with prerendering** — Use `[PersistentState]` (.NET 10+) or `PersistentComponentState`.
 4. **Always dispose**: IJSObjectReference, DotNetObjectReference, event subscriptions, CancellationTokenSource.

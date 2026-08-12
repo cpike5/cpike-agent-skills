@@ -45,18 +45,7 @@ If no format is specified, choose the most useful default for the content type (
 
 ---
 
-## Step 3 — Read the Whole Thing First
-
-Never summarize from a skim. If the content is long:
-- Read the full document before writing
-- Note structure: does it have sections, headers, a conclusion?
-- Identify the actual main point — don't just summarize the opening paragraph
-
-For file paths: read the file(s) before summarizing.
-
----
-
-## Step 4 — Write the Summary
+## Step 3 — Write the Summary
 
 Rules that always hold:
 

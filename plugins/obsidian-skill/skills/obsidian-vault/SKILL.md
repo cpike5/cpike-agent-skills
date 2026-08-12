@@ -11,8 +11,7 @@ An Obsidian vault is just a folder of plain `.md` files plus a `.obsidian/` conf
 
 1. **Locate the vault root.** It is the folder containing `.obsidian/`. All wikilinks resolve relative to the vault, not the current file's folder, so you need the root to reason about links.
 2. **Never edit `.obsidian/` unless asked.** It holds plugin config, hotkeys, and workspace state. Corrupting it can break the user's setup. If version-controlling the vault, most of it should be gitignored (see references).
-3. **Read before you write.** Obsidian files often contain frontmatter and special syntax that looks like ordinary text but has meaning. Read the whole note first.
-4. **Preserve, don't reformat.** Do not "tidy" Markdown, reflow paragraphs, or normalize link style across a note unless that is the task. Surgical edits only — the user's notes are their long-term memory.
+3. **Preserve, don't reformat.** Do not "tidy" Markdown, reflow paragraphs, or normalize link style across a note unless that is the task.
 
 ## Frontmatter (Properties)
 
@@ -49,9 +48,11 @@ These are **non-standard Markdown**. They will not render in GitHub, VS Code pre
 
 See `${CLAUDE_PLUGIN_ROOT}/docs/01-syntax.md` for the full set and edge cases.
 
-## The cardinal rule: protect link integrity
+For Mermaid diagrams inside notes, use the **mermaid** skill.
 
-Links are the connective tissue of a vault. The most damaging thing an agent can do is silently orphan notes.
+## Protect link integrity
+
+Links are the connective tissue of a vault.
 
 - **Renaming or moving a note breaks every `[[wikilink]]` pointing at it.** Obsidian's own UI auto-updates these; you are not in the UI. If you rename a note (file or its display name), you **must** search the whole vault for references to the old name and update them — including embeds `![[...]]`, heading links `[[Note#...]]`, and block links `[[Note#^...]]`. Do a vault-wide grep for the old basename.
 - Prefer adding an `alias` over renaming when the goal is just to make a note findable under a new name — it's non-destructive.
@@ -71,21 +72,5 @@ Links are the connective tissue of a vault. The most damaging thing an agent can
 - Leave frontmatter, callouts, embeds, and block IDs intact unless they are the thing being edited. In particular, never strip a `^block-id` — something may link to it.
 - If you change a heading that is the target of a `[[Note#Heading]]` link, update those links too (grep for the old heading text).
 - Don't convert wikilinks to standard Markdown links (or vice versa) unless asked — the vault has a global setting for which style it uses.
-
-## Common requests and how to approach them
-
-- **"Add a tag/property to these notes"** → edit frontmatter (or inline `#tag`), matching existing key names; don't duplicate keys.
-- **"Link these related notes"** → add `[[wikilinks]]`; verify each target note actually exists by its basename.
-- **"Make a MOC / index note"** → a note that is mostly `[[links]]` to others; confirm each link resolves.
-- **"Clean up / find broken links"** → grep all `[[...]]` targets against actual filenames; report orphans and dangling links before changing anything.
-- **"Set up a Dataview query"** → fenced ` ```dataview ` block; requires the Dataview community plugin and consistent property names. See `${CLAUDE_PLUGIN_ROOT}/docs/01-syntax.md`.
-- **"Add a diagram / Mermaid chart to a note"** → use the **`mermaid` skill** for the syntax, diagram-type choice, and styling rather than hand-writing it. Obsidian renders fenced ` ```mermaid ` blocks natively, so the diagram lives inline in the note.
-
-## Sanity check before finishing
-
-- Frontmatter still valid YAML and still the first thing in the file?
-- Any renamed note/heading — did you update every inbound link?
-- Did you avoid editing `.obsidian/`?
-- Did you preserve syntax you didn't need to touch (callouts, embeds, block IDs, comments)?
 
 For the complete syntax reference, Dataview/Templater notes, and git/gitignore guidance, read `${CLAUDE_PLUGIN_ROOT}/docs/01-syntax.md`.

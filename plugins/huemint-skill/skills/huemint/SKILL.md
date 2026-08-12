@@ -26,6 +26,8 @@ description: >
 ### Always Read First
 - `${CLAUDE_PLUGIN_ROOT}/docs/01-api-basics.md` — Endpoint, parameters, request/response format, examples, error handling
 
+Bash curl calls to the Huemint API are pre-approved by this plugin's PreToolUse hook — no permission prompt.
+
 ### Core Concepts
 - `${CLAUDE_PLUGIN_ROOT}/docs/02-adjacency-matrices.md` — CIE Delta-E scale, matrix rules, worked examples
 - `${CLAUDE_PLUGIN_ROOT}/docs/03-color-locking.md` — Lock/unlock syntax, brand workflows, dark mode locking
@@ -46,8 +48,7 @@ description: >
 3. **All values are strings** — `temperature`, `adjacency` values, and `palette` values must be strings (`"65"` not `65`, `"1.2"` not `1.2`).
 4. **Diffusion max 5** — Diffusion mode only supports up to 5 colors. Use transformer for 6+.
 5. **Diagonal = 0** — Every `adjacency[i*num_colors + i]` must be `"0"`.
-6. **Dimension consistency** — `len(adjacency) == num_colors²` and `len(palette) == num_colors`. Always verify.
+6. **Dimension consistency** — `len(adjacency) == num_colors²` and `len(palette) == num_colors`.
 7. **Non-commercial use** — The API is free for non-commercial use. Be respectful with request volume.
 8. **Temperature semantics** — Low (0.0–0.8) = safe/predictable, Medium (0.8–1.4) = balanced/creative, High (1.4–2.4) = wild/experimental.
 9. **Request multiple results** — Always set `num_results` ≥ 3 to give users options. Use 5–10 for exploration rounds.
-10. **Prototype after selection** — Generate palettes first, let the user choose, then build the HTML/CSS prototype with the selected palette.

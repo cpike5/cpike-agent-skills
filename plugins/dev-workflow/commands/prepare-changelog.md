@@ -65,5 +65,4 @@ Omit empty sections.
 
 ## Notes
 
-- The generated changelog is a draft; review before including it in a release.
 - PRs with conventional commit prefixes (feat:, fix:, docs:, …) categorize more reliably; entries from PRs with unclear descriptions may need manual improvement.

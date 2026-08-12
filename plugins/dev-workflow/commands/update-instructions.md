@@ -21,19 +21,7 @@ $ARGUMENTS
 
 ## Design Philosophy
 
-**Context has a cost.** Every line loaded into conversation consumes tokens.
-
-CLAUDE.md should be **small and focused** (~80-100 lines). It contains:
-- Critical gotchas that cause real bugs
-- Quick reference commands
-- Key file locations
-- Pointers to docs (not duplicates)
-
-CLAUDE-REFERENCE.md is **optional and comprehensive**. It contains:
-- Full configuration options table
-- Complete UI page routes
-- Command module inventory
-- Generated from code, not hand-maintained
+Every line of CLAUDE.md is loaded into every conversation — keep it to what the model can't infer.
 
 ## Two-File Strategy
 
@@ -44,7 +32,7 @@ Target: **Under 100 lines**
 **Include:**
 - Quick reference commands (build, run, test)
 - Architecture one-liner with key locations
-- Critical gotchas (JS number overflow, terminology)
+- Critical gotchas (non-obvious pitfalls, terminology)
 - Key patterns (2-3 sentences each with doc links)
 - Top 5-8 most important doc links
 - Pointer to CLAUDE-REFERENCE.md if it exists
@@ -60,12 +48,10 @@ Target: **Under 100 lines**
 Generated file containing lookup tables. Agents read this when:
 - Task involves configuration options
 - Task involves page routes
-- Task involves command modules
 
 **Include:**
 - Configuration Options table (all Options classes)
 - UI Page Routes table (all pages with URL patterns)
-- Command Modules table (if Discord bot)
 - Key Documentation table (all docs with purposes)
 
 ## Process
@@ -76,7 +62,6 @@ Generated file containing lookup tables. Agents read this when:
 2. Verify it follows slim structure
 3. Update key doc links (verify they exist)
 4. Check for new critical gotchas
-5. Ensure under 100 lines
 
 ### With "tables" or "reference": Generate CLAUDE-REFERENCE.md
 
@@ -94,27 +79,20 @@ Scan patterns below are .NET-oriented examples — adapt the globs to the projec
    src/*/Pages/**/*.razor
    ```
 
-3. Scan for command modules (if Discord bot):
-   ```
-   src/*/Commands/*.cs
-   src/*/Modules/*.cs
-   ```
-
-4. Scan docs folder:
+3. Scan docs folder:
    ```
    docs/articles/*.md
    ```
 
-5. Generate CLAUDE-REFERENCE.md with tables
+4. Generate CLAUDE-REFERENCE.md with tables
 
-6. Add pointer to CLAUDE.md if not present
+5. Add pointer to CLAUDE.md if not present
 
 ### With "slim": Aggressive Trimming
 
 1. Remove any content duplicated in README.md
 2. Remove tables (move to CLAUDE-REFERENCE.md)
 3. Condense patterns to single lines with doc links
-4. Target under 80 lines
 
 ## CLAUDE.md Template
 
@@ -180,12 +158,6 @@ Last updated: [timestamp]
 |------|-------------|-------------|
 | [PageName] | [/path] | [Description] |
 
-## Command Modules
-
-| Module | Commands |
-|--------|----------|
-| [ModuleName] | [/cmd1, /cmd2] |
-
 ## Documentation Index
 
 | Doc | Purpose |
@@ -193,27 +165,10 @@ Last updated: [timestamp]
 | [filename.md] | [Description] |
 ```
 
-## Validation
-
-After updating, verify:
-
-**CLAUDE.md:**
-- [ ] Under 100 lines (warn if over)
-- [ ] No duplication with README.md
-- [ ] All doc links valid
-- [ ] Gotchas are genuinely non-obvious
-- [ ] Has pointer to CLAUDE-REFERENCE.md
-
-**CLAUDE-REFERENCE.md:**
-- [ ] All Options classes listed
-- [ ] All page routes captured
-- [ ] All doc files indexed
-- [ ] Timestamp is current
-
 ## Output
 
 Report:
-- CLAUDE.md line count (target: <100)
+- CLAUDE.md line count
 - CLAUDE-REFERENCE.md item counts (if generated)
 - Items added/removed
 - Warnings for any issues

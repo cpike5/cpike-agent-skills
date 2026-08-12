@@ -56,7 +56,7 @@ Every assessor gets the same prompt skeleton with its focus section swapped in:
 ## Your Focus: {Focus}
 {focus bullets from the definitions below}
 
-Respond in EXACTLY this format (omit empty sections):
+Respond in this format (omit empty sections):
 
 ### Critical
 - `{doc_file}` — {finding: what's wrong, missing, or stale — and what the code actually does}
@@ -73,10 +73,10 @@ Respond in EXACTLY this format (omit empty sections):
 
 ### Assessor Focus Definitions
 
-- **Feature Accuracy** — for each documented feature, read the corresponding source code: does the documented behavior match the implementation? Are examples, parameters, and configuration options still correct? Are features described that no longer exist or work differently?
-- **Gap Detection** — map the project's public surface area (APIs, endpoints, commands, config, env vars, user-facing features) and cross-reference against existing docs; flag what exists but is undocumented. Weight by impact: a missing doc for a core feature is Critical; for an internal utility, Minor.
-- **Change Impact** — read the change set carefully: did it modify documented behavior without updating docs? Introduce features or APIs needing new docs? Remove or rename things existing docs still reference? If docs WERE updated in the change set, verify they're accurate and complete. In full-sweep mode, check the last 10–20 commits for undocumented changes.
-- **Staleness** — verify every concrete reference in each doc still exists and resolves: file paths, class/function names, config keys, commands, internal and external links, version-specific instructions, screenshots/examples, referenced dependencies or tools.
+- **Feature Accuracy** — read the source behind each documented feature; flag docs that no longer match the implementation.
+- **Gap Detection** — map the project's public surface area against existing docs; flag what's undocumented, weighted by impact.
+- **Change Impact** — flag documented behavior the change set modified, new features needing docs, and removed things docs still reference.
+- **Staleness** — verify every concrete reference in each doc still resolves: paths, names, config keys, commands, links, examples.
 
 ## Phase 3: Synthesize Findings
 

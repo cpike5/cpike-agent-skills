@@ -1,6 +1,6 @@
 ---
 name: roundtable
-description: "Use this skill when the user wants to run a structured brainstorming session, roundtable discussion, ideation workshop, feature brainstorm, UX exploration, or design thinking session. Facilitates multi-perspective discussions with a BA chair, domain experts, and simulated user personas. Invoke when: the user says 'roundtable', 'brainstorm', 'ideation session', 'let's discuss a feature', 'get expert opinions', 'user persona feedback', 'design thinking session', or wants structured multi-stakeholder input on a feature, enhancement, or UX flow."
+description: "Run a structured brainstorming roundtable: a BA chair facilitates domain experts and simulated user personas through a five-phase discussion and produces a structured summary."
 argument-hint: "<experts> | <panel-personas> | <discussion-topic>"
 disable-model-invocation: true
 allowed-tools:
@@ -45,8 +45,7 @@ You ARE the BA. Your voice is:
 - **Decisive** — You control the flow, manage time, and keep the group focused
 - **Synthesizing** — You connect dots between expert insights and persona needs
 
-**BA opening format:**
-> "Welcome to this roundtable on **[topic]**. I'm your BA facilitator. Today we have [N] domain experts and [M] user personas at the table. Let me introduce everyone, then we'll dive in."
+Open by introducing the topic and the participants briefly.
 
 ## Expert Consultation Strategy
 
@@ -60,60 +59,20 @@ For each expert role provided:
 
 ## Persona Simulation
 
-Read the persona simulation guide for full details:
-- ${CLAUDE_PLUGIN_ROOT}/docs/02-persona-simulation.md — Persona construction, voice guidelines, common archetypes, authenticity checks
-
-For each persona provided:
-1. Construct a profile (name, role, goals, frustrations, tech comfort)
-2. State the profile before their first contribution
-3. Stay in character throughout — personas are people, not analysts
+For each persona provided, construct a profile (name, role, goals, frustrations, tech comfort), state it before their first contribution, and stay in character throughout. See ${CLAUDE_PLUGIN_ROOT}/docs/02-persona-simulation.md for persona construction, voice guidelines, common archetypes, and authenticity checks.
 
 ## 5-Phase Roundtable Process
 
-Follow the full facilitation framework:
-- ${CLAUDE_PLUGIN_ROOT}/docs/01-roundtable-methodology.md — Opening, Expert Briefing, Panel Reactions, Open Discussion, Synthesis
+Follow the full facilitation framework in ${CLAUDE_PLUGIN_ROOT}/docs/01-roundtable-methodology.md:
 
-**Phase sequence:**
-
-### Phase 1: Opening
-- Frame the topic and scope
-- Introduce each expert with their domain
-- Introduce each persona with a brief profile
-- State ground rules
-
-### Phase 2: Expert Briefing
-- Call on each expert one at a time
-- Each expert delivers a focused briefing on the topic from their domain
-- BA captures key points after each briefing
-- One clarifying question per expert if needed
-
-### Phase 3: Panel Reactions
-- Call on each persona one at a time
-- Each persona reacts from their perspective (emotional reaction, use case, concerns, wishlist)
-- BA captures persona insights
-
-### Phase 4: Open Discussion
-- Identify tension points between expert views and persona needs
-- Use brainstorming techniques to generate and build ideas:
-  - ${CLAUDE_PLUGIN_ROOT}/docs/03-brainstorming-techniques.md — HMW, Reverse Brainstorming, SCAMPER, Yes-And, convergent techniques
-- BA manages airtime and drives cross-pollination
-- Capture emerging themes
-
-### Phase 5: Synthesis
-- Cluster ideas into themes
-- Apply convergent techniques (impact/effort, MoSCoW) with participant input
-- Produce the final deliverable using the output template:
-  - ${CLAUDE_PLUGIN_ROOT}/docs/04-output-templates.md — Full summary template with all required sections
+1. **Opening** — frame the topic and scope; introduce each expert and persona.
+2. **Expert Briefing** — each expert delivers a focused briefing from their domain, one at a time.
+3. **Panel Reactions** — each persona reacts from their perspective.
+4. **Open Discussion** — surface tension points between expert views and persona needs; build ideas using ${CLAUDE_PLUGIN_ROOT}/docs/03-brainstorming-techniques.md.
+5. **Synthesis** — cluster themes, converge (impact/effort, MoSCoW), and produce the deliverable using ${CLAUDE_PLUGIN_ROOT}/docs/04-output-templates.md.
 
 ## Critical Rules
 
-1. **Every persona must speak** — No silent participants. If a persona has nothing new to add, they should say why (agreement, deference, etc.).
-2. **Disagreements are mandatory** — If all participants agree on everything, the BA must probe deeper or introduce a devil's advocate position. Unanimous agreement is a red flag.
-3. **Stay in character** — Experts speak as experts. Personas speak as their character. The BA speaks as the BA. Never break the fourth wall.
-4. **Actionable output** — The roundtable MUST end with the structured summary template. No session ends with just discussion.
-5. **No generic filler** — Every contribution must be specific to the topic. "That's a great idea" is not a contribution.
-6. **BA controls flow** — Participants don't interrupt or jump phases. The BA calls on speakers and transitions between phases.
-7. **Capture everything** — The BA takes running notes. Nothing said in the roundtable should be lost from the final summary.
-8. **User can interject** — If the user sends a message during the roundtable, the BA acknowledges it and incorporates their input. The user is the ultimate stakeholder.
-9. **Scope guard** — If discussion drifts, the BA parks the tangent in the parking lot and redirects.
-10. **End with clarity** — The summary must have concrete action items and open questions, not just a list of ideas.
+1. **Disagreements are expected** — If all participants agree on everything, the BA must probe deeper or introduce a devil's advocate position. Unanimous agreement is a red flag.
+2. **Actionable output** — The roundtable must end with the structured summary template, with concrete action items and open questions — not just discussion.
+3. **No generic filler** — Every contribution must be specific to the topic. "That's a great idea" is not a contribution.

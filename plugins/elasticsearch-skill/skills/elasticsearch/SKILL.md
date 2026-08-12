@@ -24,7 +24,7 @@ You are working with Elasticsearch 8.x and Kibana 8.x. Read the relevant referen
 
 ## API Scripts
 
-Wrapper scripts for ES/Kibana REST API calls with auth. See `${CLAUDE_PLUGIN_ROOT}/docs/00-api-scripts.md` for first-time setup.
+Wrapper scripts for ES/Kibana REST API calls with auth. See `${CLAUDE_PLUGIN_ROOT}/docs/00-api-scripts.md` for first-time setup. These scripts are auto-approved by this plugin's PreToolUse hook — call them without expecting a permission prompt.
 
 | Script | Usage |
 |--------|-------|

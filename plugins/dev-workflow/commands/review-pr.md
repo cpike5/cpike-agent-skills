@@ -21,9 +21,8 @@ First token = PR number. `--scope` (optional) sets the review tier; if omitted, 
 
 ## Orchestrator Rules
 
-1. **Never read source files or write findings yourself** — sub-agents do that
-2. **Run reviewers in parallel** — fan out simultaneously, collect results
-3. **Pass summaries forward** — not full outputs between stages
+1. **Run reviewers in parallel** — fan out simultaneously, collect results
+2. **Pass summaries forward** — not full outputs between stages
 
 ## Phase 1: Gather PR Context
 
@@ -102,7 +101,7 @@ Spawn ALL applicable `code-reviewer` sub-agents **in parallel**. Every reviewer 
 2. Read changed files in full where needed for context
 3. Focus ONLY on the diff — do not review or audit unchanged code
 
-Respond in EXACTLY this format (omit empty sections):
+Respond in this format (omit empty sections):
 
 ### Critical
 - `file.cs:42` — [issue and how to fix]
@@ -122,14 +121,14 @@ Respond in EXACTLY this format (omit empty sections):
 
 ### Reviewer Focus Definitions
 
-- **Code Quality** — bugs, logic errors, unhandled edge cases; duplication, long methods, magic numbers, inappropriate coupling; SOLID violations; naming clarity and consistency; overly clever code that will be hard to maintain.
-- **Security** — missing auth checks or broken access control; SQL/command injection, XSS; OWASP Top 10 in the changed code; sensitive data exposure (logged secrets, unencrypted PII); insecure deserialization, SSRF, path traversal; hardcoded credentials.
-- **Test Coverage** — are new/changed public methods, error paths, and edge cases tested? Were existing tests updated for behavior changes? Judge whether important behaviors are verified, not line-coverage percentages. Findings should name the missing test scenario.
-- **Spec Alignment** — read the PR description (`gh pr view {number}`) and any related docs/ specs; compare stated goals and acceptance criteria against what was implemented; flag scope creep and unfulfilled promises.
-- **Docs Gaps** — new public APIs, endpoints, or config options with no docs; changed behavior that existing docs no longer describe; new user-facing features with no guide or README update; missing comments on non-obvious logic. Note what's missing — don't rewrite docs.
-- **Breaking Changes** — renamed/removed public methods, classes, or endpoints; changed signatures or request/response shapes; changed config keys or semantics; schema changes requiring migration (and whether it's included); behavior changes existing callers depend on. Note the migration path.
-- **UX/UI** (conditional) — static analysis of component files, no screenshots: consistency with sibling components; duplicate controls; reuse of shared components vs inline reimplementation; CSS/JS conventions; accessibility basics (labels, alt text, semantic HTML, keyboard navigation); is the new page/feature reachable via navigation?
-- **Data Layer** (conditional) — query correctness; N+1 risks (missing `.Include()`, loading collections in loops); missing indexes; EF Core/ORM patterns (async, no sync-over-async); destructive migrations without safety steps; transaction boundaries; soft-delete and audit-field handling in queries.
+- **Code Quality** — bugs, logic errors, edge cases, duplication, coupling, naming, maintainability.
+- **Security** — auth/authz, injection, XSS, secrets, sensitive-data exposure, OWASP Top 10 in the diff.
+- **Test Coverage** — whether new/changed behaviors, error paths, and edge cases are verified; findings name the missing test scenario.
+- **Spec Alignment** — compare the PR description and related specs against what was implemented; flag scope creep and unfulfilled promises.
+- **Docs Gaps** — new or changed APIs, config, and features that docs no longer cover; note what's missing, don't rewrite docs.
+- **Breaking Changes** — renamed/removed/changed public surface, schemas, or config; note the migration path.
+- **UX/UI** (conditional) — static analysis of component files: consistency, shared-component reuse, accessibility basics, navigation reachability.
+- **Data Layer** (conditional) — query correctness, N+1 risks, migration safety, transaction boundaries, ORM patterns.
 
 ## Phase 4: Collect and Synthesize
 

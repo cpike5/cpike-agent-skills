@@ -40,7 +40,7 @@ The discipline that matters is **writing the test before the implementation** �
 Be pragmatic about the rest:
 
 - **Batch when it's natural.** For a cluster of closely related cases (e.g. several input variations of one rule), it's fine to write a few tests together and implement against them as a group, rather than ceremonially looping one assertion at a time. Use judgment: the smaller the step, the faster the feedback, but tiny steps on obvious code is busywork.
-- **Always confirm the failure is real for non-trivial logic.** Running the test and seeing red is what distinguishes TDD from "writing tests that happen to pass." For genuinely trivial cases you can use judgment, but when in doubt, watch it fail first — it's caught more bad tests than any review.
+- **Always confirm the failure is real for non-trivial logic.** Running the test and seeing red is what distinguishes TDD from "writing tests that happen to pass." For genuinely trivial cases you can use judgment.
 - **Don't test the framework or trivial getters.** Test behavior and logic you actually wrote, the decisions and the edge cases. Exhaustively testing plumbing the compiler already guarantees is noise that future readers have to wade through.
 - **Keep implementations honest, not artificially dumb.** "Simplest thing that passes" is a discipline against speculative generality, not a license to hard-code a return value you know is wrong. If the obvious correct implementation is clear, write it; if you're unsure of the shape, let a second test drive it out.
 
@@ -51,13 +51,3 @@ See `${CLAUDE_PLUGIN_ROOT}/docs/02-test-design.md` for what makes a good failing
 Green is permission to improve the design, and the suite you just wrote is what makes that safe. Look at both the implementation *and the tests* — test code is real code and rots the same way. Common targets: duplication between cases, names that no longer fit, a method doing two things, primitive obsession, a test setup that's begging to be a helper or fixture.
 
 See `${CLAUDE_PLUGIN_ROOT}/docs/03-refactor-catalog.md` for a catalog of refactorings safe to apply under a green suite, the smells that signal each, and how to keep tests passing throughout.
-
-## Reporting back
-
-When you finish (or pause at a checkpoint), tell the user where things stand honestly: which behaviors are covered and green, what's still on the test list, and the actual test output — not a claim of success without the run behind it. If a test is failing or you skipped a case, say so plainly. The whole value of TDD is trustworthy feedback; don't undercut it by overstating the result.
-
-## Reference docs
-
-- `${CLAUDE_PLUGIN_ROOT}/docs/01-dotnet-testing.md` — Stack detection, test project layout, running tests, reading output, greenfield xUnit setup
-- `${CLAUDE_PLUGIN_ROOT}/docs/02-test-design.md` — Writing good failing tests: AAA, naming, test doubles, edge-case coverage
-- `${CLAUDE_PLUGIN_ROOT}/docs/03-refactor-catalog.md` — Refactor-phase catalog: smells, safe refactorings, keeping the suite green

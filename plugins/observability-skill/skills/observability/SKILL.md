@@ -5,11 +5,11 @@ description: "Use this skill when implementing .NET observability, logging, trac
 
 # .NET Observability Knowledge Base
 
-You are implementing observability for a .NET application. Read the relevant reference docs below based on what you're building. **Always use DI-first patterns** — inject `ITracer`, `ILogger<T>`, etc. rather than using static accessors.
+You are implementing observability for a .NET application. Read the relevant reference docs below based on what you're building.
 
 ## Observability Philosophy
 
-Good observability answers three questions: **What happened?** (logs), **Where did it happen?** (traces), **How much?** (metrics). Every signal should be correlated — a single request should be traceable across logs, spans, and metrics via trace context. See `12-observability-philosophy.md` for the full framework.
+Good observability answers three questions: **What happened?** (logs), **Where did it happen?** (traces), **How much?** (metrics). Every signal should be correlated — a single request should be traceable across logs, spans, and metrics via trace context. See ${CLAUDE_PLUGIN_ROOT}/docs/12-observability-philosophy.md for the full framework.
 
 ## Quick Decision: Which Signal Type?
 
@@ -47,14 +47,11 @@ Read the relevant docs based on your task:
 ## Critical Rules
 
 1. **Never use string interpolation in message templates** — Use `Log.Information("Processing order {OrderId}", orderId)` not `Log.Information($"Processing order {orderId}")`. Interpolation defeats structured logging.
-2. **Always null-check `CurrentTransaction`** — `_tracer.CurrentTransaction` can be null when no transaction is active (background threads, startup code). Always guard: `_tracer.CurrentTransaction?.StartSpan(...)`.
-3. **Always null-check `Activity.Current`** — `Activity.Current` is null when no listener is registered or no parent activity exists. Always guard before accessing properties.
-4. **Always close spans/transactions in try/finally or using blocks** — Unclosed spans leak memory and corrupt trace trees. Use `try/finally { span.End(); }` or the `using` pattern.
-5. **Always capture exceptions on spans before ending them** — Call `span.CaptureException(ex)` or `activity?.SetStatus(ActivityStatusCode.Error)` in the catch block, before the finally block ends the span.
-6. **Never log sensitive data** — PII, passwords, tokens, connection strings must never appear in log properties. Use `[LogMasked]` attributes or custom destructuring policies.
-7. **Always propagate trace context across service boundaries** — HTTP calls automatically propagate W3C traceparent headers when using `IHttpClientFactory`. For message queues, manually inject/extract trace context.
-8. **Avoid high-cardinality transaction/metric names** — Never include user IDs, order IDs, or GUIDs in transaction names. Use route templates (`GET /api/orders/{id}`) not resolved paths (`GET /api/orders/12345`).
-9. **Use DI-first, static as fallback** — Inject `ITracer` and `ILogger<T>` via constructor injection. Only use `Agent.Tracer` or `Serilog.Log.Logger` in non-DI contexts (startup, static helpers).
-10. **Always set minimum level overrides for noisy namespaces** — Suppress `Microsoft.AspNetCore` to Warning, `System.Net.Http` to Warning, `Microsoft.EntityFrameworkCore.Database.Command` to Warning (or Information if you need query logging).
-11. **Use `LogContext.PushProperty` for request-scoped enrichment** — Don't repeat the same property on every log call. Push it once at the middleware/filter level.
-12. **Never fire-and-forget without trace context** — Background work (`Task.Run`, `IHostedService`) loses ambient trace context. Explicitly capture and restore `Activity.Current` or start a new transaction linked to the parent.
+2. **Always null-check `CurrentTransaction` and `Activity.Current`** — `_tracer.CurrentTransaction` is null when no transaction is active (background threads, startup code), and `Activity.Current` is null when no listener is registered or no parent activity exists. Always guard: `_tracer.CurrentTransaction?.StartSpan(...)`.
+3. **Mask sensitive fields via destructuring** — Use `[LogMasked]` attributes or custom destructuring policies to keep sensitive values out of log properties.
+4. **Always propagate trace context across service boundaries** — HTTP calls automatically propagate W3C traceparent headers when using `IHttpClientFactory`. For message queues, manually inject/extract trace context.
+5. **Avoid high-cardinality transaction/metric names** — Never include user IDs, order IDs, or GUIDs in transaction names. Use route templates (`GET /api/orders/{id}`) not resolved paths (`GET /api/orders/12345`).
+6. **Use DI-first, static as fallback** — Inject `ITracer` and `ILogger<T>` via constructor injection. Only use `Agent.Tracer` or `Serilog.Log.Logger` in non-DI contexts (startup, static helpers).
+7. **Always set minimum level overrides for noisy namespaces** — Suppress `Microsoft.AspNetCore` to Warning, `System.Net.Http` to Warning, `Microsoft.EntityFrameworkCore.Database.Command` to Warning (or Information if you need query logging).
+8. **Use `LogContext.PushProperty` for request-scoped enrichment** — Don't repeat the same property on every log call. Push it once at the middleware/filter level.
+9. **Never fire-and-forget without trace context** — Background work (`Task.Run`, `IHostedService`) loses ambient trace context. Explicitly capture and restore `Activity.Current` or start a new transaction linked to the parent.
