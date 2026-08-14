@@ -56,13 +56,16 @@ Why this work is needed and how it fits into the larger plan
 
 ## Sub-Issue Hierarchy
 
-GitHub CLI does not natively support sub-issues. Use the custom helper scripts:
+`gh` 2.94+ supports sub-issues natively:
 
 | Command | Description |
 |---------|-------------|
-| `~/.claude/scripts/gh-link -Parent 10 -Child 15` | Link child to parent |
-| `~/.claude/scripts/gh-unlink -Parent 10 -Child 15` | Remove relationship |
-| `~/.claude/scripts/gh-view -Issue 10` | View issue with full hierarchy |
+| `gh issue create --parent 10 ...` | Create a new issue as a sub-issue of #10 |
+| `gh issue edit 10 --add-sub-issue 15` | Link existing #15 as a sub-issue of #10 |
+| `gh issue edit 10 --remove-sub-issue 15` | Remove the relationship |
+| `gh issue view 10` | View issue with its hierarchy |
+
+On older `gh`, the dev-workflow plugin ships fallback scripts (`gh-link`, `gh-unlink`, `gh-view`) that wrap the sub-issue GraphQL API.
 
 ## Best Practices
 

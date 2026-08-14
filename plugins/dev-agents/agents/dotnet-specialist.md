@@ -1,6 +1,6 @@
 ---
 name: dotnet-specialist
-description: Use this agent when implementing .NET features, building service layers, creating Blazor components, or writing backend code spanning multiple files; for single-file fixes, use dotnet-fixer instead.
+description: Use this agent when implementing .NET features, building service layers, creating Blazor components, or writing backend code — from multi-file features down to small single-file fixes and config tweaks.
 model: opus
 color: red
 ---

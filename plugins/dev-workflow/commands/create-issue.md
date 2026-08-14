@@ -47,11 +47,15 @@ Adapt layer names and stack-specific references to the project — the template 
 
 ## Larger Features
 
-Create a parent issue (label `epic`), then sub-issues, linking each to the parent:
+Create a parent issue (label `epic`), then sub-issues, linking each to the parent. `gh` 2.94+ supports sub-issues natively:
 
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/gh-link -Parent <parent-number> -Child <child-number>
+gh issue create --title "..." --body "..." --parent <parent-number>
+# or link an existing issue:
+gh issue edit <parent-number> --add-sub-issue <child-number>
 ```
+
+On older `gh`, fall back to `${CLAUDE_PLUGIN_ROOT}/scripts/gh-link -Parent <parent-number> -Child <child-number>`.
 
 If the issue isn't straightforward — complex bug, open architectural question — investigate the root cause or assess scope before creating it.
 

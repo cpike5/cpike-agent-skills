@@ -16,8 +16,8 @@ Coordinate specialized subagents:
 - **dotnet-specialist** - Backend architecture, Blazor components, service layers
 - **docs-writer** - Technical documentation, API docs
 - **devops-specialist** - Docker, deployment, CI/CD, server configuration
-- **security-hardener** - Infrastructure and application security hardening
-- **security-reviewer** - Application-level security review (auth, RBAC, sessions, OWASP)
+- **security-reviewer** - Read-only security analysis, app + infra config (auth, RBAC, sessions, OWASP, Docker/nginx/Postgres review)
+- **security-hardener** - Implements security changes (infra config, API middleware, secrets)
 - **performance-analyst** - Profiling, query optimization, load testing
 - **marketing** - Public-facing content, READMEs, release notes, feature messaging
 - **legal-reviewer** - Compliance review, privacy policies, licensing

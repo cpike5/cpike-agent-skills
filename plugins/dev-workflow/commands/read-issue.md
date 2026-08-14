@@ -21,7 +21,7 @@ $ARGUMENTS
 
 For each issue provided:
 
-1. Use `${CLAUDE_PLUGIN_ROOT}/scripts/gh-view -Issue NUMBER` to get the issue with parent/sub-issues
+1. Use `gh issue view NUMBER` to get the issue with parent/sub-issues (shown natively on `gh` 2.94+; on older `gh` use `${CLAUDE_PLUGIN_ROOT}/scripts/gh-view -Issue NUMBER`)
 2. If the issue has a **parent**, fetch the parent to understand broader context
 3. Note any **sub-issues** for potential relevance
 

@@ -58,15 +58,15 @@ For each failed check:
 
    | Category | Signal Patterns | Sub-agent |
    |----------|----------------|-----------|
-   | **Build error** | `error CS`, `error MSB`, `Build FAILED`, `could not resolve`, `The type or namespace` | `dotnet-fixer` (single-file) or `dotnet-specialist` (multi-file / architectural) |
-   | **Test failure** | `Failed!`, `X Error(s)`, `Assert.`, `Expected:`, `Test Run Failed`, `[FAIL]` | `test-writer` (test needs updating) or `dotnet-fixer` (implementation is wrong) |
-   | **Lint/format** | `SA1`, `IDE0`, `CA1`, `dotnet format`, `style violation`, `whitespace` | `dotnet-fixer` |
+   | **Build error** | `error CS`, `error MSB`, `Build FAILED`, `could not resolve`, `The type or namespace` | `dotnet-specialist` |
+   | **Test failure** | `Failed!`, `X Error(s)`, `Assert.`, `Expected:`, `Test Run Failed`, `[FAIL]` | `test-writer` (test needs updating) or `dotnet-specialist` (implementation is wrong) |
+   | **Lint/format** | `SA1`, `IDE0`, `CA1`, `dotnet format`, `style violation`, `whitespace` | `dotnet-specialist` |
    | **Security scan** | `CVE-`, `vulnerability`, `security advisory`, `Dependabot`, `snyk`, `trivy` | `security-hardener` |
    | **Workflow/infra** | `docker`, `Dockerfile`, `action`, `workflow`, `yaml`, `runner`, `timeout`, `service unavailable` | `devops-specialist` |
 
    Specialist agents come from the **dev-agents** plugin. If a named agent type is unavailable, or the project isn't .NET (e.g. a Python one-off), map the category to the equivalent stack tooling and use `general-purpose`.
 
-3. **Disambiguation** for Build/Test: single file with a clear error code → `dotnet-fixer`; multiple files or project references → `dotnet-specialist`; wrong test assertion → `test-writer`; buggy implementation → `dotnet-fixer`; ambiguous → `dotnet-fixer`.
+3. **Disambiguation** for Test failures: wrong test assertion → `test-writer`; buggy implementation or ambiguous → `dotnet-specialist`.
 
 4. **Batch** same-category failures that share a root cause into a single fix unit.
 

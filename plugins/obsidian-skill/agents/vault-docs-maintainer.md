@@ -75,7 +75,7 @@ updated: 2026-06-02  # absolute date — never relative
 
 ## Do NOT use this agent for
 
-- Writing code or implementing fixes → use **dotnet-specialist** / **dotnet-fixer**.
+- Writing code or implementing fixes → use **dotnet-specialist**.
 - Reviewing code quality or finding bugs in code → use **code-reviewer** or **security-reviewer**.
 - Generating a fresh `project-map/` set from scratch → that's the **map-project-skill**'s job; this agent maintains and extends the resulting docs.
 - Putting any `.md` file inside a code repository — docs always go to the vault.
