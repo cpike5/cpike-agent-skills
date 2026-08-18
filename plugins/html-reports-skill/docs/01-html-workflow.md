@@ -8,7 +8,8 @@ The full procedure for producing a single-file HTML report. Read this before bui
 2. Writing the body fragment
 3. Assembling
 4. Reviewing before delivery
-5. Failure modes
+5. Delivering the report
+6. Failure modes
 
 ---
 
@@ -106,7 +107,28 @@ Check, in this order:
 5. **The agenda matches the sections.**
 6. **The masthead and footer both say what the document is not.**
 
-## 5. Failure modes
+## 5. Delivering the report
+
+The deliverable is the file `build_report.py --out` wrote. Deliver it by telling the user the
+path — `reports/dashboard-audit-2026-08-17.html` — so they can open it, commit it, or attach it
+to an email. That is the whole delivery step for the default case.
+
+**Do not publish it as a Claude Artifact by default.** An Artifact is a hosted copy on
+claude.ai; the report is a repository file that has to survive being emailed and archived, which
+is exactly what the single-file build guarantees. Publishing is a separate action the user asks
+for, in words like "publish this", "make it an artifact", "give me a link to share", or "put it
+somewhere the team can see".
+
+When they do ask:
+
+1. Build the local file first, exactly as above. It stays the source of truth.
+2. Publish that same file with the Artifact tool — do not rebuild or re-style for the Artifact.
+3. Give the user both: the repo path and the Artifact URL.
+
+If a report is republished after an edit, re-run `build_report.py` and publish the same file path
+again so the Artifact updates in place rather than becoming a second, diverging copy.
+
+## 6. Failure modes
 
 | Symptom | Cause |
 | --- | --- |

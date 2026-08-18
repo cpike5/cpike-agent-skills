@@ -58,10 +58,22 @@ Read `${CLAUDE_PLUGIN_ROOT}/docs/01-html-workflow.md` before starting. It covers
    `${CLAUDE_PLUGIN_ROOT}/assets/body.html`.
 4. **Assemble** with `${CLAUDE_PLUGIN_ROOT}/scripts/build_report.py`, which inlines the theme, the stylesheet and the
    renderers into one portable file and refuses to write if anything is broken.
-5. **Present** the output file to the user.
+5. **Write it into the repository** and tell the user the path — see "Where the report goes"
+   below.
 
 Never hand-assemble the final HTML, and never link a stylesheet. Reports must survive being
 emailed, archived, and opened from disk in two years. `build_report.py` enforces this.
+
+### Where the report goes
+
+**A report is a file in the repository, not a published Artifact.** `build_report.py --out`
+writes it to a path under the working tree — `reports/dashboard-audit-2026-08-17.html` or
+similar — and delivery means naming that path so the user can open, commit, or send it.
+
+Do **not** publish the report as a Claude Artifact unless the user asks for one — "publish this",
+"make it an artifact", "give me a link", "share it with the team". Only then call the Artifact
+tool, and still write the local file first: the file is the deliverable, the Artifact is a copy
+of it. The same applies to Markdown reports.
 
 ## 4. Writing conventions
 
