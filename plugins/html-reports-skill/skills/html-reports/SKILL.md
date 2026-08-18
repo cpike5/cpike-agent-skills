@@ -102,6 +102,11 @@ were; only the language around them gets simpler. The full rules, the substituti
 pre-delivery check are in `${CLAUDE_PLUGIN_ROOT}/docs/05-plain-language.md` — read it before
 writing either format.
 
+**Title the document, do not editorialise it.** The `h1`, the section headings and the Markdown
+title name the subject and its scope: "Q3 ingest pipeline audit", not "Two chips, one afternoon".
+No rhetorical turn, no warning, no consequence line in the masthead. The findings go in the body,
+next to their evidence. Rules and examples in `${CLAUDE_PLUGIN_ROOT}/docs/04-editorial.md`.
+
 **Bold the claim, not the sentence.** A reader who reads only the bold text should still come
 away with the findings.
 

@@ -11,20 +11,48 @@ This file covers how the page is arranged. `${CLAUDE_PLUGIN_ROOT}/docs/05-plain-
 how the sentences are written — simplified English, which is the default for every report. Read
 both. Short, active sentences make the devices below work better, not worse.
 
-## The headline is a finding, not a subject
+## The headline names the document
 
-The masthead `h1` is the most-read line in the document. Spend it on the conclusion.
+The masthead `h1` is a title, not a line of commentary. Write what the report is about, the way
+you would name a file someone has to find again in a year.
 
 ```html
-<h1>The house has ten rooms.<br><em>Four of them are hollow.</em></h1>
+<h1>Room build-out survey</h1>
+<h1>Q3 ingest pipeline audit</h1>
+<h1>Cold-chain scheduling estimate — Bergen site</h1>
 ```
 
-The device: a flat statement, then the sharp half in `em`, which `base.css` sets in italic in the
-accent colour. Two lines, one turn. "Room build-out survey" is a filename, not a headline.
+Name the subject, and add the scope that makes it unambiguous: which system, which period, which
+site. That is the whole job. A title that could sit in a table of contents next to twenty others
+and still be picked out is a good title.
 
-Then `.sub` — the standfirst — says in two sentences what was examined, on what axes, and what
-the reader gets. It is the only place in the document that is allowed to be a summary of the
-document.
+Do not write a headline that argues, warns, or turns. These read as marketing, not as a report:
+
+> ✗ Two chips, one afternoon.
+> ✗ The house has ten rooms. *Four of them are hollow.*
+> ✗ Ten rooms, four of them hollow
+
+The findings go in the body, where they are next to their evidence. A reader who meets the
+conclusion before the scope has no way to judge it.
+
+The same rule governs `h2` section headings and `.eyebrow` labels: *Findings*, *Scope*, *Cost*,
+*Part two*. Name the section's contents. Do not preview its verdict.
+
+`base.css` italicises `h1 em` in the accent colour. Use it only for a genuine subtitle that is
+part of the name — `<h1>Ingest pipeline audit <em>— second pass</em></h1>` — and leave it out
+otherwise. Most reports never need it.
+
+## The standfirst says what was examined
+
+`.sub` gets two sentences: what was examined, on what axes, and what the reader gets. Plain
+statements, no rhetorical turn.
+
+> ✓ This review covers the 14 ingest jobs that run on the nightly schedule. It scores each on
+> runtime, failure rate and recovery cost, and recommends which three to rewrite first.
+
+> ✗ Miss the 24-hour window and you start again.
+
+A consequence line belongs in the body of the finding that establishes it, not in the masthead.
 
 ## Say what the document is not, twice
 
@@ -93,6 +121,7 @@ who made the thing it describes, and that includes not having features the produ
 
 Beyond the mechanical checks in `${CLAUDE_PLUGIN_ROOT}/docs/01-html-workflow.md`:
 
+- Read the `h1` alone. Does it name what the report is about, without arguing anything?
 - Read only the bold text and the headings top to bottom. Do the findings survive?
 - Run the simplified-English check in `${CLAUDE_PLUGIN_ROOT}/docs/05-plain-language.md`.
 - Is there a screenful anywhere with no number, no component and no claim? Cut it.
