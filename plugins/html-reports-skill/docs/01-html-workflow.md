@@ -48,7 +48,9 @@ Write a scratch file containing only what sits between `<body>` and `</body>`. S
 `${CLAUDE_PLUGIN_ROOT}/assets/body.html` and delete every component the outline did not call for.
 
 Read `${CLAUDE_PLUGIN_ROOT}/docs/04-editorial.md` first — it covers the headline, the part structure, density and
-accent use, which is most of what separates a report someone forwards from one they skim.
+accent use, which is most of what separates a report someone forwards from one they skim. Read
+`${CLAUDE_PLUGIN_ROOT}/docs/05-plain-language.md` too: every sentence in the body is written in
+simplified English by default.
 
 Structure, in order:
 
@@ -111,6 +113,9 @@ Check, in this order:
 4. **Every KPI figure appears in the body** with its derivation.
 5. **The agenda matches the sections.**
 6. **The masthead and footer both say what the document is not.**
+7. **The prose passes the simplified-English check** in
+   `${CLAUDE_PLUGIN_ROOT}/docs/05-plain-language.md`. Longest sentence under 25 words, active
+   voice, one term per concept, no padding words.
 
 ## 5. Delivering the report
 
@@ -144,3 +149,4 @@ again so the Artifact updates in place rather than becoming a second, diverging 
 | Chart renders but is unstyled | The host div lacks its class — `Report.gantt` adds `.gt` itself, so this usually means the call threw. Check the browser console. |
 | Bars illegible in dark mode | `theme.css` was hand-edited without updating the matching `--cN-ink` value. Re-run `derive_theme.py`. |
 | Report looks nothing like the app | `theme.css` was generated from a guess. Re-derive from the app's actual stylesheet. |
+| Report reads as dense and hard to follow | The prose skipped `docs/05-plain-language.md`. Split the long sentences, make the voice active, and use one term per concept. |
