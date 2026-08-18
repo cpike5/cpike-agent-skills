@@ -47,9 +47,13 @@ Commit `.reports/`. It is a source folder, not a build artefact.
 Write a scratch file containing only what sits between `<body>` and `</body>`. Start from
 `${CLAUDE_PLUGIN_ROOT}/assets/body.html` and delete every component the outline did not call for.
 
+Read `${CLAUDE_PLUGIN_ROOT}/docs/04-editorial.md` first — it covers the headline, the part structure, density and
+accent use, which is most of what separates a report someone forwards from one they skim.
+
 Structure, in order:
 
-1. `#theme-toggle` button — keep it unless the report will only ever be printed
+1. `#theme-toggle` button — keep it unless the report will only ever be printed, or the theme was
+   generated with `--mode light`/`--mode dark` to match a single-scheme application
 2. `header.masthead` — eyebrow, title, sub, meta, and a `.banner` if the document is qualified
 3. `.agenda` — one card per `h2`, same order, matching `id`s
 4. A `.card` titled "The short version" — the findings, readable alone
@@ -100,6 +104,7 @@ that look like the report invite someone to send the wrong one.
 Check, in this order:
 
 1. **Both themes.** Toggle the button. Dark mode is not decoration — these get read on phones.
+   (Single-scheme themes: check the one scheme, and check the toggle is absent.)
 2. **Print preview.** Section headings should not strand at page bottoms; tables and figures
    should not split. The stylesheet handles this, but verify.
 3. **Narrow viewport.** The Gantt label column collapses to 150px below 620px; tables scroll.

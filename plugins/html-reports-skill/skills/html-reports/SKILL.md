@@ -51,10 +51,12 @@ Read `${CLAUDE_PLUGIN_ROOT}/docs/01-html-workflow.md` before starting. It covers
    and `${CLAUDE_PLUGIN_ROOT}/assets/base.js` into it unchanged, and generate `theme.css` from the host application's
    palette (see step 2). This happens once per repository.
 2. **Derive the theme automatically** — do not ask the user for colours. Find the application's
-   palette in its stylesheets and run `${CLAUDE_PLUGIN_ROOT}/scripts/derive_theme.py`. Details and search order are in
-   `${CLAUDE_PLUGIN_ROOT}/docs/02-theming.md`.
+   palette *and its faces* in its stylesheets and run `${CLAUDE_PLUGIN_ROOT}/scripts/derive_theme.py`. Match a
+   single-scheme app with `--mode dark`/`--mode light` and drop the toggle. Details and search
+   order are in `${CLAUDE_PLUGIN_ROOT}/docs/02-theming.md`.
 3. **Write the body fragment** to a scratch file — everything between `<body>` and `</body>`.
-   Component markup is in `${CLAUDE_PLUGIN_ROOT}/docs/03-components.md`; start from
+   Component markup is in `${CLAUDE_PLUGIN_ROOT}/docs/03-components.md`; how to make it read as designed rather
+   than defaulted is in `${CLAUDE_PLUGIN_ROOT}/docs/04-editorial.md`; start from
    `${CLAUDE_PLUGIN_ROOT}/assets/body.html`.
 4. **Assemble** with `${CLAUDE_PLUGIN_ROOT}/scripts/build_report.py`, which inlines the theme, the stylesheet and the
    renderers into one portable file and refuses to write if anything is broken.
@@ -117,6 +119,7 @@ All paths are relative to `${CLAUDE_PLUGIN_ROOT}`.
 | `docs/01-html-workflow.md` | Before building any HTML report. The full procedure. |
 | `docs/02-theming.md` | Setting up `.reports/` in a repo for the first time. |
 | `docs/03-components.md` | Choosing and writing component markup. Has a selection table. |
+| `docs/04-editorial.md` | Writing the body fragment. Headline, structure, density, accent use. |
 | `assets/body.html` | The starting skeleton for a body fragment. |
 | `assets/components.html` | Every component rendered, with its markup. Open in a browser. |
 | `assets/base.css`, `assets/base.js` | Copied verbatim into `.reports/`. Do not edit per report. |
@@ -127,6 +130,10 @@ All paths are relative to `${CLAUDE_PLUGIN_ROOT}`.
 ```bash
 # once per repo — derive theme tokens from the app's palette
 python3 "$CLAUDE_PLUGIN_ROOT/scripts/derive_theme.py" --primary "#7c3aed" > .reports/theme.css
+
+# a serif-headed, dark-only application
+python3 "$CLAUDE_PLUGIN_ROOT/scripts/derive_theme.py" --primary "#c9a8ec" --mode dark \
+    --plane "#161c17" --surface "#1e251f" --display-font serif > .reports/theme.css
 
 # check a palette's legibility without writing anything
 python3 "$CLAUDE_PLUGIN_ROOT/scripts/derive_theme.py" --primary "#7c3aed" --check

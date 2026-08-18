@@ -9,7 +9,11 @@
 
   Rules: no literal hex colours, no external references, every chart host id
   matches the selector its script targets. build_report.py enforces all three.
-  Component markup lives in docs/03-components.md and assets/components.html.
+  Component markup lives in docs/03-components.md and assets/components.html;
+  docs/04-editorial.md covers the headline, structure and density decisions.
+
+  Delete the theme-toggle button if .reports/theme.css was generated with
+  --mode light or --mode dark to match a single-scheme application.
 -->
 <button id="theme-toggle" type="button" aria-label="Toggle colour theme">Dark</button>
 <div class="wrap">
@@ -18,7 +22,8 @@
 <header class="masthead">
   <div class="banner">Draft — not for circulation</div>
   <p class="eyebrow">Programme · document type</p>
-  <h1>Report title</h1>
+  <!-- The headline is a finding, not a subject. The em is set in italic in the accent colour. -->
+  <h1>The flat statement.<br><em>The sharp half.</em></h1>
   <p class="sub">One or two sentences on what this document answers and for whom.</p>
   <div class="meta">
     <span><b>Prepared by:</b> Name</span>
@@ -73,7 +78,50 @@
   </table>
 </div>
 
+<!-- A scorecard where the question is "which of these is finished?".
+     Same axes on every card, in the same order. Fills: none / low / mid / full. -->
+<div class="scorecard">
+  <article class="sc" style="--hue: var(--c0)">
+    <div class="sc-top"><span class="sc-name">Thing</span><span class="sc-key">key</span></div>
+    <div class="sc-axes">
+      <div class="axis"><span class="k">Axis one</span><span class="bar" data-fill="full"><i></i></span></div>
+      <div class="axis"><span class="k">Axis two</span><span class="bar" data-fill="none"><i></i></span></div>
+    </div>
+    <p class="sc-note">The sentence you would say out loud about this one.</p>
+  </article>
+</div>
+<p class="legend"><span><b>Full</b> — built and in use</span><span><b>Empty</b> — nothing there</span></p>
+
 <h2 id="s3"><span class="num">03</span>Recommendation</h2>
+
+<!-- Recommendations in priority order. Heading = the action; .pill markers = cost and impact. -->
+<div class="tier">
+  <div class="tier-head"><h3>Do these first</h3><p>What this tier has in common</p></div>
+  <div class="ranked">
+    <article class="item">
+      <div class="item-head">
+        <span class="rank">01</span>
+        <h3>The recommendation, phrased as an action</h3>
+        <div class="markers"><span class="pill muted">an afternoon</span><span class="pill info">what it unlocks</span></div>
+      </div>
+      <p>The finding, with its evidence in the same breath.</p>
+      <p class="small">The mechanics — how, and what it costs.</p>
+    </article>
+  </div>
+</div>
+
+<!-- The running order. Each step says why it sits where it does. -->
+<div class="seq">
+  <div class="step">
+    <span class="step-n">01</span>
+    <div>
+      <h4>First move</h4>
+      <p>Why it is first — what it makes cheaper for the step after it.</p>
+      <span class="when">an afternoon · item 01</span>
+    </div>
+  </div>
+</div>
+
 <ul class="checklist">
   <li><b>Action.</b> <span class="who">Owner</span></li>
 </ul>

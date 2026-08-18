@@ -46,6 +46,50 @@ text, not the brand colour.
 Surfaces and ink carry most of the "same product" feeling. Get those right and the report reads
 as a sibling of the app even when the accent colours differ.
 
+## Typography
+
+Colour makes a report match the app. **Type is what makes it look designed rather than
+defaulted** — a serif heading over sans body copy reads as a document; sans over sans reads as a
+web page. Three tokens carry it: `--font-display` (headings, `.sc-name`), `--font-body`,
+`--font-mono` (`code`, figures, `.step-n`, `.when`).
+
+Find the app's faces where you found its colours — a `font-family` on `body`, a
+`--font-*`/`$font-*` token, or the Tailwind `theme.fontFamily` block — then pick the preset
+nearest to them:
+
+| The app's headings are… | Pass |
+| --- | --- |
+| A serif or a display serif (Cormorant, Playfair, Lora, Merriweather) | `--display-font serif` |
+| A slab or a typewriter face | `--display-font slab` |
+| Helvetica/Inter/Karla-ish, or you found nothing | omit — the default system sans |
+| Deliberately neutral and tight (Helvetica Neue, Akzidenz) | `--display-font grotesk` |
+
+**Never link a web font.** The app can; the report cannot — it has to render from disk, offline,
+in two years, and `build_report.py` rejects the `<link>`. Presets are widely-installed stacks
+chosen to sit near a family, not to match it. A literal stack works too:
+`--body-font '"Segoe UI", system-ui, sans-serif'`.
+
+The safest strong move is a serif display over the system sans body. Setting `--font-body` to a
+serif as well makes long reports harder to skim; do it only when the app itself does.
+
+## One scheme or two
+
+The default theme carries light and dark, and the body carries a `#theme-toggle` button. That is
+right for most apps.
+
+When the application has **only one scheme** — a dark-only product, a print-styled internal tool —
+match it: pass `--mode dark` (or `--mode light`), take `--plane` and `--surface` from the app's
+actual surfaces, and **leave the toggle button out of the body**. A toggle that flips a report
+into a scheme the product does not have is worse than no toggle.
+
+```bash
+python3 "$CLAUDE_PLUGIN_ROOT/scripts/derive_theme.py" --primary "#c9a8ec" --mode dark \
+    --plane "#161c17" --surface "#1e251f" --display-font serif > .reports/theme.css
+```
+
+`--mode` is a property of the repository's theme, not of one report. Decide it once, when
+`.reports/` is created.
+
 ## Running the derivation
 
 ```bash
@@ -83,7 +127,10 @@ An application palette and a report palette want different things, so the script
   least 2.2:1 against the page, so a bar reads as a shape and not a wash. Colours are nudged in
   lightness until both hold.
 - **A full dark set.** Apps often have no dark mode; reports need one, because they get read on
-  phones at night. Hues are preserved and lightness lifted.
+  phones at night. Hues are preserved and lightness lifted. Under `--mode dark` that set becomes
+  the only set, emitted on `:root` with no media query and no toggle hook.
+- **Type and rhythm tokens.** `--font-display`, `--font-body`, `--font-mono`, plus `--measure`
+  (the prose line length every component respects) and `--tracking-caps`.
 
 ## Cases needing judgement
 

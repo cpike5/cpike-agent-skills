@@ -47,10 +47,20 @@
   --tint-flag: rgba(237,161,0,0.14);
   --tint-info: rgba(42,120,214,0.10);
 
+  /* type — system stacks only, never a web font (see docs/02-theming.md).
+     --font-display carries headings and the display numerals; set it to a
+     serif stack when the application's own headings are serif, and the report
+     stops looking like a default web page. */
+  --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  --font-body:    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  --font-mono:    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
   /* rhythm */
   --wrap:      1080px;
+  --measure:   72ch;   /* prose line length — body copy never exceeds this */
   --radius:    10px;
   --radius-sm: 6px;
+  --tracking-caps: .12em;
 }
 
 /* Dark values live in one place and are applied by both the media query
