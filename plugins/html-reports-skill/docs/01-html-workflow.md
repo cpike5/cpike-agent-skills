@@ -105,15 +105,37 @@ that look like the report invite someone to send the wrong one.
 
 Check, in this order:
 
+0. **Look at the rendered pixels.** `build_report.py` proves the file is well formed. It cannot
+   see a diagram pointing the wrong way, an arrowhead on the wrong end, a label sitting on a
+   line, or a chart that threw and left an empty box. Rasterize the built report and read the
+   images:
+
+   ```bash
+   python3 "$CLAUDE_PLUGIN_ROOT/scripts/rasterize.py" reports/audit-2026-08-17.html
+   ```
+
+   It writes `<name>-light.png` and `<name>-dark.png` beside the report, using a headless
+   Chromium if one is installed. Read those files — actually look at them — and trace every
+   edge in every diagram back to what it claims.
+
+   **If no browser is available**, the script says so and exits non-zero. Then you have one
+   obligation: say plainly in the delivery message that the visuals were not visually verified,
+   and name what is unverified ("the two diagrams in section 3 were not rendered"). Silence here
+   is how a reversed arrow reaches a client.
+
 1. **Both themes.** Toggle the button. Dark mode is not decoration — these get read on phones.
-   (Single-scheme themes: check the one scheme, and check the toggle is absent.)
+   (Single-scheme themes: check the one scheme, and check the toggle is absent.) The rasterized
+   pair covers this if you looked at both.
 2. **Print preview.** Section headings should not strand at page bottoms; tables and figures
    should not split. The stylesheet handles this, but verify.
 3. **Narrow viewport.** The Gantt label column collapses to 150px below 620px; tables scroll.
 4. **Every KPI figure appears in the body** with its derivation.
 5. **The agenda matches the sections.**
 6. **The masthead and footer both say what the document is not.**
-7. **The prose passes the simplified-English check** in
+7. **Every diagram reads back as a sentence.** "An asset has many readings" — check the
+   direction of each edge against what you meant, one at a time. This is the defect the tooling
+   cannot catch, so it is the one worth reading twice.
+8. **The prose passes the simplified-English check** in
    `${CLAUDE_PLUGIN_ROOT}/docs/05-plain-language.md`. Longest sentence under 25 words, active
    voice, one term per concept, no padding words.
 
@@ -149,4 +171,9 @@ again so the Artifact updates in place rather than becoming a second, diverging 
 | Chart renders but is unstyled | The host div lacks its class — `Report.gantt` adds `.gt` itself, so this usually means the call threw. Check the browser console. |
 | Bars illegible in dark mode | `theme.css` was hand-edited without updating the matching `--cN-ink` value. Re-run `derive_theme.py`. |
 | Report looks nothing like the app | `theme.css` was generated from a guess. Re-derive from the app's actual stylesheet. |
+| `a closed path carries .s-edge` | An arrowhead was drawn as a second path. Use a `<marker>` with `.s-arrow`, or switch the figure to `Report.graph()`. |
+| `marker #x is referenced but never defined` | The `marker-end` names an id that has no `<marker>` in the body. Add the `<defs>` block. |
+| `hand-drawn <svg> in the body` (warning) | Expected only for pictures that are not nodes and edges. If it is a schema or a flow, use `Report.graph()`. Either way, rasterize and look. |
+| `no Chromium or Chrome binary found` | No browser in this environment. Say in delivery that the visuals were not visually verified. |
+| Diagram lays out with the chain pushed sideways | A node was pinned with `col`/`row` in a way the derived layering fights. Pin the rest, or drop the pin. |
 | Report reads as dense and hard to follow | The prose skipped `docs/05-plain-language.md`. Split the long sentences, make the voice active, and use one term per concept. |

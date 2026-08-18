@@ -138,6 +138,11 @@
   <figcaption>Caption: state what the schedule proves, not what it contains.</figcaption>
 </figure>
 
+<figure>
+  <div class="svgbox"><div id="gph-1"></div></div>
+  <figcaption>Caption: state what the diagram proves, not what it contains.</figcaption>
+</figure>
+
 <!-- 6. Footer — provenance, what the document is not, confidentiality -->
 <footer>
   <p>What this traces to. Hours are planning estimates, not a quotation.</p>
@@ -166,5 +171,14 @@ document.addEventListener("DOMContentLoaded", function () {
     cats: { M1: { label: "Phase one", c: 0 } },
     caption: "Scenario name"
   });
+
+  /* Nodes and edges only — every coordinate, arrowhead and self-loop is derived.
+     Read each edge back as a sentence: "an A has many B". */
+  Report.graph("#gph-1", [
+    { id: "a", label: "Thing", sub: "what it is", cat: 0 },
+    { id: "b", label: "Other thing", cat: 1 }
+  ], [
+    { from: "a", to: "b", label: "the relationship" }
+  ], { label: "What this diagram is" });
 });
 </script>

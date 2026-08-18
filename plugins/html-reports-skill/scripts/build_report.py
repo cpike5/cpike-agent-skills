@@ -23,6 +23,11 @@ Verifies before writing:
   * no external http(s) references survive in the output
   * no literal hex colour appears in the body (they must come from tokens)
   * chart hosts referenced by the script actually exist in the body
+  * every marker an arrowhead points at is actually defined
+  * no arrowhead is drawn as a closed .s-edge path
+
+Warns about hand-drawn SVG, which nothing can validate. Rasterize the result
+with rasterize.py and look at it before delivering.
 """
 
 import argparse
@@ -86,6 +91,28 @@ def check(body, out_html):
         token = m.group(0)
         if re.fullmatch(r"#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}|#[0-9a-fA-F]{8}", token):
             warnings.append("literal colour %s in the body — use a token instead" % token)
+
+    # Hand-drawn SVG is the one part of a report nothing here can validate: the
+    # geometry is the author's, and a reversed edge or a stranded arrowhead is
+    # perfectly well-formed HTML. Say so, loudly, every time.
+    hand = re.sub(r"<svg\b[^>]*\bclass=[\"'][^\"']*\b(wf|gt|gph)\b", "", body)
+    if re.search(r"<svg\b", hand, re.I):
+        warnings.append("hand-drawn <svg> in the body — nothing here checks that it points the "
+                        "right way. Prefer Report.graph() for nodes and edges. If it stays, "
+                        "rasterize the built report and look at it (scripts/rasterize.py), or "
+                        "tell the reader the visuals were not visually verified")
+
+    for m in re.finditer(r'class\s*=\s*["\'][^"\']*\bs-edge\b[^"\']*["\'][^>]*\bd\s*=\s*["\']([^"\']+)', body):
+        if re.search(r"[zZ]\s*$", m.group(1)):
+            problems.append("a closed path carries .s-edge, which is fill:none — an arrowhead "
+                            "drawn as a second path drifts from its line. Use "
+                            "marker-end with the .s-arrow marker, or Report.graph()")
+
+    markers = set(re.findall(r'<marker\b[^>]*\bid\s*=\s*["\']([\w-]+)["\']', body))
+    for m in re.finditer(r'marker-(?:end|start|mid)\s*=\s*["\']url\(#([\w-]+)\)', body):
+        if m.group(1) not in markers:
+            problems.append("marker #%s is referenced but never defined — the arrowheads will "
+                            "not draw" % m.group(1))
 
     hosts = set(re.findall(r'Report\.\w+\(\s*["\']#([\w-]+)["\']', body))
     ids = set(re.findall(r'id\s*=\s*["\']([\w-]+)["\']', body))

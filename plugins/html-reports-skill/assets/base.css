@@ -346,7 +346,26 @@ figcaption { font-size: 13px; color: var(--ink-muted); margin-top: 10px; max-wid
 .s-grplab  { fill: var(--ink-muted); font: 600 11px ui-sans-serif, system-ui, sans-serif; letter-spacing: .1em; }
 .s-edge    { stroke: var(--ink-muted); stroke-width: 1.6; fill: none; }
 .s-edge-alt{ stroke: var(--c4); stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; }
-.s-edgelab { fill: var(--ink-2); font: 11px ui-sans-serif, system-ui, sans-serif; }
+/* Arrowheads are marker content, so they inherit the edge's meaning, not its
+   geometry. Never draw a head as a second path — see docs/03-components.md. */
+.s-arrow     { fill: var(--ink-muted); stroke: none; }
+.s-arrow-alt { fill: var(--c4); stroke: none; }
+/* Edge labels sit on top of the line they name, so they carry a surface-coloured
+   halo. paint-order keeps the stroke behind the glyphs. */
+.s-edgelab { fill: var(--ink-2); font: 11px ui-sans-serif, system-ui, sans-serif;
+             paint-order: stroke; stroke: var(--surface); stroke-width: 3px;
+             stroke-linejoin: round; }
+
+/* --------------------------------------------------------------------------
+   15b. GRAPH DIAGRAM
+   Drawn by Report.graph(). Nodes, edges, arrowheads and self-loops are all
+   derived from { from, to } pairs — no hand-kept coordinates.
+   -------------------------------------------------------------------------- */
+.gph svg { display: block; width: 100%; height: auto; margin-inline: auto; }
+.gph .s-node { cursor: default; }
+.gph .s-node.is-accent { stroke: var(--hue); }
+.gph .s-edge, .gph .s-edge-alt { pointer-events: stroke; }
+.gph .s-node:hover { filter: brightness(1.04); }
 
 /* --------------------------------------------------------------------------
    12b. WATERFALL CHART
