@@ -64,6 +64,12 @@ Obsidian vault knowledge base for reading, creating, editing, and maintaining Ma
 
 **1 doc** — syntax & tooling reference (frontmatter, links/embeds/block refs, callouts, tags, formatting extras, Dataview, Templater, git/`.obsidian/`, editing pitfalls).
 
+### html-reports-skill (v1.0.0)
+
+Project report writing — audits, scope reviews, status updates, findings, estimates, schedules, post-mortems. Defaults to Markdown and carries the document structure and writing conventions for both formats; builds a themed, self-contained HTML report when the content needs a Gantt chart, waterfall chart, KPI row, or a client-facing deliverable.
+
+**3 docs** — HTML build workflow, theming from the host app's palette, component reference. Ships `scripts/derive_theme.py` and `scripts/build_report.py` plus the CSS/JS asset library.
+
 ## Repository Structure
 
 ```
@@ -76,6 +82,7 @@ cpike-agent-skills/
 │   ├── blazor-skill/
 │   ├── elasticsearch-skill/
 │   ├── frontend-design-skill/
+│   ├── html-reports-skill/
 │   ├── huemint-skill/
 │   ├── mermaid-skill/
 │   ├── observability-skill/
@@ -89,6 +96,7 @@ Each plugin follows the same structure:
 plugin-name/
 ├── .claude-plugin/plugin.json    # Plugin manifest with version
 ├── docs/01-NN.md                 # Numbered knowledge base docs
+├── assets/, scripts/             # Optional: templates and helper scripts
 └── skills/<name>/SKILL.md        # Skill router with trigger phrases
 ```
 

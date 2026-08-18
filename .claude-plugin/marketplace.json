@@ -83,6 +83,11 @@
       "name": "blazor-design-impl",
       "source": "./plugins/blazor-design-impl",
       "description": "Bootstrap a Blazor component library from a Claude Design export — creates a three-project solution with CSS design tokens, Razor components, and a TestApp showcase"
+    },
+    {
+      "name": "html-reports-skill",
+      "source": "./plugins/html-reports-skill",
+      "description": "Project report writing skill — document structure and writing conventions for Markdown reports, plus a themed single-file HTML pipeline with Gantt charts, waterfall charts, KPI rows, and automatic theme derivation from the host application's palette"
     }
   ]
 }
