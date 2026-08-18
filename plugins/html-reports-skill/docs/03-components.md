@@ -26,7 +26,8 @@ future reports inherit it.
 | What to do in what order, and why that order | `.seq` + `.step` |
 | A schedule with dependencies | Gantt — `Report.gantt()` |
 | Why a number moved between two versions | waterfall — `Report.waterfall()` in a `.svgbox` |
-| Structure or flow | inline `<svg>` in `.svgbox`, using the `s-*` classes |
+| Structure or flow — a schema, a pipeline, a service map | graph — `Report.graph()` in a `.svgbox` |
+| A picture with no nodes and edges in it — a floor plan, a timeline sketch | hand-drawn inline `<svg>` in `.svgbox`, using the `s-*` classes. Read the warning below first. |
 | Provenance and the limits of the claims | `<footer>` |
 
 ## Scorecard
@@ -119,6 +120,148 @@ The running order. Use it once, near the end, after the recommendations have bee
 - Use `ul.checklist` instead when the rows need owners and tick-boxes; use a Gantt when they run
   in parallel and depend on each other. `.seq` is for a strictly ordered list of moves.
 
+## The graph diagram
+
+A schema, a pipeline, a service map, a state machine — anything whose content is **what
+connects to what**. This is the most common visual in an audit or an architecture review, so it
+has a renderer rather than a set of classes: you declare nodes and edges, and every coordinate,
+arrowhead and self-loop is derived from them.
+
+```js
+Report.graph("#gph-schema", [
+  { id: "org",   label: "Organisation", sub: "tenant root", cat: 0 },
+  { id: "site",  label: "Site",         sub: "1 per address", cat: 1 },
+  { id: "asset", label: "Asset",        sub: "serialised", cat: 2 },
+  { id: "read",  label: "Reading",      sub: "append only", cat: 3 },
+  { id: "user",  label: "User", cat: 4, col: 1, row: 1 }
+], [
+  { from: "org",   to: "site",  label: "1 : n" },
+  { from: "site",  to: "asset", label: "1 : n" },
+  { from: "asset", to: "read",  label: "1 : n" },
+  { from: "asset", to: "asset", label: "parent asset" },      // self-loop
+  { from: "user",  to: "read",  label: "recorded by", kind: "alt" }
+], {
+  label: "Data model",
+  groups: [{ label: "Tenanted", nodes: ["org", "site", "user"] }]
+});
+```
+
+**Node fields**
+
+| Field | Meaning |
+| --- | --- |
+| `id` | Required. What the edges refer to. |
+| `label` | Box text. Wraps to three lines, two when there is a `sub`. |
+| `sub` | A smaller second line — a type, a store, a count. |
+| `cat` | `0`–`5`. Tints the border from `--c0`…`--c5`. Encode something, or leave it off. |
+| `col`, `row` | 0-based grid position. Omit both and the layout is derived; set them to override one node without hand-placing the rest. |
+| `tip` | Tooltip HTML, shown when `#tip` is in the body. |
+
+**Edge fields**
+
+| Field | Meaning |
+| --- | --- |
+| `from`, `to` | Node ids. `from === to` draws a self-loop. |
+| `label` | Sits on the line with a surface-coloured halo, so it stays readable over it. |
+| `kind` | `"alt"` for the dashed accent style — a secondary or asynchronous relationship. |
+| `dir` | `"both"` for a head at each end, `"none"` for a plain line. Default is one head at `to`. |
+
+**Options**: `nodeW` / `nodeH` (default `168` × `56`), `colGap` / `rowGap` (`78` / `34`),
+`groups` (`[{ label, nodes: [id, …] }]`, a dashed enclosure), `label` (the `aria-label`), and
+`tidy: false` to keep returning edges straight instead of bowed.
+
+Conventions:
+
+- **Direction is the claim.** `{ from: "asset", to: "reading" }` says an asset has readings. Read
+  every edge back as a sentence before you build. The renderer will not catch a reversed one.
+- **Columns are derived by layering** — a node sits one column right of everything that points
+  at it. Edges that close a cycle are held out of that calculation, so a feedback path bows back
+  instead of dragging the chain sideways. Pin a node with `col`/`row` when the derived layout
+  reads wrong.
+- **Self-loops are automatic and identical everywhere.** An arc over the top of the box with its
+  label above. Do not invent one: `{ from: "x", to: "x" }` is the whole convention.
+- **Twelve nodes is the ceiling.** Past that, split the diagram by concern or move the detail
+  into a table. A graph nobody can trace is a decoration.
+- **Colour encodes, or it is absent.** `cat` should mean domain, owner or lifecycle. A rainbow of
+  boxes that means nothing is worse than no colour.
+- **The caption states what the diagram proves.** "Every reading reaches a site through an asset;
+  nothing is tenant-scoped below `site`" — not "the data model".
+- Needs the base `<script>`. If you strip the script block, replace the diagram with a table of
+  `from`, `to`, `relationship`.
+
+## Hand-drawn inline SVG
+
+Sometimes the picture is not nodes and edges — a floor plan, a page layout, a shape sketch. Then
+you draw it yourself in a `.svgbox` with the `s-*` classes: `.s-node`, `.s-lab`, `.s-sub`,
+`.s-grp`, `.s-grplab`, `.s-edge`, `.s-edge-alt`, `.s-edgelab`, `.s-arrow`.
+
+**Know what you are giving up.** Every other component here is either validated by
+`build_report.py` or generated by a renderer. Hand-drawn SVG is neither. A reversed edge, an
+arrowhead pointing the wrong way, a label sitting on top of a line and a shape 200 units off the
+canvas are all perfectly well-formed HTML. The build cannot see any of them. **If a diagram has
+nodes and edges in it, use `Report.graph()`** — this section is the exception, not the
+alternative.
+
+If you do draw one, rasterize the built report and look at it before delivering:
+
+```bash
+python3 "$CLAUDE_PLUGIN_ROOT/scripts/rasterize.py" reports/audit.html
+```
+
+### Arrowheads
+
+**Never draw an arrowhead as a second path.** `.s-edge` is `fill: none`, so a filled head has to
+be its own shape, and its three coordinates then have to be kept in sync with an endpoint that
+lives in a different string. That is the single most common defect in a hand-drawn diagram, and
+`build_report.py` now rejects it: a closed path carrying `.s-edge` is an error.
+
+Define one marker per document and point every edge at it:
+
+```html
+<div class="svgbox">
+  <svg viewBox="0 0 520 140" role="img" aria-label="Ingest path">
+    <defs>
+      <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5"
+              markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path class="s-arrow" d="M0,0 L10,5 L0,10 Z"/>
+      </marker>
+    </defs>
+    <rect class="s-node" x="8" y="40" width="150" height="48" rx="8"/>
+    <text class="s-lab" x="83" y="69" text-anchor="middle">Queue</text>
+    <path class="s-edge" d="M164,64 L246,64" marker-end="url(#arw)"/>
+    <text class="s-edgelab" x="205" y="56" text-anchor="middle">batched</text>
+    <rect class="s-node" x="252" y="40" width="150" height="48" rx="8"/>
+    <text class="s-lab" x="327" y="69" text-anchor="middle">Validator</text>
+  </svg>
+</div>
+```
+
+- The head lands on the end of the line, whatever the line does afterwards. Move the path and the
+  head follows.
+- `orient="auto-start-reverse"` means the same marker works as `marker-start` on a two-way edge.
+- `.s-arrow` fills from `--ink-muted`; `.s-arrow-alt` fills from `--c4` for a `.s-edge-alt` line.
+- `markerWidth`/`markerHeight` are in stroke widths, so the head scales with the line.
+- The build rejects a `marker-end` that names an id no `<marker>` defines. It cannot tell you the
+  head is at the wrong end — only your eyes can.
+
+### Self-loops
+
+An edge from a thing to itself. Draw it the same way every time: a cubic arc over the top of the
+box, from the left shoulder to the right shoulder, head landing back on the box, label above the
+arc.
+
+```html
+<!-- box at x=90…210, y=60…108, inside a viewBox with room above it -->
+<path class="s-edge" d="M124,57 C124,21 176,21 176,57" marker-end="url(#arw)"/>
+<text class="s-edgelab" x="150" y="14" text-anchor="middle">parent asset</text>
+```
+
+Leave headroom in the `viewBox` for the arc and its label. A loop drawn off the top of the
+canvas is invisible, and nothing but a rasterized screenshot will tell you.
+
+`Report.graph()` draws exactly this shape for `{ from: "x", to: "x" }`. Match it so the two never
+disagree inside one report.
+
 ## The scripts
 
 All opt-in. A static report can delete the whole `<script>` block.
@@ -133,9 +276,10 @@ All opt-in. A static report can delete the whole `<script>` block.
 
 | A waterfall chart | `Report.waterfall(host, steps, opts)` — see below |
 | A Gantt chart | `Report.gantt(host, rows, opts)` — see below |
+| A graph diagram | `Report.graph(host, nodes, edges, opts)` — see below |
 
 For report-specific code, append a second `<script>` after the base block and use
-`window.Report.{$, $$, esc, bindTip, waterfall, gantt}`. Escape any interpolated string with
+`window.Report.{$, $$, esc, bindTip, waterfall, gantt, graph}`. Escape any interpolated string with
 `esc()` before it reaches `innerHTML`.
 
 ## The waterfall chart

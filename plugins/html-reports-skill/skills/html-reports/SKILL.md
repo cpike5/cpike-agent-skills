@@ -1,6 +1,6 @@
 ---
 name: html-reports
-description: Write project reports — audits, scope reviews, status updates, findings, estimates, schedules, post-mortems, recommendations. Defaults to Markdown; produces a themed single-file HTML report when the user asks for HTML or when the content needs a Gantt chart, waterfall chart, KPI row, or other component Markdown cannot express. Use this skill whenever the user asks for a report, findings document, audit write-up, scope review, estimate, project schedule, or client-facing deliverable, even if they do not say the word "report" or specify a format — and use it for Markdown reports too, since the document structure and writing conventions here apply to both. Reports are written in simplified English by default — short active sentences, one term per concept, no padding.
+description: Write project reports — audits, scope reviews, status updates, findings, estimates, schedules, post-mortems, recommendations. Defaults to Markdown; produces a themed single-file HTML report when the user asks for HTML or when the content needs a Gantt chart, waterfall chart, schema or architecture diagram, KPI row, or other component Markdown cannot express. Use this skill whenever the user asks for a report, findings document, audit write-up, scope review, estimate, project schedule, or client-facing deliverable, even if they do not say the word "report" or specify a format — and use it for Markdown reports too, since the document structure and writing conventions here apply to both. Reports are written in simplified English by default — short active sentences, one term per concept, no padding.
 ---
 
 # Reports
@@ -35,6 +35,8 @@ Use HTML only when one of these is true:
 - The content needs a **Gantt chart** — a schedule where the reader must see what runs in
   parallel and what waits
 - The content needs a **waterfall chart** — a number that moved, and the movements that moved it
+- The content needs a **diagram** — a schema, a pipeline, a service map, anything whose point is
+  what connects to what
 - The content needs hover detail, sortable columns, switchable scenarios, or a KPI row
 - The document is a client-facing deliverable where presentation carries weight
 
@@ -61,8 +63,18 @@ Read `${CLAUDE_PLUGIN_ROOT}/docs/01-html-workflow.md` before starting. It covers
    `${CLAUDE_PLUGIN_ROOT}/assets/body.html`.
 4. **Assemble** with `${CLAUDE_PLUGIN_ROOT}/scripts/build_report.py`, which inlines the theme, the stylesheet and the
    renderers into one portable file and refuses to write if anything is broken.
-5. **Write it into the repository** and tell the user the path — see "Where the report goes"
+5. **Look at it.** Run `${CLAUDE_PLUGIN_ROOT}/scripts/rasterize.py` on the built file and read the PNGs it writes.
+   The build checks structure; only the pixels show a diagram pointing the wrong way or a chart
+   that failed to draw. If no browser is available the script says so — then say in delivery that
+   the visuals were not visually verified.
+6. **Write it into the repository** and tell the user the path — see "Where the report goes"
    below.
+
+**Diagrams are generated, not hand-drawn.** Anything with nodes and edges — a schema, a flow, a
+service map — is `Report.graph(host, nodes, edges)`, which derives every coordinate, arrowhead
+and self-loop from the pairs you declare. Hand-drawn `<svg>` is for pictures that have no nodes
+and edges in them, and it is the one thing in this skill that nothing validates: `docs/03-components.md`
+says what that costs and how to draw an arrowhead that cannot drift.
 
 Never hand-assemble the final HTML, and never link a stylesheet. Reports must survive being
 emailed, archived, and opened from disk in two years. `build_report.py` enforces this.
@@ -134,6 +146,7 @@ All paths are relative to `${CLAUDE_PLUGIN_ROOT}`.
 | `assets/components.html` | Every component rendered, with its markup. Open in a browser. |
 | `assets/base.css`, `assets/base.js` | Copied verbatim into `.reports/`. Do not edit per report. |
 | `assets/theme.css` | The default palette, used unchanged when no app palette is found. |
+| `scripts/rasterize.py` | After every build. Screenshots the report so the visuals get looked at. |
 
 ## 6. Scripts
 
@@ -151,8 +164,13 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/derive_theme.py" --primary "#7c3aed" --chec
 # per report — assemble the single-file output
 python3 "$CLAUDE_PLUGIN_ROOT/scripts/build_report.py" --body draft-body.html \
     --title "Dashboard Audit — Findings" --out reports/dashboard-audit.html
+
+# per report — screenshot it in both themes and read the PNGs before delivering
+python3 "$CLAUDE_PLUGIN_ROOT/scripts/rasterize.py" reports/dashboard-audit.html
 ```
 
 `build_report.py` fails loudly rather than writing a broken report. It checks tag balance,
-rejects external references, rejects literal hex colours in the body, and confirms every chart
-target exists. Fix what it reports; do not work around it.
+rejects external references, rejects literal hex colours in the body, confirms every chart
+target exists, and rejects an arrowhead drawn as a closed `.s-edge` path or a `marker-end`
+pointing at a marker nobody defined. Fix what it reports; do not work around it. It cannot check
+what a diagram means — that is what `rasterize.py` and your eyes are for.

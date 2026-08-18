@@ -469,11 +469,280 @@
     $$("[data-tip]", el).forEach((n) => bindTip(n, n.getAttribute("data-tip")));
   }
 
+  /* ---------- 8. GRAPH DIAGRAM --------------------------------------------
+     Report.graph(hostSelectorOrNode, nodes, edges, opts)
+
+     Structure and flow: schemas, pipelines, service maps, state machines.
+     You give it what connects to what; it derives every coordinate, every
+     arrowhead and every self-loop. Nothing has to be kept in sync by hand.
+
+     nodes: [{ id, label, sub, cat, col, row, tip }]
+       id     required, referenced by edges
+       label  the box text; wraps to at most three lines
+       sub    a second, smaller line — a type, a count, a store
+       cat    0-5, tints the border from --c0…--c5
+       col    0-based column. Omit and it is derived from the edges.
+       row    0-based row within the column. Omit and declaration order wins.
+       tip    tooltip HTML, shown when #tip exists
+
+     edges: [{ from, to, label, kind, dir }]
+       from,to  node ids. from === to draws a self-loop.
+       label    placed on the line, with a halo so it stays readable
+       kind     "alt" for the dashed accent style
+       dir      "both" for a head at each end, "none" for a plain line
+
+     opts:
+       nodeW,nodeH  box size in user units (default 168 x 56)
+       colGap,rowGap  space between boxes (default 78 / 34)
+       groups   [{ label, nodes: [id, …] }] dashed enclosure with a caption
+       label    aria-label for the figure
+       tidy     false to keep back-edges straight instead of curving them
+
+     Renders an <svg> into the host. Twelve nodes is a comfortable ceiling;
+     past that, split the diagram or move the detail into a table.
+  ------------------------------------------------------------------------ */
+  let graphSeq = 0;
+
+  function graph(host, nodes, edges, opts) {
+    const el = typeof host === "string" ? $(host) : host;
+    if (!el || !Array.isArray(nodes) || !nodes.length) return;
+    edges = Array.isArray(edges) ? edges : [];
+    opts = opts || {};
+
+    const NW = opts.nodeW || 168, NH = opts.nodeH || 56;
+    const GY = opts.rowGap || 34;
+    const uid = "g" + (++graphSeq);
+
+    const byId = {};
+    nodes.forEach((n) => { if (n && n.id != null) byId[n.id] = n; });
+    const links = edges.filter((e) => e && byId[e.from] && byId[e.to]);
+    const flows = links.filter((e) => e.from !== e.to);
+    const loops = links.filter((e) => e.from === e.to);
+
+    /* ---- columns: honour what was given, derive the rest from the edges.
+           Edges that close a cycle are held out of the layering, so a feedback
+           path bows backwards instead of dragging the chain to the right. ---- */
+    const fanout = {};
+    flows.forEach((e, i) => { (fanout[e.from] = fanout[e.from] || []).push(i); });
+    const mark = {}, closes = {};
+    (function () {
+      const walk = (id) => {
+        mark[id] = 1;
+        (fanout[id] || []).forEach((i) => {
+          const to = flows[i].to;
+          if (mark[to] === 1) closes[i] = true;             /* target is an ancestor */
+          else if (!mark[to]) walk(to);
+        });
+        mark[id] = 2;
+      };
+      nodes.forEach((n) => { if (!mark[n.id]) walk(n.id); });
+    })();
+    const forward = flows.filter((e, i) => !closes[i]);
+
+    const col = {};
+    nodes.forEach((n) => { col[n.id] = n.col != null ? n.col : 0; });
+    const fixed = (id) => byId[id].col != null;
+    for (let pass = 0; pass <= nodes.length; pass++) {
+      let moved = false;
+      forward.forEach((e) => {
+        if (fixed(e.to)) return;
+        const want = col[e.from] + 1;
+        if (want > col[e.to]) { col[e.to] = want; moved = true; }
+      });
+      if (!moved) break;
+    }
+    const c0 = Math.min.apply(null, nodes.map((n) => col[n.id]));
+    if (c0) nodes.forEach((n) => { col[n.id] -= c0; });      /* no empty leading column */
+
+    /* ---- rows: given, else declaration order within the column ---- */
+    const used = {}, row = {};
+    nodes.forEach((n) => {
+      const c = col[n.id];
+      used[c] = used[c] || [];
+      if (n.row != null) { row[n.id] = n.row; used[c].push(n.row); }
+    });
+    nodes.forEach((n) => {
+      if (row[n.id] != null) return;
+      const c = col[n.id];
+      let r = 0;
+      while (used[c].indexOf(r) !== -1) r++;
+      row[n.id] = r;
+      used[c].push(r);
+    });
+
+    /* Column gaps widen for the longest edge label, so a label never has to sit
+       on top of the boxes it runs between. */
+    let need = 0;
+    flows.forEach((e) => {
+      if (e.label && col[e.to] !== col[e.from]) need = Math.max(need, String(e.label).length * 5.8 + 16);
+    });
+    const GX = Math.max(opts.colGap || 78, Math.min(need, 190));
+
+    const r0 = Math.min.apply(null, nodes.map((n) => row[n.id]));
+    if (r0) nodes.forEach((n) => { row[n.id] -= r0; });
+
+    const maxCol = Math.max.apply(null, nodes.map((n) => col[n.id]));
+    const maxRow = Math.max.apply(null, nodes.map((n) => row[n.id]));
+    const M = { t: loops.length ? 58 : 22, r: 22, b: 22, l: 22 };
+    const W = M.l + (maxCol + 1) * NW + maxCol * GX + M.r;
+    const H = M.t + (maxRow + 1) * NH + maxRow * GY + M.b;
+
+    const at = (n) => ({
+      x: M.l + col[n.id] * (NW + GX) + NW / 2,
+      y: M.t + row[n.id] * (NH + GY) + NH / 2
+    });
+    const pos = {};
+    nodes.forEach((n) => { pos[n.id] = at(n); });
+
+    /* ---- geometry: where a straight line leaves a box, with a 5-unit gap ---- */
+    const border = (p, q) => {
+      const dx = q.x - p.x, dy = q.y - p.y;
+      if (!dx && !dy) return { x: p.x, y: p.y };
+      const s = Math.min(
+        dx ? (NW / 2) / Math.abs(dx) : Infinity,
+        dy ? (NH / 2) / Math.abs(dy) : Infinity
+      );
+      const len = Math.sqrt(dx * dx + dy * dy);
+      const gap = 5 / len;
+      return { x: p.x + dx * (s + gap), y: p.y + dy * (s + gap) };
+    };
+
+    const wrap = (text, max, lines) => {
+      const out = [];
+      let line = "";
+      String(text == null ? "" : text).split(/\s+/).forEach((w) => {
+        if (!line.length) line = w;
+        else if ((line + " " + w).length <= max) line += " " + w;
+        else { out.push(line); line = w; }
+      });
+      if (line) out.push(line);
+      if (out.length > lines) { out.length = lines; out[lines - 1] = out[lines - 1].slice(0, max - 1) + "…"; }
+      return out;
+    };
+
+    const p = [];
+    /* max-width stops a small diagram from being blown up to the container
+       width, so type stays the same size in every figure in the report */
+    p.push('<svg viewBox="0 0 ' + W + " " + H + '" style="max-width:' + W + "px;min-width:" +
+      Math.min(W, 640) + 'px" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' +
+      esc(opts.label || "Structure diagram") + '">');
+
+    /* ---- arrowheads live in <marker>, so a head can never drift from its line ---- */
+    p.push('<defs>');
+    [["", "s-arrow"], ["-alt", "s-arrow-alt"]].forEach((m) => {
+      p.push('<marker id="' + uid + '-arrow' + m[0] + '" viewBox="0 0 10 10" refX="9" refY="5" ' +
+        'markerWidth="7" markerHeight="7" orient="auto-start-reverse">' +
+        '<path class="' + m[1] + '" d="M0,0 L10,5 L0,10 Z"/></marker>');
+    });
+    p.push('</defs>');
+
+    /* ---- group enclosures, behind everything ---- */
+    (opts.groups || []).forEach((g) => {
+      const pts = (g.nodes || []).filter((id) => pos[id]).map((id) => pos[id]);
+      if (!pts.length) return;
+      const pad = 16;
+      const x0 = Math.min.apply(null, pts.map((q) => q.x)) - NW / 2 - pad;
+      const x1 = Math.max.apply(null, pts.map((q) => q.x)) + NW / 2 + pad;
+      const y0 = Math.min.apply(null, pts.map((q) => q.y)) - NH / 2 - pad;
+      const y1 = Math.max.apply(null, pts.map((q) => q.y)) + NH / 2 + pad;
+      p.push('<rect class="s-grp" x="' + x0.toFixed(1) + '" y="' + y0.toFixed(1) +
+        '" width="' + (x1 - x0).toFixed(1) + '" height="' + (y1 - y0).toFixed(1) + '" rx="10"/>');
+      if (g.label) {
+        p.push('<text class="s-grplab" x="' + (x0 + 4).toFixed(1) + '" y="' + (y0 - 6).toFixed(1) +
+          '">' + esc(String(g.label).toUpperCase()) + "</text>");
+      }
+    });
+
+    /* ---- edges ---- */
+    const edge = (d, e, lab) => {
+      const cls = e.kind === "alt" ? "s-edge-alt" : "s-edge";
+      const head = e.kind === "alt" ? uid + "-arrow-alt" : uid + "-arrow";
+      let a = '<path class="' + cls + '" d="' + d + '"';
+      if (e.dir !== "none") a += ' marker-end="url(#' + head + ')"';
+      if (e.dir === "both") a += ' marker-start="url(#' + head + ')"';
+      if (e.tip) a += ' data-tip="' + esc(e.tip) + '"';
+      a += "><title>" + esc((e.from) + " → " + (e.to) + (e.label ? " — " + e.label : "")) + "</title></path>";
+      p.push(a);
+      if (e.label) {
+        p.push('<text class="s-edgelab" x="' + lab.x.toFixed(1) + '" y="' + lab.y.toFixed(1) +
+          '" text-anchor="middle">' + esc(e.label) + "</text>");
+      }
+    };
+
+    flows.forEach((e) => {
+      const A = pos[e.from], B = pos[e.to];
+      const back = col[e.to] < col[e.from] || (col[e.to] === col[e.from] && row[e.to] < row[e.from]);
+      const a = border(A, B), b = border(B, A);
+      if (back && opts.tidy !== false) {
+        /* a returning edge bows clear of the forward ones it runs beside */
+        const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const len = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+        const bow = Math.min(52, len * 0.22);
+        const cxp = mx + (dy / len) * bow, cyp = my - (dx / len) * bow;
+        edge("M" + a.x.toFixed(1) + "," + a.y.toFixed(1) + " Q" + cxp.toFixed(1) + "," + cyp.toFixed(1) +
+          " " + b.x.toFixed(1) + "," + b.y.toFixed(1), e,
+          { x: (mx + cxp) / 2, y: (my + cyp) / 2 - 4 });
+      } else {
+        /* a mostly-horizontal label wider than its run is lifted clear of the boxes.
+           A vertical edge keeps its label on the line: the lane above the box
+           belongs to the self-loop. */
+        const run = Math.abs(b.x - a.x);
+        const wide = e.label && run >= Math.abs(b.y - a.y) && String(e.label).length * 5.8 > run;
+        edge("M" + a.x.toFixed(1) + "," + a.y.toFixed(1) + " L" + b.x.toFixed(1) + "," + b.y.toFixed(1), e,
+          wide ? { x: (a.x + b.x) / 2, y: Math.min(A.y, B.y) - NH / 2 - 7 }
+               : { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 - 5 });
+      }
+    });
+
+    /* ---- self-loops: one convention, drawn the same way every time.
+           An arc over the top of the box, left shoulder to right shoulder,
+           head landing back on the box. Its label sits above the arc. ---- */
+    loops.forEach((e) => {
+      const n = pos[e.from];
+      const x1 = n.x - NW * 0.20, x2 = n.x + NW * 0.20, top = n.y - NH / 2;
+      const rise = 30;
+      edge("M" + x1.toFixed(1) + "," + (top - 3).toFixed(1) +
+        " C" + x1.toFixed(1) + "," + (top - rise - 12).toFixed(1) +
+        " " + x2.toFixed(1) + "," + (top - rise - 12).toFixed(1) +
+        " " + x2.toFixed(1) + "," + (top - 3).toFixed(1), e,
+        { x: n.x, y: top - rise - 16 });
+    });
+
+    /* ---- nodes, on top of the edges ---- */
+    nodes.forEach((n) => {
+      const q = pos[n.id];
+      const x = q.x - NW / 2, y = q.y - NH / 2;
+      const accent = n.cat != null ? ' class="s-node is-accent" style="--hue: var(--c' + n.cat + ')"'
+                                   : ' class="s-node"';
+      p.push("<rect" + accent + ' x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + NW +
+        '" height="' + NH + '" rx="8"' + (n.tip ? ' data-tip="' + esc(n.tip) + '"' : "") + "/>");
+
+      const lines = wrap(n.label != null ? n.label : n.id, Math.floor(NW / 7.4), n.sub ? 2 : 3);
+      const block = lines.length * 15 + (n.sub ? 13 : 0);
+      let ty = q.y - block / 2 + 12;
+      lines.forEach((line) => {
+        p.push('<text class="s-lab" x="' + q.x + '" y="' + ty.toFixed(1) +
+          '" text-anchor="middle">' + esc(line) + "</text>");
+        ty += 15;
+      });
+      if (n.sub) {
+        p.push('<text class="s-sub" x="' + q.x + '" y="' + (ty + 1).toFixed(1) +
+          '" text-anchor="middle">' + esc(n.sub) + "</text>");
+      }
+    });
+
+    p.push("</svg>");
+    el.classList.add("gph");
+    el.innerHTML = p.join("");
+    $$("[data-tip]", el).forEach((n) => bindTip(n, n.getAttribute("data-tip")));
+  }
+
   /* ---------- boot ---------- */
   function boot() { initTheme(); initTips(); initSort(); initScrollspy(); initStamp(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
 
   /* Exposed for report-specific code appended below this block. */
-  window.Report = { $, $$, esc, bindTip, waterfall, gantt };
+  window.Report = { $, $$, esc, bindTip, waterfall, gantt, graph };
 })();
