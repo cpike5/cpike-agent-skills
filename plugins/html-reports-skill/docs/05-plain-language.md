@@ -124,8 +124,9 @@ Simplified English governs the connective language. It does not soften the repor
 - **Identifiers stay exact.** `document_scan_service.py`, `read_pir_book_in_process`,
   `300-second timeout`. Never paraphrase a name.
 - **Numbers stay precise, and ranges stay ranges.** "90–130 h, central ~110" is plain and honest.
-- **The headline stays a finding.** `04-editorial.md` still applies — flat statement, then the
-  sharp half in `em`. Short sentences make that device work better, not worse.
+- **The headline stays a plain title.** `04-editorial.md` still applies — the `h1` names the
+  subject and its scope. Simplified English does not license a punchier headline; it rules one
+  out.
 - **Bold still carries the claim.** Bold text read alone must still deliver the findings.
 - **Qualification stays.** "This holds only for a single worker process" is not a hedge; it is the
   finding. Cut the padding, never the caveat.
