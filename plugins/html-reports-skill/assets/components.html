@@ -5,15 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Report components</title>
 <style>
-/* ==========================================================================
-   Report base stylesheet — v1
-   Single-file HTML reports. No build step, no dependencies, no web fonts.
-   Inline this whole file inside <style> in the <head>.
-   Every colour is a token; never hard-code a hex in document markup.
-   ========================================================================== */
-
 /* --------------------------------------------------------------------------
-   1. TOKENS
+   1. TOKENS — this is theme.css, the only file that changes per project
    -------------------------------------------------------------------------- */
 :root {
   color-scheme: light;
@@ -59,10 +52,20 @@
   --tint-flag: rgba(237,161,0,0.14);
   --tint-info: rgba(42,120,214,0.10);
 
+  /* type — system stacks only, never a web font (see docs/02-theming.md).
+     --font-display carries headings and the display numerals; set it to a
+     serif stack when the application's own headings are serif, and the report
+     stops looking like a default web page. */
+  --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  --font-body:    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  --font-mono:    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
   /* rhythm */
   --wrap:      1080px;
+  --measure:   72ch;   /* prose line length — body copy never exceeds this */
   --radius:    10px;
   --radius-sm: 6px;
+  --tracking-caps: .12em;
 }
 
 /* Dark values live in one place and are applied by both the media query
@@ -118,6 +121,16 @@
   --tint-info: rgba(57,135,229,0.14);
 }
 
+/* ==========================================================================
+   Report base stylesheet — v2
+   Single-file HTML reports. No build step, no dependencies, no web fonts.
+   Inlined by build_report.py inside <style> in the <head>, after theme.css.
+   The palette lives in theme.css; this file only consumes those tokens
+   (the two bar-ink overrides and the print block aside). Never hard-code a hex in
+   document markup.
+   ========================================================================== */
+
+
 /* --------------------------------------------------------------------------
    2. BASE
    -------------------------------------------------------------------------- */
@@ -132,7 +145,7 @@ body {
   margin: 0;
   background: var(--plane);
   color: var(--ink);
-  font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  font: 16px/1.55 var(--font-body);
 }
 .wrap { max-width: var(--wrap); margin: 0 auto; padding: 40px 24px 96px; }
 .wrap.wide { max-width: 1180px; }
@@ -142,7 +155,11 @@ a.link { color: var(--info); text-decoration: none; }
 a.link:hover { text-decoration: underline; }
 :focus-visible { outline: 2px solid var(--info); outline-offset: 2px; border-radius: 3px; }
 
+h1, h2, h3, .sc-name { font-family: var(--font-display); text-wrap: balance; }
 h1 { font-size: clamp(28px, 4.4vw, 40px); line-height: 1.12; margin: 0 0 12px; letter-spacing: -0.02em; }
+/* The one typographic flourish: italicise the sharp half of a headline.
+   <h1>The house has ten rooms. <em>Four of them are hollow.</em></h1> */
+h1 em { font-style: italic; color: var(--c0); }
 h2 {
   font-size: 22px; letter-spacing: -0.01em; margin: 56px 0 6px;
   padding-top: 20px; border-top: 1px solid var(--border-strong);
@@ -153,13 +170,13 @@ h2 .tag { font-size: 12px; font-weight: 500; color: var(--ink-muted); letter-spa
 h3 { font-size: 16px; margin: 28px 0 8px; letter-spacing: -0.005em; scroll-margin-top: 16px; }
 h4 { font-size: 14px; margin: 20px 0 6px; color: var(--ink-2); }
 p  { margin: 10px 0; }
-.lede  { color: var(--ink-2); max-width: 74ch; }
+.lede  { color: var(--ink-2); max-width: var(--measure); }
 .small { font-size: 13px; color: var(--ink-muted); }
 ul, ol { margin: 10px 0; padding-left: 22px; }
 li { margin: 5px 0; }
 
 code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: .88em; background: var(--surface-2);
   border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px;
 }
@@ -168,17 +185,17 @@ pre {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
   box-shadow: var(--shadow); padding: 14px 16px; overflow-x: auto;
   font-size: 12.5px; line-height: 1.6;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
 }
 pre code { background: none; border: 0; padding: 0; font-size: inherit; white-space: pre; }
-.ids { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; color: var(--ink-2); }
+.ids { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-2); }
 
 /* --------------------------------------------------------------------------
    3. MASTHEAD
    -------------------------------------------------------------------------- */
 header.masthead { border-bottom: 2px solid var(--ink); padding-bottom: 20px; margin-bottom: 8px; }
 .eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-muted); margin: 0 0 10px; }
-.sub  { color: var(--ink-2); margin: 0; max-width: 62ch; }
+.sub  { color: var(--ink-2); margin: 0; max-width: var(--measure); }
 .meta { display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 18px; font-size: 13px; color: var(--ink-muted); }
 .meta b { color: var(--ink-2); font-weight: 600; }
 
@@ -312,7 +329,86 @@ th[data-sort][aria-sort="descending"]::after { content: " ↓"; opacity: 1; }
 }
 
 /* --------------------------------------------------------------------------
-   10. CONTROLS — segmented switches, date pickers, theme toggle
+   10. SCORECARD — N comparable things, scored on the same few axes
+   Per-card accent: style="--hue: var(--c2)". Bars carry no numbers by design;
+   the axis label carries the count, the note carries the judgement.
+   -------------------------------------------------------------------------- */
+.scorecard { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; margin: 20px 0; }
+.sc {
+  --hue: var(--c0);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 16px 16px 14px;
+  display: flex; flex-direction: column; gap: 13px;
+}
+.sc.is-weak { border-color: var(--warn); }
+.sc-top { display: flex; align-items: center; gap: 10px; }
+.sc-name { font-size: 17px; font-weight: 600; line-height: 1.15; }
+.sc-key { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted); }
+.sc-axes { display: grid; gap: 7px; }
+.axis { display: grid; grid-template-columns: 92px 1fr; align-items: center; gap: 10px; }
+.axis .k {
+  font-size: 10px; font-weight: 700; letter-spacing: var(--tracking-caps);
+  text-transform: uppercase; color: var(--ink-muted);
+}
+.bar { height: 5px; border-radius: 3px; background: var(--surface-2); border: 1px solid var(--grid); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--hue); border-radius: 3px; }
+.bar[data-fill="none"] i { width: 0; }
+.bar[data-fill="low"]  i { width: 22%; opacity: .55; }
+.bar[data-fill="mid"]  i { width: 55%; opacity: .78; }
+.bar[data-fill="full"] i { width: 100%; }
+.sc-note {
+  font-size: 12.5px; line-height: 1.45; color: var(--ink-2);
+  border-top: 1px solid var(--grid); padding-top: 11px; margin: auto 0 0;
+}
+.sc-note strong { color: var(--warn); font-weight: 600; }
+.sc-note em { color: var(--good); font-style: normal; font-weight: 600; }
+
+/* --------------------------------------------------------------------------
+   11. RANKED ITEMS — recommendations in priority order, optionally in tiers
+   Sizing and impact go in .pill markers, never in the heading.
+   -------------------------------------------------------------------------- */
+.tier { margin-top: 34px; }
+.tier-head {
+  display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+  padding-bottom: 10px; border-bottom: 1px solid var(--grid);
+}
+.tier-head h3 { margin: 0; font-size: 19px; }
+.tier-head p  { margin: 0; font-size: 13px; color: var(--ink-muted); }
+.ranked { display: grid; gap: 12px; margin: 14px 0; }
+.item {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 20px 22px;
+}
+.item-head { display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
+.rank {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  color: var(--c0-ink); background: var(--c0);
+  border-radius: var(--radius-sm); padding: 3px 8px; flex: none; margin-top: 3px;
+  font-variant-numeric: tabular-nums;
+}
+.item-head h3, .item-head h4 { margin: 0; flex: 1 1 300px; color: var(--ink); }
+.markers { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 3px; }
+.item > p { max-width: var(--measure); }
+.item > p.small { color: var(--ink-2); }
+.item > :first-child { margin-top: 0; }
+.item > :last-child  { margin-bottom: 0; }
+
+/* --------------------------------------------------------------------------
+   12. SEQUENCE — a running order. Steps, not owners; use .checklist for actions.
+   -------------------------------------------------------------------------- */
+.seq {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden; margin: 16px 0;
+}
+.step { display: grid; grid-template-columns: 34px 1fr; gap: 16px; padding: 15px 18px; border-top: 1px solid var(--grid); }
+.step:first-child { border-top: 0; }
+.step-n { font-family: var(--font-mono); font-size: 12px; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+.step h4 { margin: 0 0 4px; font-size: 14.5px; color: var(--ink); }
+.step p  { margin: 0; font-size: 13.5px; color: var(--ink-2); max-width: var(--measure); }
+.step .when { display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted); }
+
+/* --------------------------------------------------------------------------
+   13. CONTROLS — segmented switches, date pickers, theme toggle
    -------------------------------------------------------------------------- */
 .controls { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end; margin-bottom: 18px; }
 .ctl-label { font-size: 12px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .05em; display: block; margin-bottom: 6px; }
@@ -339,7 +435,7 @@ input[type="date"], input[type="search"], select {
 #theme-toggle:hover { color: var(--ink); }
 
 /* --------------------------------------------------------------------------
-   11. TOOLTIP — populated by bindTip() / [data-tip]
+   14. TOOLTIP — populated by bindTip() / [data-tip]
    -------------------------------------------------------------------------- */
 #tip {
   position: fixed; z-index: 60; pointer-events: none; opacity: 0;
@@ -354,7 +450,7 @@ input[type="date"], input[type="search"], select {
 #tip .r b { color: var(--ink); font-weight: 600; }
 
 /* --------------------------------------------------------------------------
-   12. FIGURES + INLINE SVG DIAGRAMS
+   15. FIGURES + INLINE SVG DIAGRAMS
    Draw diagrams as inline SVG using these classes so they theme correctly.
    -------------------------------------------------------------------------- */
 figure { margin: 22px 0; }
@@ -498,7 +594,7 @@ figcaption { font-size: 13px; color: var(--ink-muted); margin-top: 10px; max-wid
 }
 
 /* --------------------------------------------------------------------------
-   13. FOOTER
+   16. FOOTER
    -------------------------------------------------------------------------- */
 footer {
   margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--border-strong);
@@ -506,20 +602,23 @@ footer {
 }
 
 /* --------------------------------------------------------------------------
-   14. RESPONSIVE + PRINT
+   17. RESPONSIVE + PRINT
    -------------------------------------------------------------------------- */
 @media (max-width: 620px) {
   .wrap { padding: 28px 16px 72px; }
   h2 { margin-top: 40px; }
   #theme-toggle { top: auto; bottom: 14px; right: 14px; }
+  .axis { grid-template-columns: 78px 1fr; }
+  .step { grid-template-columns: 1fr; gap: 5px; }
+  .item { padding: 18px 16px; }
 }
 
 @media print {
   body { background: #fff; }
-  .card, .tablewrap, .kpi, .svgbox, .agenda a, pre { box-shadow: none; }
+  .card, .tablewrap, .kpi, .svgbox, .agenda a, pre, .sc, .item, .seq { box-shadow: none; }
   #theme-toggle, .controls { display: none; }
   h2 { break-after: avoid; }
-  .tablewrap, figure, .note, .kpi { break-inside: avoid; }
+  .tablewrap, figure, .note, .kpi, .sc, .item, .step { break-inside: avoid; }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 11px; color: #666; }
 }
 </style>
@@ -557,7 +656,10 @@ footer {
   <a href="#c14"><span class="k">15</span><span class="v">Waterfall chart</span></a>
   <a href="#c15"><span class="k">16</span><span class="v">Gantt chart</span></a>
   <a href="#c16"><span class="k">17</span><span class="v">Code block</span></a>
-  <a href="#c17"><span class="k">18</span><span class="v">Footer</span></a>
+  <a href="#c18"><span class="k">19</span><span class="v">Scorecard</span></a>
+  <a href="#c19"><span class="k">20</span><span class="v">Ranked items</span></a>
+  <a href="#c20"><span class="k">21</span><span class="v">Sequence</span></a>
+  <a href="#c17"><span class="k">22</span><span class="v">Footer</span></a>
 </div>
 
 <div class="note info">
@@ -1023,7 +1125,213 @@ document.addEventListener(&quot;DOMContentLoaded&quot;, function () {
       QUEUE_URL: postgres://queue&lt;/code&gt;&lt;/pre&gt;</code></pre>
 </details>
 
-<h2 id="c17"><span class="num">18</span>Footer</h2>
+<h2 id="c18"><span class="num">19</span>Scorecard</h2>
+<p class="lede">Several comparable things scored on the same few axes. Denser than a table and it reads at a glance; the accent hue is per card, via <code>style="--hue: var(--c2)"</code>. Fills are <code>none</code>, <code>low</code>, <code>mid</code>, <code>full</code> — never a number.</p>
+<div class="scorecard">
+  <article class="sc" style="--hue: var(--c2)">
+    <div class="sc-top"><span class="sc-name">The Kitchen</span><span class="sc-key">kitchen</span></div>
+    <div class="sc-axes">
+      <div class="axis"><span class="k">Prompt</span><span class="bar" data-fill="full"><i></i></span></div>
+      <div class="axis"><span class="k">Tools · 16</span><span class="bar" data-fill="full"><i></i></span></div>
+      <div class="axis"><span class="k">Workspace</span><span class="bar" data-fill="full"><i></i></span></div>
+      <div class="axis"><span class="k">Digest</span><span class="bar" data-fill="full"><i></i></span></div>
+    </div>
+    <p class="sc-note"><em>Complete.</em> The reference implementation — everything else is measured against it.</p>
+  </article>
+  <article class="sc is-weak" style="--hue: var(--c1)">
+    <div class="sc-top"><span class="sc-name">The Nexus</span><span class="sc-key">nexus</span></div>
+    <div class="sc-axes">
+      <div class="axis"><span class="k">Prompt</span><span class="bar" data-fill="low"><i></i></span></div>
+      <div class="axis"><span class="k">Tools · 0</span><span class="bar" data-fill="none"><i></i></span></div>
+      <div class="axis"><span class="k">Workspace</span><span class="bar" data-fill="none"><i></i></span></div>
+      <div class="axis"><span class="k">Digest</span><span class="bar" data-fill="none"><i></i></span></div>
+    </div>
+    <p class="sc-note"><strong>An empty shell.</strong> Nothing it can do that the default room cannot.</p>
+  </article>
+  <article class="sc" style="--hue: var(--c3)">
+    <div class="sc-top"><span class="sc-name">The Garden</span><span class="sc-key">garden</span></div>
+    <div class="sc-axes">
+      <div class="axis"><span class="k">Prompt</span><span class="bar" data-fill="full"><i></i></span></div>
+      <div class="axis"><span class="k">Tools · 5</span><span class="bar" data-fill="mid"><i></i></span></div>
+      <div class="axis"><span class="k">Workspace</span><span class="bar" data-fill="none"><i></i></span></div>
+      <div class="axis"><span class="k">Digest</span><span class="bar" data-fill="none"><i></i></span></div>
+    </div>
+    <p class="sc-note">Model, tools and exporter all exist. <strong>No controller and no panel.</strong></p>
+  </article>
+</div>
+<p class="legend"><span><b>Full</b> — built and in use</span><span><b>Half</b> — present but thin</span><span><b>Sliver</b> — nominal</span><span><b>Empty</b> — nothing there</span></p>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;div class=&quot;scorecard&quot;&gt;
+  &lt;article class=&quot;sc&quot; style=&quot;--hue: var(--c2)&quot;&gt;
+    &lt;div class=&quot;sc-top&quot;&gt;&lt;span class=&quot;sc-name&quot;&gt;The Kitchen&lt;/span&gt;&lt;span class=&quot;sc-key&quot;&gt;kitchen&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;sc-axes&quot;&gt;
+      &lt;div class=&quot;axis&quot;&gt;&lt;span class=&quot;k&quot;&gt;Prompt&lt;/span&gt;&lt;span class=&quot;bar&quot; data-fill=&quot;full&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;axis&quot;&gt;&lt;span class=&quot;k&quot;&gt;Tools · 16&lt;/span&gt;&lt;span class=&quot;bar&quot; data-fill=&quot;full&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;axis&quot;&gt;&lt;span class=&quot;k&quot;&gt;Workspace&lt;/span&gt;&lt;span class=&quot;bar&quot; data-fill=&quot;full&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;axis&quot;&gt;&lt;span class=&quot;k&quot;&gt;Digest&lt;/span&gt;&lt;span class=&quot;bar&quot; data-fill=&quot;full&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;sc-note&quot;&gt;&lt;em&gt;Complete.&lt;/em&gt; The reference implementation — everything else is measured against it.&lt;/p&gt;
+  &lt;/article&gt;
+  &lt;article class=&quot;sc is-weak&quot; style=&quot;--hue: var(--c1)&quot;&gt;
+    &lt;div class=&quot;sc-top&quot;&gt;&lt;span class=&quot;sc-name&quot;&gt;The Nexus&lt;/span&gt;&lt;span class=&quot;sc-key&quot;&gt;nexus&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;sc-axes&quot;&gt;
+      &lt;div class=&quot;axis&quot;&gt;&lt;span class=&quot;k&quot;&gt;Prompt&lt;/span&gt;&lt;span class=&quot;bar&quot; data-fill=&quot;low&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;axis&quot;&gt;&lt;span class=&quot;k&quot;&gt;Tools · 0&lt;/span&gt;&lt;span class=&quot;bar&quot; data-fill=&quot;none&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;axis&quot;&gt;&lt;span class=&quot;k&quot;&gt;Workspace&lt;/span&gt;&lt;span class=&quot;bar&quot; data-fill=&quot;none&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;axis&quot;&gt;&lt;span class=&quot;k&quot;&gt;Digest&lt;/span&gt;&lt;span class=&quot;bar&quot; data-fill=&quot;none&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;sc-note&quot;&gt;&lt;strong&gt;An empty shell.&lt;/strong&gt; Nothing it can do that the default room cannot.&lt;/p&gt;
+  &lt;/article&gt;
+  &lt;article class=&quot;sc&quot; style=&quot;--hue: var(--c3)&quot;&gt;
+    &lt;div class=&quot;sc-top&quot;&gt;&lt;span class=&quot;sc-name&quot;&gt;The Garden&lt;/span&gt;&lt;span class=&quot;sc-key&quot;&gt;garden&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;sc-axes&quot;&gt;
+      &lt;div class=&quot;axis&quot;&gt;&lt;span class=&quot;k&quot;&gt;Prompt&lt;/span&gt;&lt;span class=&quot;bar&quot; data-fill=&quot;full&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;axis&quot;&gt;&lt;span class=&quot;k&quot;&gt;Tools · 5&lt;/span&gt;&lt;span class=&quot;bar&quot; data-fill=&quot;mid&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;axis&quot;&gt;&lt;span class=&quot;k&quot;&gt;Workspace&lt;/span&gt;&lt;span class=&quot;bar&quot; data-fill=&quot;none&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;axis&quot;&gt;&lt;span class=&quot;k&quot;&gt;Digest&lt;/span&gt;&lt;span class=&quot;bar&quot; data-fill=&quot;none&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;sc-note&quot;&gt;Model, tools and exporter all exist. &lt;strong&gt;No controller and no panel.&lt;/strong&gt;&lt;/p&gt;
+  &lt;/article&gt;
+&lt;/div&gt;
+&lt;p class=&quot;legend&quot;&gt;&lt;span&gt;&lt;b&gt;Full&lt;/b&gt; — built and in use&lt;/span&gt;&lt;span&gt;&lt;b&gt;Half&lt;/b&gt; — present but thin&lt;/span&gt;&lt;span&gt;&lt;b&gt;Sliver&lt;/b&gt; — nominal&lt;/span&gt;&lt;span&gt;&lt;b&gt;Empty&lt;/b&gt; — nothing there&lt;/span&gt;&lt;/p&gt;</code></pre>
+</details>
+
+<h2 id="c19"><span class="num">20</span>Ranked items</h2>
+<p class="lede">Recommendations in priority order. The rank badge carries the order, <code>.pill</code> markers carry size and impact, and the heading stays a claim.</p>
+<div class="tier">
+  <div class="tier-head">
+    <h3>Do these first</h3>
+    <p>Small, mechanical, and each one visible everywhere</p>
+  </div>
+  <div class="ranked">
+    <article class="item">
+      <div class="item-head">
+        <span class="rank">01</span>
+        <h3>Delete nine tabs that promise views nobody built</h3>
+        <div class="markers">
+          <span class="pill muted">an afternoon</span>
+          <span class="pill info">every room</span>
+        </div>
+      </div>
+      <p><code>Room.razor:186</code> gives every room a default tablist, and three rooms render all of it as “on its way”. Nine tabs advertising work with no ticket.</p>
+      <p class="small">Rooms with nothing beyond chat should show Chat alone — one constant and one branch.</p>
+    </article>
+    <article class="item">
+      <div class="item-head">
+        <span class="rank">02</span>
+        <h3>Five digest providers over data that already exists</h3>
+        <div class="markers">
+          <span class="pill muted">1–2 days</span>
+          <span class="pill flag">8 rooms → 3</span>
+        </div>
+      </div>
+      <p>The spine shipped — DTO, interface, scanning, controller, cache invalidation — then phase two never started.</p>
+      <div class="cols">
+        <div class="note good"><span class="lbl">Already there</span><ul><li><code>RoomGlanceDto</code>, <code>GlanceController</code></li><li>Two providers as the pattern</li></ul></div>
+        <div class="note risk"><span class="lbl">Missing</span><ul><li>One sealed class per remaining room</li><li>The guard test: every key resolves</li></ul></div>
+      </div>
+    </article>
+  </div>
+</div>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;div class=&quot;tier&quot;&gt;
+  &lt;div class=&quot;tier-head&quot;&gt;
+    &lt;h3&gt;Do these first&lt;/h3&gt;
+    &lt;p&gt;Small, mechanical, and each one visible everywhere&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;ranked&quot;&gt;
+    &lt;article class=&quot;item&quot;&gt;
+      &lt;div class=&quot;item-head&quot;&gt;
+        &lt;span class=&quot;rank&quot;&gt;01&lt;/span&gt;
+        &lt;h3&gt;Delete nine tabs that promise views nobody built&lt;/h3&gt;
+        &lt;div class=&quot;markers&quot;&gt;
+          &lt;span class=&quot;pill muted&quot;&gt;an afternoon&lt;/span&gt;
+          &lt;span class=&quot;pill info&quot;&gt;every room&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;code&gt;Room.razor:186&lt;/code&gt; gives every room a default tablist, and three rooms render all of it as “on its way”. Nine tabs advertising work with no ticket.&lt;/p&gt;
+      &lt;p class=&quot;small&quot;&gt;Rooms with nothing beyond chat should show Chat alone — one constant and one branch.&lt;/p&gt;
+    &lt;/article&gt;
+    &lt;article class=&quot;item&quot;&gt;
+      &lt;div class=&quot;item-head&quot;&gt;
+        &lt;span class=&quot;rank&quot;&gt;02&lt;/span&gt;
+        &lt;h3&gt;Five digest providers over data that already exists&lt;/h3&gt;
+        &lt;div class=&quot;markers&quot;&gt;
+          &lt;span class=&quot;pill muted&quot;&gt;1–2 days&lt;/span&gt;
+          &lt;span class=&quot;pill flag&quot;&gt;8 rooms → 3&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;The spine shipped — DTO, interface, scanning, controller, cache invalidation — then phase two never started.&lt;/p&gt;
+      &lt;div class=&quot;cols&quot;&gt;
+        &lt;div class=&quot;note good&quot;&gt;&lt;span class=&quot;lbl&quot;&gt;Already there&lt;/span&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;RoomGlanceDto&lt;/code&gt;, &lt;code&gt;GlanceController&lt;/code&gt;&lt;/li&gt;&lt;li&gt;Two providers as the pattern&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;
+        &lt;div class=&quot;note risk&quot;&gt;&lt;span class=&quot;lbl&quot;&gt;Missing&lt;/span&gt;&lt;ul&gt;&lt;li&gt;One sealed class per remaining room&lt;/li&gt;&lt;li&gt;The guard test: every key resolves&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+</details>
+
+<h2 id="c20"><span class="num">21</span>Sequence</h2>
+<p class="lede">A running order — what to do, in what order, and why that order. Use <code>ul.checklist</code> instead when the rows need owners rather than sequence.</p>
+<div class="seq">
+  <div class="step">
+    <span class="step-n">01</span>
+    <div>
+      <h4>Stop advertising the nine tabs</h4>
+      <p>Rooms with no second surface show Chat alone. The cheapest credibility fix in the app.</p>
+      <span class="when">an afternoon · item 01</span>
+    </div>
+  </div>
+  <div class="step">
+    <span class="step-n">02</span>
+    <div>
+      <h4>Ship the digest providers</h4>
+      <p>Five sealed classes over existing data, plus the guard test that stops the next room shipping blank.</p>
+      <span class="when">1–2 days · item 02</span>
+    </div>
+  </div>
+  <div class="step">
+    <span class="step-n">03</span>
+    <div>
+      <h4>Finish the Garden</h4>
+      <p>Controller, tab, migration. Its digest then costs an hour, because step 02 set the pattern.</p>
+      <span class="when">2–3 days · item 03</span>
+    </div>
+  </div>
+</div>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;div class=&quot;seq&quot;&gt;
+  &lt;div class=&quot;step&quot;&gt;
+    &lt;span class=&quot;step-n&quot;&gt;01&lt;/span&gt;
+    &lt;div&gt;
+      &lt;h4&gt;Stop advertising the nine tabs&lt;/h4&gt;
+      &lt;p&gt;Rooms with no second surface show Chat alone. The cheapest credibility fix in the app.&lt;/p&gt;
+      &lt;span class=&quot;when&quot;&gt;an afternoon · item 01&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;step&quot;&gt;
+    &lt;span class=&quot;step-n&quot;&gt;02&lt;/span&gt;
+    &lt;div&gt;
+      &lt;h4&gt;Ship the digest providers&lt;/h4&gt;
+      &lt;p&gt;Five sealed classes over existing data, plus the guard test that stops the next room shipping blank.&lt;/p&gt;
+      &lt;span class=&quot;when&quot;&gt;1–2 days · item 02&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;step&quot;&gt;
+    &lt;span class=&quot;step-n&quot;&gt;03&lt;/span&gt;
+    &lt;div&gt;
+      &lt;h4&gt;Finish the Garden&lt;/h4&gt;
+      &lt;p&gt;Controller, tab, migration. Its digest then costs an hour, because step 02 set the pattern.&lt;/p&gt;
+      &lt;span class=&quot;when&quot;&gt;2–3 days · item 03&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+</details>
+
+<h2 id="c17"><span class="num">22</span>Footer</h2>
 <p class="lede">Every report. Provenance and the limits of the claims.</p>
 <footer>
   <p>Milestone 0 deliverable. Traces to Spec v0 Rev 1.0 by requirement ID. Hours are planning estimates, not a quotation.</p>

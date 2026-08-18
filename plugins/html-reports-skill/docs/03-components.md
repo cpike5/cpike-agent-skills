@@ -21,10 +21,103 @@ future reports inherit it.
 | A status on a row | `.pill` (`warn`, `flag`, `good`, `info`, `muted`) |
 | A fixed set of categories (milestones, owners, streams) | `--c0`…`--c5` via `.chip` / `.swatch` |
 | Actions with an owner | `ul.checklist` |
+| Several comparable things scored on the same few axes | `.scorecard` + `.sc` |
+| Recommendations in priority order | `.ranked` + `.item`, in `.tier`s if they group |
+| What to do in what order, and why that order | `.seq` + `.step` |
 | A schedule with dependencies | Gantt — `Report.gantt()` |
 | Why a number moved between two versions | waterfall — `Report.waterfall()` in a `.svgbox` |
 | Structure or flow | inline `<svg>` in `.svgbox`, using the `s-*` classes |
 | Provenance and the limits of the claims | `<footer>` |
+
+## Scorecard
+
+Ten rooms, six services, four vendors — anything where the reader's question is *which of these
+is finished?* Denser than a table, and the shape of a weak entity is visible before any of it is
+read.
+
+```html
+<div class="scorecard">
+  <article class="sc" style="--hue: var(--c2)">
+    <div class="sc-top"><span class="sc-name">The Kitchen</span><span class="sc-key">kitchen</span></div>
+    <div class="sc-axes">
+      <div class="axis"><span class="k">Prompt</span><span class="bar" data-fill="full"><i></i></span></div>
+      <div class="axis"><span class="k">Tools · 16</span><span class="bar" data-fill="full"><i></i></span></div>
+      <div class="axis"><span class="k">Digest</span><span class="bar" data-fill="none"><i></i></span></div>
+    </div>
+    <p class="sc-note"><em>Complete.</em> The reference implementation.</p>
+  </article>
+</div>
+```
+
+- **The same axes on every card, in the same order.** A scorecard where the axes vary is a set of
+  unrelated cards, and the eye cannot compare down a column.
+- **Four axes, five at the outside.** More and the card becomes a table with worse alignment.
+- **`data-fill` is `none` / `low` / `mid` / `full`** — four steps, no numbers. A count that
+  matters goes in the axis label (`Tools · 16`), a judgement goes in `.sc-note`. Bars are for the
+  shape of the row, not for measurement; if the reader needs the exact figures, use a table.
+- **`--hue` per card** picks the accent from the series tokens. Use it to encode something —
+  domain, owner, status — or set it once for the whole grid. Never pick a hue for prettiness.
+- **`.sc-note` carries the sentence you would say out loud** about that entity: `strong` for what
+  is missing, `em` for what is done. Add `.is-weak` to the card to outline the ones in trouble.
+- Follow the grid with a `.legend` explaining what a full bar means. Four fill levels are not
+  self-evident.
+
+## Ranked items
+
+Recommendations, in the order you would do them. The rank badge means the order is a claim you
+are making — if the order does not matter, this is a list.
+
+```html
+<div class="tier">
+  <div class="tier-head"><h3>Do these first</h3><p>Small, mechanical, visible everywhere</p></div>
+  <div class="ranked">
+    <article class="item">
+      <div class="item-head">
+        <span class="rank">01</span>
+        <h3>Delete nine tabs that promise views nobody built</h3>
+        <div class="markers"><span class="pill muted">an afternoon</span><span class="pill info">every room</span></div>
+      </div>
+      <p>The finding, with the evidence in the same breath.</p>
+      <p class="small">The secondary detail — how, and what it costs.</p>
+    </article>
+  </div>
+</div>
+```
+
+- **The heading is the recommendation**, phrased as an action with its object. "Five digest
+  providers over data that already exists" — not "Digests".
+- **Sizing and impact go in `.pill` markers**, never in the heading. Two markers: what it costs,
+  what it unlocks.
+- **`.tier`s group by kind of work**, not by theme — do-these-first, nearly-there, the big bet.
+  The tier's own `p` says what the tier has in common.
+- A `.cols` pair of `.note good` / `.note risk` inside an item is the have/need split: what
+  already exists against what is missing. It is the fastest way to show that a recommendation is
+  a fifth copy of something rather than new ground.
+- Numbering is `01`, `02`, … and is referenced elsewhere in the document ("item 02"), so it has
+  to stay stable once written.
+
+## Sequence
+
+The running order. Use it once, near the end, after the recommendations have been argued.
+
+```html
+<div class="seq">
+  <div class="step">
+    <span class="step-n">01</span>
+    <div>
+      <h4>Stop advertising the nine tabs</h4>
+      <p>Why this is first, in one sentence.</p>
+      <span class="when">an afternoon · item 01</span>
+    </div>
+  </div>
+</div>
+```
+
+- **Each step says why it is in that position** — what it makes cheaper for the step after it. A
+  sequence that is just the recommendations re-listed adds nothing.
+- **`.when` carries duration and a back-reference** to the item that argues for it.
+- Use `ul.checklist` instead when the rows need owners and tick-boxes; use a Gantt when they run
+  in parallel and depend on each other. `.seq` is for a strictly ordered list of moves.
 
 ## The scripts
 

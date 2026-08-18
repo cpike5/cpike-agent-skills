@@ -1,5 +1,5 @@
 {
   "name": "html-reports-skill",
   "description": "Project report writing skill — document structure and writing conventions for Markdown reports, plus a themed single-file HTML pipeline with Gantt charts, waterfall charts, KPI rows, and automatic theme derivation from the host application's palette",
-  "version": "1.1.0"
+  "version": "1.2.0"
 }
