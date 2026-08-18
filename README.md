@@ -64,11 +64,11 @@ Obsidian vault knowledge base for reading, creating, editing, and maintaining Ma
 
 **1 doc** — syntax & tooling reference (frontmatter, links/embeds/block refs, callouts, tags, formatting extras, Dataview, Templater, git/`.obsidian/`, editing pitfalls).
 
-### html-reports-skill (v1.0.0)
+### html-reports-skill (v1.3.0)
 
-Project report writing — audits, scope reviews, status updates, findings, estimates, schedules, post-mortems. Defaults to Markdown and carries the document structure and writing conventions for both formats; builds a themed, self-contained HTML report when the content needs a Gantt chart, waterfall chart, KPI row, or a client-facing deliverable.
+Project report writing — audits, scope reviews, status updates, findings, estimates, schedules, post-mortems. Defaults to Markdown and carries the document structure and writing conventions for both formats; builds a themed, self-contained HTML report when the content needs a Gantt chart, waterfall chart, KPI row, or a client-facing deliverable. Reports are written in simplified English by default — short active sentences, one term per concept, no padding.
 
-**3 docs** — HTML build workflow, theming from the host app's palette, component reference. Ships `scripts/derive_theme.py` and `scripts/build_report.py` plus the CSS/JS asset library.
+**5 docs** — HTML build workflow, theming from the host app's palette, component reference, editorial guidance, and the simplified-English writing rules. Ships `scripts/derive_theme.py` and `scripts/build_report.py` plus the CSS/JS asset library.
 
 ## Repository Structure
 

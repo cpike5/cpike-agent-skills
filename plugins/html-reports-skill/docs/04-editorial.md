@@ -7,6 +7,10 @@ fragment.
 
 None of it needs new CSS. Everything here is `base.css` plus judgement.
 
+This file covers how the page is arranged. `${CLAUDE_PLUGIN_ROOT}/docs/05-plain-language.md` covers
+how the sentences are written — simplified English, which is the default for every report. Read
+both. Short, active sentences make the devices below work better, not worse.
+
 ## The headline is a finding, not a subject
 
 The masthead `h1` is the most-read line in the document. Spend it on the conclusion.
@@ -90,6 +94,7 @@ who made the thing it describes, and that includes not having features the produ
 Beyond the mechanical checks in `${CLAUDE_PLUGIN_ROOT}/docs/01-html-workflow.md`:
 
 - Read only the bold text and the headings top to bottom. Do the findings survive?
+- Run the simplified-English check in `${CLAUDE_PLUGIN_ROOT}/docs/05-plain-language.md`.
 - Is there a screenful anywhere with no number, no component and no claim? Cut it.
 - Does every visual prove something the caption states? A chart nobody would act on is decoration.
 - Would the reader know, at any point, what they are being asked to decide?

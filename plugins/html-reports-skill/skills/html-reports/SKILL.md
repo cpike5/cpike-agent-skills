@@ -1,6 +1,6 @@
 ---
 name: html-reports
-description: Write project reports — audits, scope reviews, status updates, findings, estimates, schedules, post-mortems, recommendations. Defaults to Markdown; produces a themed single-file HTML report when the user asks for HTML or when the content needs a Gantt chart, waterfall chart, KPI row, or other component Markdown cannot express. Use this skill whenever the user asks for a report, findings document, audit write-up, scope review, estimate, project schedule, or client-facing deliverable, even if they do not say the word "report" or specify a format — and use it for Markdown reports too, since the document structure and writing conventions here apply to both.
+description: Write project reports — audits, scope reviews, status updates, findings, estimates, schedules, post-mortems, recommendations. Defaults to Markdown; produces a themed single-file HTML report when the user asks for HTML or when the content needs a Gantt chart, waterfall chart, KPI row, or other component Markdown cannot express. Use this skill whenever the user asks for a report, findings document, audit write-up, scope review, estimate, project schedule, or client-facing deliverable, even if they do not say the word "report" or specify a format — and use it for Markdown reports too, since the document structure and writing conventions here apply to both. Reports are written in simplified English by default — short active sentences, one term per concept, no padding.
 ---
 
 # Reports
@@ -56,7 +56,8 @@ Read `${CLAUDE_PLUGIN_ROOT}/docs/01-html-workflow.md` before starting. It covers
    order are in `${CLAUDE_PLUGIN_ROOT}/docs/02-theming.md`.
 3. **Write the body fragment** to a scratch file — everything between `<body>` and `</body>`.
    Component markup is in `${CLAUDE_PLUGIN_ROOT}/docs/03-components.md`; how to make it read as designed rather
-   than defaulted is in `${CLAUDE_PLUGIN_ROOT}/docs/04-editorial.md`; start from
+   than defaulted is in `${CLAUDE_PLUGIN_ROOT}/docs/04-editorial.md`; how to write the prose is in
+   `${CLAUDE_PLUGIN_ROOT}/docs/05-plain-language.md`; start from
    `${CLAUDE_PLUGIN_ROOT}/assets/body.html`.
 4. **Assemble** with `${CLAUDE_PLUGIN_ROOT}/scripts/build_report.py`, which inlines the theme, the stylesheet and the
    renderers into one portable file and refuses to write if anything is broken.
@@ -80,6 +81,14 @@ of it. The same applies to Markdown reports.
 ## 4. Writing conventions
 
 These apply to **both formats** and matter more than any styling decision.
+
+**Write in simplified English.** This is the default for every report, not an option. One idea per
+sentence, 20 words or fewer. Active voice, and name the actor. Present tense for what is true. One
+term per concept, repeated — never varied for elegance. No *utilize*, *leverage*, *in order to*,
+*facilitate*, *functionality*. Identifiers, numbers and caveats stay exactly as precise as they
+were; only the language around them gets simpler. The full rules, the substitution table and the
+pre-delivery check are in `${CLAUDE_PLUGIN_ROOT}/docs/05-plain-language.md` — read it before
+writing either format.
 
 **Bold the claim, not the sentence.** A reader who reads only the bold text should still come
 away with the findings.
@@ -120,6 +129,7 @@ All paths are relative to `${CLAUDE_PLUGIN_ROOT}`.
 | `docs/02-theming.md` | Setting up `.reports/` in a repo for the first time. |
 | `docs/03-components.md` | Choosing and writing component markup. Has a selection table. |
 | `docs/04-editorial.md` | Writing the body fragment. Headline, structure, density, accent use. |
+| `docs/05-plain-language.md` | Writing any report, either format. The simplified-English rules. |
 | `assets/body.html` | The starting skeleton for a body fragment. |
 | `assets/components.html` | Every component rendered, with its markup. Open in a browser. |
 | `assets/base.css`, `assets/base.js` | Copied verbatim into `.reports/`. Do not edit per report. |
