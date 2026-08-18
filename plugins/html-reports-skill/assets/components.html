@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Report components</title>
+<style>
+/* ==========================================================================
+   Report base stylesheet — v1
+   Single-file HTML reports. No build step, no dependencies, no web fonts.
+   Inline this whole file inside <style> in the <head>.
+   Every colour is a token; never hard-code a hex in document markup.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. TOKENS
+   -------------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+
+  /* surfaces + ink */
+  --plane:         #f9f9f7;   /* page background                     */
+  --surface:       #fcfcfb;   /* cards, tables, raised things        */
+  --surface-2:     #f2f1ed;   /* table headers, code, inset things   */
+  --ink:           #0b0b0b;   /* primary text                        */
+  --ink-2:         #52514e;   /* secondary text, lede, body copy     */
+  --ink-muted:     #898781;   /* labels, captions, metadata          */
+
+  /* lines */
+  --grid:          #e1e0d9;   /* table row rules                     */
+  --axis:          #c3c2b7;   /* chart axes, stronger dashed rules   */
+  --border:        rgba(11,11,11,0.10);
+  --border-strong: rgba(11,11,11,0.18);
+  --shadow:        0 1px 2px rgba(11,11,11,0.06), 0 8px 24px rgba(11,11,11,0.05);
+
+  /* categorical series — use in order, for milestones/phases/streams/legends */
+  --c0: #2a78d6;  /* blue    */
+  --c1: #eb6834;  /* orange  */
+  --c2: #1baf7a;  /* aqua    */
+  --c3: #eda100;  /* yellow  */
+  --c4: #e87ba4;  /* magenta */
+  --c5: #008300;  /* green   */
+
+  /* text colour for anything sitting on a series colour — set by contrast */
+  --c0-ink: #ffffff;
+  --c1-ink: #ffffff;
+  --c2-ink: #ffffff;
+  --c3-ink: #1a1a19;
+  --c4-ink: #1a1a19;
+  --c5-ink: #ffffff;
+
+  /* semantic */
+  --warn:      #d03b3b;
+  --good:      #006300;
+  --flag:      #eda100;
+  --info:      #2a78d6;
+  --tint-warn: rgba(208,59,59,0.10);
+  --tint-good: rgba(0,131,0,0.10);
+  --tint-flag: rgba(237,161,0,0.14);
+  --tint-info: rgba(42,120,214,0.10);
+
+  /* rhythm */
+  --wrap:      1080px;
+  --radius:    10px;
+  --radius-sm: 6px;
+}
+
+/* Dark values live in one place and are applied by both the media query
+   (system preference) and the [data-theme="dark"] attribute (manual toggle). */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --plane:         #0d0d0d;
+    --surface:       #1a1a19;
+    --surface-2:     #232322;
+    --ink:           #ffffff;
+    --ink-2:         #c3c2b7;
+    --ink-muted:     #898781;
+    --grid:          #2c2c2a;
+    --axis:          #383835;
+    --border:        rgba(255,255,255,0.10);
+    --border-strong: rgba(255,255,255,0.20);
+    --shadow:        0 1px 2px rgba(0,0,0,0.40), 0 8px 24px rgba(0,0,0,0.35);
+    --c0: #3987e5;  --c1: #d95926;  --c2: #199e70;
+    --c3: #c98500;  --c4: #d55181;  --c5: #008300;
+    --warn: #e66767;
+    --good: #0ca30c;
+    --flag: #c98500;
+    --info: #3987e5;
+    --tint-warn: rgba(230,103,103,0.14);
+    --tint-good: rgba(12,163,12,0.14);
+    --tint-flag: rgba(201,133,0,0.18);
+    --tint-info: rgba(57,135,229,0.14);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --plane:         #0d0d0d;
+  --surface:       #1a1a19;
+  --surface-2:     #232322;
+  --ink:           #ffffff;
+  --ink-2:         #c3c2b7;
+  --ink-muted:     #898781;
+  --grid:          #2c2c2a;
+  --axis:          #383835;
+  --border:        rgba(255,255,255,0.10);
+  --border-strong: rgba(255,255,255,0.20);
+  --shadow:        0 1px 2px rgba(0,0,0,0.40), 0 8px 24px rgba(0,0,0,0.35);
+  --c0: #3987e5;  --c1: #d95926;  --c2: #199e70;
+  --c3: #c98500;  --c4: #d55181;  --c5: #008300;
+  --warn: #e66767;
+  --good: #0ca30c;
+  --flag: #c98500;
+  --info: #3987e5;
+  --tint-warn: rgba(230,103,103,0.14);
+  --tint-good: rgba(12,163,12,0.14);
+  --tint-flag: rgba(201,133,0,0.18);
+  --tint-info: rgba(57,135,229,0.14);
+}
+
+/* --------------------------------------------------------------------------
+   2. BASE
+   -------------------------------------------------------------------------- */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--plane);
+  color: var(--ink);
+  font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+}
+.wrap { max-width: var(--wrap); margin: 0 auto; padding: 40px 24px 96px; }
+.wrap.wide { max-width: 1180px; }
+
+a { color: inherit; }
+a.link { color: var(--info); text-decoration: none; }
+a.link:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; border-radius: 3px; }
+
+h1 { font-size: clamp(28px, 4.4vw, 40px); line-height: 1.12; margin: 0 0 12px; letter-spacing: -0.02em; }
+h2 {
+  font-size: 22px; letter-spacing: -0.01em; margin: 56px 0 6px;
+  padding-top: 20px; border-top: 1px solid var(--border-strong);
+  scroll-margin-top: 16px;
+}
+h2 .num { color: var(--ink-muted); font-variant-numeric: tabular-nums; margin-right: 10px; font-weight: 600; }
+h2 .tag { font-size: 12px; font-weight: 500; color: var(--ink-muted); letter-spacing: 0; margin-left: 8px; }
+h3 { font-size: 16px; margin: 28px 0 8px; letter-spacing: -0.005em; scroll-margin-top: 16px; }
+h4 { font-size: 14px; margin: 20px 0 6px; color: var(--ink-2); }
+p  { margin: 10px 0; }
+.lede  { color: var(--ink-2); max-width: 74ch; }
+.small { font-size: 13px; color: var(--ink-muted); }
+ul, ol { margin: 10px 0; padding-left: 22px; }
+li { margin: 5px 0; }
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .88em; background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px;
+}
+td code, li code, th code { white-space: nowrap; }
+pre {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 14px 16px; overflow-x: auto;
+  font-size: 12.5px; line-height: 1.6;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+pre code { background: none; border: 0; padding: 0; font-size: inherit; white-space: pre; }
+.ids { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; color: var(--ink-2); }
+
+/* --------------------------------------------------------------------------
+   3. MASTHEAD
+   -------------------------------------------------------------------------- */
+header.masthead { border-bottom: 2px solid var(--ink); padding-bottom: 20px; margin-bottom: 8px; }
+.eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-muted); margin: 0 0 10px; }
+.sub  { color: var(--ink-2); margin: 0; max-width: 62ch; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 18px; font-size: 13px; color: var(--ink-muted); }
+.meta b { color: var(--ink-2); font-weight: 600; }
+
+/* status ribbon — e.g. DRAFT / INTERNAL / NOT A QUOTATION */
+.banner {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--warn); border: 1px solid currentColor; border-radius: 999px;
+  padding: 4px 12px; margin-bottom: 20px;
+}
+.banner.info { color: var(--info); }
+.banner.good { color: var(--good); }
+
+/* --------------------------------------------------------------------------
+   4. NAVIGATION — agenda cards, one per top-level section
+   -------------------------------------------------------------------------- */
+.agenda { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin: 24px 0 8px; }
+.agenda a {
+  display: block; text-decoration: none; color: inherit; background: var(--surface);
+  border: 1px solid var(--border); border-left: 3px solid var(--ink-muted);
+  border-radius: 8px; padding: 12px 14px; box-shadow: var(--shadow);
+}
+.agenda a:hover { border-left-color: var(--c0); }
+.agenda .k { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-muted); display: block; }
+.agenda .v { font-weight: 600; margin-top: 3px; display: block; }
+.agenda .d { font-size: 13px; color: var(--ink-2); margin-top: 4px; display: block; }
+
+/* --------------------------------------------------------------------------
+   5. CONTAINERS
+   -------------------------------------------------------------------------- */
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 18px 20px; margin: 18px 0;
+}
+.card > :first-child { margin-top: 0; }
+.card > :last-child  { margin-bottom: 0; }
+
+.cols  { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+.cols3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+
+/* callout — the labelled aside. Default = flag/attention. */
+.note {
+  border-left: 3px solid var(--flag); background: var(--tint-flag);
+  padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0;
+}
+.note.risk { border-left-color: var(--warn); background: var(--tint-warn); }
+.note.good { border-left-color: var(--good); background: var(--tint-good); }
+.note.info { border-left-color: var(--info); background: var(--tint-info); }
+.note.plain { border-left-color: var(--axis); background: var(--surface-2); color: var(--ink-2); }
+.note .lbl { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 4px; }
+.note > :first-child.lbl + * { margin-top: 0; }
+.note p:first-of-type { margin-top: 0; }
+.note p:last-child { margin-bottom: 0; }
+
+/* --------------------------------------------------------------------------
+   6. NUMBERS — headline figures
+   -------------------------------------------------------------------------- */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(158px, 1fr)); gap: 12px; margin: 20px 0; }
+.kpi {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 12px 14px;
+}
+.kpi b { display: block; font-size: 26px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.kpi .k { font-size: 11.5px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .05em; display: block; }
+.kpi span { font-size: 12.5px; color: var(--ink-2); }
+.kpi .n { font-size: 12px; color: var(--ink-muted); margin-top: 4px; display: block; }
+
+/* --------------------------------------------------------------------------
+   7. TABLES
+   -------------------------------------------------------------------------- */
+.tablewrap {
+  overflow-x: auto; margin: 16px 0; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow);
+}
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+thead th {
+  font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted);
+  background: var(--surface-2); border-bottom: 1px solid var(--border-strong); white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--surface-2); }
+tfoot td { font-weight: 700; background: var(--surface-2); border-top: 1px solid var(--border-strong); border-bottom: none; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+th[data-sort] { cursor: pointer; user-select: none; }
+th[data-sort]::after { content: " ↕"; opacity: .35; }
+th[data-sort][aria-sort="ascending"]::after  { content: " ↑"; opacity: 1; }
+th[data-sort][aria-sort="descending"]::after { content: " ↓"; opacity: 1; }
+
+/* --------------------------------------------------------------------------
+   8. INLINE MARKERS
+   -------------------------------------------------------------------------- */
+.pill {
+  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; padding: 2px 8px; border-radius: 999px;
+  border: 1px solid var(--border-strong); white-space: nowrap;
+}
+.pill.warn { background: var(--tint-warn); color: var(--warn); border-color: currentColor; }
+.pill.good { background: var(--tint-good); color: var(--good); border-color: currentColor; }
+.pill.flag { background: var(--tint-flag); color: var(--flag); border-color: currentColor; }
+.pill.info { background: var(--tint-info); color: var(--info); border-color: currentColor; }
+.pill.muted { background: var(--surface-2); color: var(--ink-2); }
+
+/* solid chip, for series colours — set background inline or with .c0….c5 */
+.chip {
+  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .02em;
+  color: #fff; border-radius: 4px; padding: 1px 6px; margin-right: 4px;
+}
+.chip.ink-dark { color: #1a1a19; }   /* use on light series colours (c3, c4) */
+
+/* legend swatch / inline dot */
+.dot, .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.dot { margin-right: 8px; vertical-align: 1px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 14px 0 0; font-size: 12.5px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+
+.c0 { background: var(--c0); } .c1 { background: var(--c1); } .c2 { background: var(--c2); }
+.c3 { background: var(--c3); } .c4 { background: var(--c4); } .c5 { background: var(--c5); }
+.chip.c0 { color: var(--c0-ink); } .chip.c1 { color: var(--c1-ink); } .chip.c2 { color: var(--c2-ink); }
+.chip.c3 { color: var(--c3-ink); } .chip.c4 { color: var(--c4-ink); } .chip.c5 { color: var(--c5-ink); }
+
+/* --------------------------------------------------------------------------
+   9. CHECKLIST
+   -------------------------------------------------------------------------- */
+.checklist { list-style: none; padding-left: 0; }
+.checklist li { display: flex; gap: 12px; align-items: flex-start; padding: 11px 0; border-bottom: 1px solid var(--grid); }
+.checklist li:last-child { border-bottom: none; }
+.checklist .box {
+  flex: 0 0 auto; width: 15px; height: 15px; border: 1.5px solid var(--ink-muted);
+  border-radius: 3px; margin-top: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   10. CONTROLS — segmented switches, date pickers, theme toggle
+   -------------------------------------------------------------------------- */
+.controls { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end; margin-bottom: 18px; }
+.ctl-label { font-size: 12px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .05em; display: block; margin-bottom: 6px; }
+.seg { display: inline-flex; background: var(--surface-2); border: 1px solid var(--border); border-radius: 9px; padding: 3px; gap: 3px; flex-wrap: wrap; }
+.seg button {
+  font: inherit; font-size: 13px; font-weight: 550; color: var(--ink-2);
+  background: transparent; border: 0; border-radius: 7px; padding: 7px 13px;
+  cursor: pointer; white-space: nowrap;
+}
+.seg button:hover { color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.10); }
+
+input[type="date"], input[type="search"], select {
+  font: inherit; font-size: 13px; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--border-strong); border-radius: 8px; padding: 7px 10px;
+}
+
+#theme-toggle {
+  position: fixed; top: 14px; right: 14px; z-index: 50;
+  font: inherit; font-size: 12px; color: var(--ink-2); background: var(--surface);
+  border: 1px solid var(--border-strong); border-radius: 999px;
+  padding: 6px 12px; cursor: pointer; box-shadow: var(--shadow);
+}
+#theme-toggle:hover { color: var(--ink); }
+
+/* --------------------------------------------------------------------------
+   11. TOOLTIP — populated by bindTip() / [data-tip]
+   -------------------------------------------------------------------------- */
+#tip {
+  position: fixed; z-index: 60; pointer-events: none; opacity: 0;
+  transition: opacity .1s ease;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--border-strong); border-radius: 9px;
+  box-shadow: var(--shadow); padding: 10px 12px; max-width: 300px;
+  font-size: 12.5px; line-height: 1.45;
+}
+#tip .t { font-weight: 650; margin-bottom: 3px; display: block; }
+#tip .r { color: var(--ink-2); }
+#tip .r b { color: var(--ink); font-weight: 600; }
+
+/* --------------------------------------------------------------------------
+   12. FIGURES + INLINE SVG DIAGRAMS
+   Draw diagrams as inline SVG using these classes so they theme correctly.
+   -------------------------------------------------------------------------- */
+figure { margin: 22px 0; }
+figure svg { display: block; width: 100%; height: auto; }
+figcaption { font-size: 13px; color: var(--ink-muted); margin-top: 10px; max-width: 72ch; }
+.svgbox {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 14px; overflow-x: auto;
+}
+.scroller { overflow-x: auto; }
+
+.s-node    { fill: var(--surface-2); stroke: var(--border-strong); }
+.s-lab     { fill: var(--ink); font: 600 13px ui-sans-serif, system-ui, sans-serif; }
+.s-sub     { fill: var(--ink-muted); font: 10px ui-sans-serif, system-ui, sans-serif; }
+.s-grp     { fill: none; stroke: var(--grid); stroke-dasharray: 4 4; }
+.s-grplab  { fill: var(--ink-muted); font: 600 11px ui-sans-serif, system-ui, sans-serif; letter-spacing: .1em; }
+.s-edge    { stroke: var(--ink-muted); stroke-width: 1.6; fill: none; }
+.s-edge-alt{ stroke: var(--c4); stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; }
+.s-edgelab { fill: var(--ink-2); font: 11px ui-sans-serif, system-ui, sans-serif; }
+
+/* --------------------------------------------------------------------------
+   12b. WATERFALL CHART
+   Drawn by Report.waterfall(). Needs the script block; there is no CSS-only
+   fallback, so give the figure a caption that states the conclusion.
+   -------------------------------------------------------------------------- */
+.wf { font-variant-numeric: tabular-nums; }
+.wf svg { display: block; width: 100%; height: auto; }
+.wf-grid  { stroke: var(--grid); stroke-width: 1; }
+.wf-zero  { stroke: var(--axis); stroke-width: 1; }
+.wf-conn  { stroke: var(--axis); stroke-width: 1; stroke-dasharray: 3 3; }
+.wf-tick  { fill: var(--ink-muted); font: 11px ui-sans-serif, system-ui, sans-serif; }
+.wf-lab   { fill: var(--ink-2); font: 11.5px ui-sans-serif, system-ui, sans-serif; }
+.wf-val   { fill: var(--ink); font: 600 11.5px ui-sans-serif, system-ui, sans-serif; }
+.wf-bar   { cursor: default; }
+.wf-bar:hover { filter: brightness(1.08); }
+.wf-up    { fill: var(--warn); }   /* adds to the total — usually the bad news */
+.wf-down  { fill: var(--good); }   /* takes off the total                     */
+.wf-total { fill: var(--c0); }     /* opening and closing bars                */
+
+/* --------------------------------------------------------------------------
+   12c. GANTT CHART
+   Drawn by Report.gantt(). HTML/CSS rather than SVG, so labels wrap, rows
+   reflow on narrow screens, and text stays selectable. Needs the script.
+   -------------------------------------------------------------------------- */
+.gt { --gt-labels: 250px; }
+.gt .gt-chart { min-width: 780px; }
+
+.gt-axis, .gt-flags, .gt-row, .gt-bg {
+  display: grid; grid-template-columns: var(--gt-labels) 1fr;
+}
+.gt-axis .gt-ticks { position: relative; height: 34px; }
+.gt-axis .gt-caption {
+  font-size: 11px; color: var(--ink-muted); padding: 0 14px 6px 0;
+  text-align: right; align-self: start;
+}
+.gt-tick {
+  position: absolute; top: 0; font-size: 11px; color: var(--ink-muted);
+  transform: translateX(-50%); text-align: center; line-height: 1.25; white-space: nowrap;
+}
+.gt-tick.first { transform: translateX(0); text-align: left; }
+.gt-tick.last  { transform: translateX(-100%); text-align: right; }
+.gt-tick .d { display: block; font-size: 10px; opacity: .85; }
+
+/* flag lane — sits between axis and rows so callouts never collide with bars */
+.gt-flags .gt-lane { position: relative; height: 44px; }
+.gt-flag {
+  position: absolute; transform: translateX(-50%);
+  font-size: 10.5px; color: var(--ink-2); background: var(--surface);
+  border: 1px solid var(--border-strong); border-radius: 999px;
+  padding: 2px 8px; white-space: nowrap;
+}
+.gt-flag.pin-left  { transform: translateX(-6px); }
+.gt-flag.pin-right { transform: translateX(calc(-100% + 6px)); }
+
+/* body: background layer painted behind the rows */
+.gt-body { position: relative; }
+.gt-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.gt-bg > div:last-child { position: relative; }
+.gt-rows { position: relative; z-index: 1; }
+.gt-vline { position: absolute; top: 0; bottom: 0; border-left: 1px dashed var(--axis); }
+.gt-today { position: absolute; top: 0; bottom: 0; border-left: 2px solid var(--warn); opacity: .55; }
+.gt-band {
+  position: absolute; top: 0; bottom: 0;
+  background: repeating-linear-gradient(135deg, var(--grid) 0 6px, transparent 6px 12px);
+  border-left: 1px dashed var(--axis); border-right: 1px dashed var(--axis);
+}
+
+.gt-row { border-top: 1px solid var(--grid); align-items: stretch; }
+.gt-rows .gt-row:last-child { border-bottom: 1px solid var(--grid); }
+.gt-row.is-head { border-top: 0; }
+.gt-group {
+  grid-column: 1 / -1; padding: 16px 0 5px;
+  font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.gt-label {
+  padding: 7px 14px 7px 0; font-size: 13px; line-height: 1.3;
+  display: flex; align-items: center; gap: 8px; min-height: 34px;
+}
+.gt-label .nm  { color: var(--ink); }
+.gt-label .ids { color: var(--ink-muted); font-size: 11.5px; white-space: nowrap; }
+.gt-owner {
+  flex: none; font-size: 10.5px; font-weight: 700; letter-spacing: .04em;
+  border: 1px solid var(--border-strong); border-radius: 4px; padding: 1px 5px; color: var(--ink-2);
+}
+.gt-track { position: relative; min-height: 34px; }
+
+.gt-bar {
+  position: absolute; top: 6px; height: 22px; border-radius: 4px;
+  display: flex; align-items: center; padding: 0 8px;
+  font-size: 11.5px; font-weight: 600; color: #fff;
+  white-space: nowrap; overflow: hidden; cursor: default;
+  box-shadow: 0 0 0 2px var(--surface);
+}
+.gt-bar.ink-dark { color: #1a1a19; }   /* manual override; normally --cN-ink handles this */
+.gt-bar:hover { filter: brightness(1.06); }
+.gt-outlabel {
+  position: absolute; top: 6px; height: 22px; display: flex; align-items: center;
+  font-size: 11.5px; font-weight: 600; color: var(--ink-2);
+  white-space: nowrap; pointer-events: none;
+}
+.gt-diamond {
+  position: absolute; top: 11px; width: 13px; height: 13px;
+  transform: translateX(-50%) rotate(45deg); border-radius: 2px;
+  box-shadow: 0 0 0 2px var(--surface); cursor: default;
+}
+
+.gt-c0 { background: var(--c0); color: var(--c0-ink); }
+.gt-c1 { background: var(--c1); color: var(--c1-ink); }
+.gt-c2 { background: var(--c2); color: var(--c2-ink); }
+.gt-c3 { background: var(--c3); color: var(--c3-ink); }
+.gt-c4 { background: var(--c4); color: var(--c4-ink); }
+.gt-c5 { background: var(--c5); color: var(--c5-ink); }
+
+@media (max-width: 620px) {
+  .gt { --gt-labels: 150px; }
+  .gt-label .ids, .gt-owner { display: none; }
+}
+@media print {
+  .gt-bar, .gt-diamond, .gt-band { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* --------------------------------------------------------------------------
+   13. FOOTER
+   -------------------------------------------------------------------------- */
+footer {
+  margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--border-strong);
+  font-size: 13px; color: var(--ink-muted);
+}
+
+/* --------------------------------------------------------------------------
+   14. RESPONSIVE + PRINT
+   -------------------------------------------------------------------------- */
+@media (max-width: 620px) {
+  .wrap { padding: 28px 16px 72px; }
+  h2 { margin-top: 40px; }
+  #theme-toggle { top: auto; bottom: 14px; right: 14px; }
+}
+
+@media print {
+  body { background: #fff; }
+  .card, .tablewrap, .kpi, .svgbox, .agenda a, pre { box-shadow: none; }
+  #theme-toggle, .controls { display: none; }
+  h2 { break-after: avoid; }
+  .tablewrap, figure, .note, .kpi { break-inside: avoid; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 11px; color: #666; }
+}
+</style>
+</head>
+<body>
+<button id="theme-toggle" type="button" aria-label="Toggle colour theme">Dark</button>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Reference</p>
+  <h1>Report components</h1>
+  <p class="sub">Every component in the base template, rendered, with the markup that produces it. Copy from here; do not invent new classes.</p>
+  <div class="meta">
+    <span><b>Pairs with:</b> <code>assets/body.html</code></span>
+    <span><b>Version:</b> 1</span>
+    <span><b>Rule:</b> tokens only, never a literal hex in markup</span>
+  </div>
+</header>
+
+<div class="agenda">
+  <a href="#c0"><span class="k">01</span><span class="v">Masthead</span></a>
+  <a href="#c1"><span class="k">02</span><span class="v">Agenda</span></a>
+  <a href="#c2"><span class="k">03</span><span class="v">Section heading</span></a>
+  <a href="#c3"><span class="k">04</span><span class="v">Card</span></a>
+  <a href="#c4"><span class="k">05</span><span class="v">KPI row</span></a>
+  <a href="#c5"><span class="k">06</span><span class="v">Notes and callouts</span></a>
+  <a href="#c6"><span class="k">07</span><span class="v">Two-up comparison</span></a>
+  <a href="#c7"><span class="k">08</span><span class="v">Table</span></a>
+  <a href="#c8"><span class="k">09</span><span class="v">Pills</span></a>
+  <a href="#c9"><span class="k">10</span><span class="v">Series colours</span></a>
+  <a href="#c10"><span class="k">11</span><span class="v">Checklist</span></a>
+  <a href="#c11"><span class="k">12</span><span class="v">Tooltip</span></a>
+  <a href="#c12"><span class="k">13</span><span class="v">Controls</span></a>
+  <a href="#c13"><span class="k">14</span><span class="v">Figure and inline SVG</span></a>
+  <a href="#c14"><span class="k">15</span><span class="v">Waterfall chart</span></a>
+  <a href="#c15"><span class="k">16</span><span class="v">Gantt chart</span></a>
+  <a href="#c16"><span class="k">17</span><span class="v">Code block</span></a>
+  <a href="#c17"><span class="k">18</span><span class="v">Footer</span></a>
+</div>
+
+<div class="note info">
+  <span class="lbl">How to use this file</span>
+  <p>Start from <code>assets/body.html</code>. When you need a component, open the <b>Markup</b> disclosure below it here and copy the block. Toggle the theme with the button in the corner to check both schemes before delivering.</p>
+</div>
+
+<h2 id="c0"><span class="num">01</span>Masthead</h2>
+<p class="lede">Every report. Identity, date, authority, and what the document is not.</p>
+<header class="masthead">
+  <div class="banner">Draft — not for circulation</div>
+  <p class="eyebrow">Programme · document type</p>
+  <h1>Report title</h1>
+  <p class="sub">One or two sentences on what this answers and for whom.</p>
+  <div class="meta">
+    <span><b>Prepared by:</b> Name</span>
+    <span><b>Date:</b> 1 January 2026</span>
+    <span><b>Status:</b> Pre-quote review — not a quotation</span>
+  </div>
+</header>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;header class=&quot;masthead&quot;&gt;
+  &lt;div class=&quot;banner&quot;&gt;Draft — not for circulation&lt;/div&gt;
+  &lt;p class=&quot;eyebrow&quot;&gt;Programme · document type&lt;/p&gt;
+  &lt;h1&gt;Report title&lt;/h1&gt;
+  &lt;p class=&quot;sub&quot;&gt;One or two sentences on what this answers and for whom.&lt;/p&gt;
+  &lt;div class=&quot;meta&quot;&gt;
+    &lt;span&gt;&lt;b&gt;Prepared by:&lt;/b&gt; Name&lt;/span&gt;
+    &lt;span&gt;&lt;b&gt;Date:&lt;/b&gt; 1 January 2026&lt;/span&gt;
+    &lt;span&gt;&lt;b&gt;Status:&lt;/b&gt; Pre-quote review — not a quotation&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/header&gt;</code></pre>
+</details>
+
+<h2 id="c1"><span class="num">02</span>Agenda</h2>
+<p class="lede">Any report with more than two sections. One card per H2.</p>
+<div class="agenda">
+  <a href="#x"><span class="k">Item 1</span><span class="v">Findings</span><span class="d">What the audit turned up.</span></a>
+  <a href="#x"><span class="k">Item 2</span><span class="v">Scope</span><span class="d">What is in, what is out, in what order it drops.</span></a>
+  <a href="#x"><span class="k">Item 3</span><span class="v">Hours</span><span class="d">The estimate and what moves it.</span></a>
+</div>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;div class=&quot;agenda&quot;&gt;
+  &lt;a href=&quot;#x&quot;&gt;&lt;span class=&quot;k&quot;&gt;Item 1&lt;/span&gt;&lt;span class=&quot;v&quot;&gt;Findings&lt;/span&gt;&lt;span class=&quot;d&quot;&gt;What the audit turned up.&lt;/span&gt;&lt;/a&gt;
+  &lt;a href=&quot;#x&quot;&gt;&lt;span class=&quot;k&quot;&gt;Item 2&lt;/span&gt;&lt;span class=&quot;v&quot;&gt;Scope&lt;/span&gt;&lt;span class=&quot;d&quot;&gt;What is in, what is out, in what order it drops.&lt;/span&gt;&lt;/a&gt;
+  &lt;a href=&quot;#x&quot;&gt;&lt;span class=&quot;k&quot;&gt;Item 3&lt;/span&gt;&lt;span class=&quot;v&quot;&gt;Hours&lt;/span&gt;&lt;span class=&quot;d&quot;&gt;The estimate and what moves it.&lt;/span&gt;&lt;/a&gt;
+&lt;/div&gt;</code></pre>
+</details>
+
+<h2 id="c2"><span class="num">03</span>Section heading</h2>
+<p class="lede">Top-level sections. Drop the <code>.num</code> span when the sections are not a sequence.</p>
+<h2><span class="num">01</span>Section name <span class="tag">optional qualifier</span></h2>
+<p class="lede">A framing sentence for the section.</p>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;h2&gt;&lt;span class=&quot;num&quot;&gt;01&lt;/span&gt;Section name &lt;span class=&quot;tag&quot;&gt;optional qualifier&lt;/span&gt;&lt;/h2&gt;
+&lt;p class=&quot;lede&quot;&gt;A framing sentence for the section.&lt;/p&gt;</code></pre>
+</details>
+
+<h2 id="c3"><span class="num">04</span>Card</h2>
+<p class="lede">A summary box, or any group of content that should read as one unit.</p>
+<div class="card">
+  <h3 style="margin-top:0">The short version</h3>
+  <ul>
+    <li><b>Lead with the conclusion.</b> Evidence in one clause.</li>
+    <li><b>Second finding.</b> Bold the claim, not the qualification.</li>
+  </ul>
+</div>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;div class=&quot;card&quot;&gt;
+  &lt;h3 style=&quot;margin-top:0&quot;&gt;The short version&lt;/h3&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;b&gt;Lead with the conclusion.&lt;/b&gt; Evidence in one clause.&lt;/li&gt;
+    &lt;li&gt;&lt;b&gt;Second finding.&lt;/b&gt; Bold the claim, not the qualification.&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+</details>
+
+<h2 id="c4"><span class="num">05</span>KPI row</h2>
+<p class="lede">Headline counts. Four to eight. Every figure must appear in the body too.</p>
+<div class="kpis">
+  <div class="kpi"><b>91</b><span>pages audited</span></div>
+  <div class="kpi"><b>243</b><span>call sites in 40 files</span></div>
+  <div class="kpi"><b>0</b><span>lock mechanisms found</span></div>
+  <div class="kpi"><b>90–130</b><span class="k">hours</span><span class="n">central ~110</span></div>
+</div>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;div class=&quot;kpis&quot;&gt;
+  &lt;div class=&quot;kpi&quot;&gt;&lt;b&gt;91&lt;/b&gt;&lt;span&gt;pages audited&lt;/span&gt;&lt;/div&gt;
+  &lt;div class=&quot;kpi&quot;&gt;&lt;b&gt;243&lt;/b&gt;&lt;span&gt;call sites in 40 files&lt;/span&gt;&lt;/div&gt;
+  &lt;div class=&quot;kpi&quot;&gt;&lt;b&gt;0&lt;/b&gt;&lt;span&gt;lock mechanisms found&lt;/span&gt;&lt;/div&gt;
+  &lt;div class=&quot;kpi&quot;&gt;&lt;b&gt;90–130&lt;/b&gt;&lt;span class=&quot;k&quot;&gt;hours&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;central ~110&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+</details>
+
+<h2 id="c5"><span class="num">06</span>Notes and callouts</h2>
+<p class="lede">A point that must not be skimmed past. The label names the kind of point it is.</p>
+<div class="note">
+  <span class="lbl">Decision needed</span>
+  <p>Default treatment — attention, open question, pending answer.</p>
+</div>
+<div class="note risk"><span class="lbl">Risk</span><p>Something that costs money or time if ignored.</p></div>
+<div class="note good"><span class="lbl">Confirmed</span><p>Something that landed, or came in cheaper than assumed.</p></div>
+<div class="note info"><span class="lbl">Context</span><p>Background the reader needs but did not ask for.</p></div>
+<div class="note plain"><span class="lbl">Aside</span><p>Neutral, low-emphasis.</p></div>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;div class=&quot;note&quot;&gt;
+  &lt;span class=&quot;lbl&quot;&gt;Decision needed&lt;/span&gt;
+  &lt;p&gt;Default treatment — attention, open question, pending answer.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;note risk&quot;&gt;&lt;span class=&quot;lbl&quot;&gt;Risk&lt;/span&gt;&lt;p&gt;Something that costs money or time if ignored.&lt;/p&gt;&lt;/div&gt;
+&lt;div class=&quot;note good&quot;&gt;&lt;span class=&quot;lbl&quot;&gt;Confirmed&lt;/span&gt;&lt;p&gt;Something that landed, or came in cheaper than assumed.&lt;/p&gt;&lt;/div&gt;
+&lt;div class=&quot;note info&quot;&gt;&lt;span class=&quot;lbl&quot;&gt;Context&lt;/span&gt;&lt;p&gt;Background the reader needs but did not ask for.&lt;/p&gt;&lt;/div&gt;
+&lt;div class=&quot;note plain&quot;&gt;&lt;span class=&quot;lbl&quot;&gt;Aside&lt;/span&gt;&lt;p&gt;Neutral, low-emphasis.&lt;/p&gt;&lt;/div&gt;</code></pre>
+</details>
+
+<h2 id="c6"><span class="num">07</span>Two-up comparison</h2>
+<p class="lede">Cheaper/costlier, before/after, option A/option B.</p>
+<div class="cols">
+  <div class="note good"><span class="lbl">Cheaper than assumed</span><ul><li>Point.</li><li>Point.</li></ul></div>
+  <div class="note risk"><span class="lbl">Costlier than assumed</span><ul><li>Point.</li><li>Point.</li></ul></div>
+</div>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;div class=&quot;cols&quot;&gt;
+  &lt;div class=&quot;note good&quot;&gt;&lt;span class=&quot;lbl&quot;&gt;Cheaper than assumed&lt;/span&gt;&lt;ul&gt;&lt;li&gt;Point.&lt;/li&gt;&lt;li&gt;Point.&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;
+  &lt;div class=&quot;note risk&quot;&gt;&lt;span class=&quot;lbl&quot;&gt;Costlier than assumed&lt;/span&gt;&lt;ul&gt;&lt;li&gt;Point.&lt;/li&gt;&lt;li&gt;Point.&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+</details>
+
+<h2 id="c7"><span class="num">08</span>Table</h2>
+<p class="lede">Anything with more than three comparable rows. Add data-sort to make a column sortable.</p>
+<div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th style="width:60px">ID</th><th data-sort="text">Work item</th><th>Notes</th>
+          <th class="num" data-sort="num">Low</th><th class="num" data-sort="num">High</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="ids">W1</td><td>Data access module</td>
+          <td>Covers the read path only. <span class="pill flag">Priced</span></td>
+          <td class="num">12</td><td class="num">16</td></tr>
+      <tr><td class="ids">W2</td><td>Feature flags</td>
+          <td>Rollback is a flag flip. <span class="pill good">Agreed</span></td>
+          <td class="num">4</td><td class="num">6</td></tr>
+      <tr><td class="ids">W3</td><td>Analytics engine</td>
+          <td>Separate quote. <span class="pill warn">Excluded</span></td>
+          <td class="num">40</td><td class="num">80</td></tr>
+    </tbody>
+    <tfoot><tr><td colspan="3">Total</td><td class="num">56</td><td class="num">102</td></tr></tfoot>
+  </table>
+</div>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;div class=&quot;tablewrap&quot;&gt;
+  &lt;table&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;&lt;th style=&quot;width:60px&quot;&gt;ID&lt;/th&gt;&lt;th data-sort=&quot;text&quot;&gt;Work item&lt;/th&gt;&lt;th&gt;Notes&lt;/th&gt;
+          &lt;th class=&quot;num&quot; data-sort=&quot;num&quot;&gt;Low&lt;/th&gt;&lt;th class=&quot;num&quot; data-sort=&quot;num&quot;&gt;High&lt;/th&gt;&lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;&lt;td class=&quot;ids&quot;&gt;W1&lt;/td&gt;&lt;td&gt;Data access module&lt;/td&gt;
+          &lt;td&gt;Covers the read path only. &lt;span class=&quot;pill flag&quot;&gt;Priced&lt;/span&gt;&lt;/td&gt;
+          &lt;td class=&quot;num&quot;&gt;12&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;16&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td class=&quot;ids&quot;&gt;W2&lt;/td&gt;&lt;td&gt;Feature flags&lt;/td&gt;
+          &lt;td&gt;Rollback is a flag flip. &lt;span class=&quot;pill good&quot;&gt;Agreed&lt;/span&gt;&lt;/td&gt;
+          &lt;td class=&quot;num&quot;&gt;4&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;6&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td class=&quot;ids&quot;&gt;W3&lt;/td&gt;&lt;td&gt;Analytics engine&lt;/td&gt;
+          &lt;td&gt;Separate quote. &lt;span class=&quot;pill warn&quot;&gt;Excluded&lt;/span&gt;&lt;/td&gt;
+          &lt;td class=&quot;num&quot;&gt;40&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;80&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tbody&gt;
+    &lt;tfoot&gt;&lt;tr&gt;&lt;td colspan=&quot;3&quot;&gt;Total&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;56&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;102&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+  &lt;/table&gt;
+&lt;/div&gt;</code></pre>
+</details>
+
+<h2 id="c8"><span class="num">09</span>Pills</h2>
+<p class="lede">Status on a row or inline in a sentence. Uppercase, one or two words.</p>
+<span class="pill warn">Blocked</span>
+<span class="pill flag">Moves price</span>
+<span class="pill good">Agreed</span>
+<span class="pill info">Design</span>
+<span class="pill muted">Deferred</span>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;span class=&quot;pill warn&quot;&gt;Blocked&lt;/span&gt;
+&lt;span class=&quot;pill flag&quot;&gt;Moves price&lt;/span&gt;
+&lt;span class=&quot;pill good&quot;&gt;Agreed&lt;/span&gt;
+&lt;span class=&quot;pill info&quot;&gt;Design&lt;/span&gt;
+&lt;span class=&quot;pill muted&quot;&gt;Deferred&lt;/span&gt;</code></pre>
+</details>
+
+<h2 id="c9"><span class="num">10</span>Series colours</h2>
+<p class="lede">Milestones, phases, workstreams, owners — anything with a fixed set of categories.</p>
+<div class="legend">
+  <span><i class="swatch c0"></i>M0 · Setup</span>
+  <span><i class="swatch c1"></i>M1 · Pipeline</span>
+  <span><i class="swatch c2"></i>M2 · Query surface</span>
+  <span><i class="swatch c3"></i>M3 · Cutover</span>
+  <span><i class="swatch c4"></i>M4 · Commands</span>
+  <span><i class="swatch c5"></i>M5 · Platform</span>
+</div>
+<p style="margin-top:12px">
+  <span class="chip c0">M0</span><span class="chip c1">M1</span><span class="chip c2">M2</span>
+  <span class="chip c3 ink-dark">M3</span><span class="chip c4 ink-dark">M4</span><span class="chip c5">M5</span>
+</p>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;div class=&quot;legend&quot;&gt;
+  &lt;span&gt;&lt;i class=&quot;swatch c0&quot;&gt;&lt;/i&gt;M0 · Setup&lt;/span&gt;
+  &lt;span&gt;&lt;i class=&quot;swatch c1&quot;&gt;&lt;/i&gt;M1 · Pipeline&lt;/span&gt;
+  &lt;span&gt;&lt;i class=&quot;swatch c2&quot;&gt;&lt;/i&gt;M2 · Query surface&lt;/span&gt;
+  &lt;span&gt;&lt;i class=&quot;swatch c3&quot;&gt;&lt;/i&gt;M3 · Cutover&lt;/span&gt;
+  &lt;span&gt;&lt;i class=&quot;swatch c4&quot;&gt;&lt;/i&gt;M4 · Commands&lt;/span&gt;
+  &lt;span&gt;&lt;i class=&quot;swatch c5&quot;&gt;&lt;/i&gt;M5 · Platform&lt;/span&gt;
+&lt;/div&gt;
+&lt;p style=&quot;margin-top:12px&quot;&gt;
+  &lt;span class=&quot;chip c0&quot;&gt;M0&lt;/span&gt;&lt;span class=&quot;chip c1&quot;&gt;M1&lt;/span&gt;&lt;span class=&quot;chip c2&quot;&gt;M2&lt;/span&gt;
+  &lt;span class=&quot;chip c3 ink-dark&quot;&gt;M3&lt;/span&gt;&lt;span class=&quot;chip c4 ink-dark&quot;&gt;M4&lt;/span&gt;&lt;span class=&quot;chip c5&quot;&gt;M5&lt;/span&gt;
+&lt;/p&gt;</code></pre>
+</details>
+
+<h2 id="c10"><span class="num">11</span>Checklist</h2>
+<p class="lede">Actions with an owner. Not for findings — findings go in a card or a table.</p>
+<ul class="checklist">
+  <li><span class="box"></span><span><b>Confirm the identity service.</b> Client — before day one.</span></li>
+  <li><span class="box"></span><span><b>Freeze the queue envelope.</b> Us — week 1.</span></li>
+</ul>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;ul class=&quot;checklist&quot;&gt;
+  &lt;li&gt;&lt;span class=&quot;box&quot;&gt;&lt;/span&gt;&lt;span&gt;&lt;b&gt;Confirm the identity service.&lt;/b&gt; Client — before day one.&lt;/span&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;span class=&quot;box&quot;&gt;&lt;/span&gt;&lt;span&gt;&lt;b&gt;Freeze the queue envelope.&lt;/b&gt; Us — week 1.&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+</details>
+
+<h2 id="c11"><span class="num">12</span>Tooltip</h2>
+<p class="lede">Dense visuals where the detail would not fit on screen. Needs the #tip host element.</p>
+<p>Hover this <b data-tip="&lt;span class='t'&gt;M3 · Dashboard cutover&lt;/span&gt;&lt;span class='r'&gt;110 h central · &lt;b&gt;90–130 h&lt;/b&gt; band&lt;/span&gt;">milestone</b> for detail.</p>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;p&gt;Hover this &lt;b data-tip=&quot;&amp;lt;span class=&#x27;t&#x27;&amp;gt;M3 · Dashboard cutover&amp;lt;/span&amp;gt;&amp;lt;span class=&#x27;r&#x27;&amp;gt;110 h central · &amp;lt;b&amp;gt;90–130 h&amp;lt;/b&amp;gt; band&amp;lt;/span&amp;gt;&quot;&gt;milestone&lt;/b&gt; for detail.&lt;/p&gt;</code></pre>
+</details>
+
+<h2 id="c12"><span class="num">13</span>Controls</h2>
+<p class="lede">Reports with switchable views — scenarios, date ranges, filters.</p>
+<div class="controls">
+  <div>
+    <span class="ctl-label">Scenario</span>
+    <div class="seg" role="group">
+      <button type="button" aria-pressed="true">Solo</button>
+      <button type="button" aria-pressed="false">Two developers</button>
+    </div>
+  </div>
+  <div>
+    <span class="ctl-label">Start date</span>
+    <input type="date" value="2026-09-01">
+  </div>
+</div>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;div class=&quot;controls&quot;&gt;
+  &lt;div&gt;
+    &lt;span class=&quot;ctl-label&quot;&gt;Scenario&lt;/span&gt;
+    &lt;div class=&quot;seg&quot; role=&quot;group&quot;&gt;
+      &lt;button type=&quot;button&quot; aria-pressed=&quot;true&quot;&gt;Solo&lt;/button&gt;
+      &lt;button type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Two developers&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div&gt;
+    &lt;span class=&quot;ctl-label&quot;&gt;Start date&lt;/span&gt;
+    &lt;input type=&quot;date&quot; value=&quot;2026-09-01&quot;&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+</details>
+
+<h2 id="c13"><span class="num">14</span>Figure and inline SVG</h2>
+<p class="lede">Architecture and flow diagrams. Use the s-* classes so the diagram themes correctly.</p>
+<figure>
+  <div class="svgbox">
+    <svg viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Probe to gateway to store">
+      <rect class="s-node" x="8"   y="34" width="120" height="46" rx="8"/>
+      <rect class="s-node" x="200" y="34" width="120" height="46" rx="8"/>
+      <rect class="s-node" x="392" y="34" width="120" height="46" rx="8"/>
+      <text class="s-lab" x="68"  y="55" text-anchor="middle">Probe</text>
+      <text class="s-sub" x="68"  y="70" text-anchor="middle">field hardware</text>
+      <text class="s-lab" x="260" y="55" text-anchor="middle">Gateway</text>
+      <text class="s-sub" x="260" y="70" text-anchor="middle">validate, queue</text>
+      <text class="s-lab" x="452" y="55" text-anchor="middle">Store</text>
+      <text class="s-sub" x="452" y="70" text-anchor="middle">store of record</text>
+      <path class="s-edge" d="M128 57 H196"/>
+      <path class="s-edge" d="M320 57 H388"/>
+      <text class="s-edgelab" x="162" y="48" text-anchor="middle">MQTT</text>
+      <text class="s-edgelab" x="354" y="48" text-anchor="middle">queue</text>
+    </svg>
+  </div>
+  <figcaption>Caption: say what the diagram proves, not what it contains.</figcaption>
+</figure>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;figure&gt;
+  &lt;div class=&quot;svgbox&quot;&gt;
+    &lt;svg viewBox=&quot;0 0 520 120&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; role=&quot;img&quot; aria-label=&quot;Probe to gateway to store&quot;&gt;
+      &lt;rect class=&quot;s-node&quot; x=&quot;8&quot;   y=&quot;34&quot; width=&quot;120&quot; height=&quot;46&quot; rx=&quot;8&quot;/&gt;
+      &lt;rect class=&quot;s-node&quot; x=&quot;200&quot; y=&quot;34&quot; width=&quot;120&quot; height=&quot;46&quot; rx=&quot;8&quot;/&gt;
+      &lt;rect class=&quot;s-node&quot; x=&quot;392&quot; y=&quot;34&quot; width=&quot;120&quot; height=&quot;46&quot; rx=&quot;8&quot;/&gt;
+      &lt;text class=&quot;s-lab&quot; x=&quot;68&quot;  y=&quot;55&quot; text-anchor=&quot;middle&quot;&gt;Probe&lt;/text&gt;
+      &lt;text class=&quot;s-sub&quot; x=&quot;68&quot;  y=&quot;70&quot; text-anchor=&quot;middle&quot;&gt;field hardware&lt;/text&gt;
+      &lt;text class=&quot;s-lab&quot; x=&quot;260&quot; y=&quot;55&quot; text-anchor=&quot;middle&quot;&gt;Gateway&lt;/text&gt;
+      &lt;text class=&quot;s-sub&quot; x=&quot;260&quot; y=&quot;70&quot; text-anchor=&quot;middle&quot;&gt;validate, queue&lt;/text&gt;
+      &lt;text class=&quot;s-lab&quot; x=&quot;452&quot; y=&quot;55&quot; text-anchor=&quot;middle&quot;&gt;Store&lt;/text&gt;
+      &lt;text class=&quot;s-sub&quot; x=&quot;452&quot; y=&quot;70&quot; text-anchor=&quot;middle&quot;&gt;store of record&lt;/text&gt;
+      &lt;path class=&quot;s-edge&quot; d=&quot;M128 57 H196&quot;/&gt;
+      &lt;path class=&quot;s-edge&quot; d=&quot;M320 57 H388&quot;/&gt;
+      &lt;text class=&quot;s-edgelab&quot; x=&quot;162&quot; y=&quot;48&quot; text-anchor=&quot;middle&quot;&gt;MQTT&lt;/text&gt;
+      &lt;text class=&quot;s-edgelab&quot; x=&quot;354&quot; y=&quot;48&quot; text-anchor=&quot;middle&quot;&gt;queue&lt;/text&gt;
+    &lt;/svg&gt;
+  &lt;/div&gt;
+  &lt;figcaption&gt;Caption: say what the diagram proves, not what it contains.&lt;/figcaption&gt;
+&lt;/figure&gt;</code></pre>
+</details>
+
+<h2 id="c14"><span class="num">15</span>Waterfall chart</h2>
+<p class="lede">Why a number moved. Opening value, the movements that acted on it, closing value — the visual form of a “what changed the estimate” table.</p>
+<figure>
+  <div class="svgbox"><div id="wf-estimate"></div></div>
+  <figcaption>The audit did not simply raise the estimate — it replaced a guess with six measured
+  movements, three of which pushed down. Red adds hours, green removes them.</figcaption>
+</figure>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  Report.waterfall("#wf-estimate", [
+    { label: "Prior central estimate", total: true },
+    { label: "Claim UX built from nothing", delta: 12 },
+    { label: "No test harness exists",      delta: 9  },
+    { label: "Plot derivation, five forms", delta: 8  },
+    { label: "EF already in a DAL",         delta: -6 },
+    { label: "Wire format preserved",       delta: -4 },
+    { label: "Exports and clock rendering", delta: 11 },
+    { label: "Post-audit central estimate", total: true }
+  ], { start: 80, unit: " h", polarity: "cost" });
+});
+</script>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;figure&gt;
+  &lt;div class=&quot;svgbox&quot;&gt;&lt;div id=&quot;wf-estimate&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;figcaption&gt;The audit did not simply raise the estimate — it replaced a guess with six measured
+  movements, three of which pushed down. Red adds hours, green removes them.&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;script&gt;
+document.addEventListener(&quot;DOMContentLoaded&quot;, function () {
+  Report.waterfall(&quot;#wf-estimate&quot;, [
+    { label: &quot;Prior central estimate&quot;, total: true },
+    { label: &quot;Claim UX built from nothing&quot;, delta: 12 },
+    { label: &quot;No test harness exists&quot;,      delta: 9  },
+    { label: &quot;Plot derivation, five forms&quot;, delta: 8  },
+    { label: &quot;EF already in a DAL&quot;,         delta: -6 },
+    { label: &quot;Wire format preserved&quot;,       delta: -4 },
+    { label: &quot;Exports and clock rendering&quot;, delta: 11 },
+    { label: &quot;Post-audit central estimate&quot;, total: true }
+  ], { start: 80, unit: &quot; h&quot;, polarity: &quot;cost&quot; });
+});
+&lt;/script&gt;</code></pre>
+</details>
+
+<h2 id="c15"><span class="num">16</span>Gantt chart</h2>
+<p class="lede">A schedule with dependencies the reader needs to see: what runs in parallel, what waits, where the critical path is. Not for a simple list of dates — that is a table.</p>
+<div class="card">
+  <div id="gt-plan"></div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  Report.gantt("#gt-plan", [
+    { group: "Gateway" },
+    { label: "Sinks, queue handoff, status", ids: "G1–G6",  owner: "A", cat: "M1", from: "2026-09-07", to: "2026-09-28" },
+    { label: "Commands, claims, audit log",  ids: "G7–G11", owner: "A", cat: "M4", from: "2026-09-28", to: "2026-10-12" },
+    { group: "Ingest and store" },
+    { label: "Schema and migrations",        ids: "N6",      owner: "B", cat: "M1", from: "2026-09-07", to: "2026-09-14" },
+    { label: "Ingest worker",                ids: "I1–I9",  owner: "B", cat: "M1", from: "2026-09-14", to: "2026-09-28" },
+    { label: "Reconciliation job",           ids: "R1",      owner: "B", cat: "M1", from: "2026-09-28", to: "2026-10-02" },
+    { group: "Data API and dashboard" },
+    { label: "Route groups, auth, export",   ids: "A1–A10", owner: "B", cat: "M2", from: "2026-10-02", to: "2026-10-30" },
+    { label: "Data access module and flags", ids: "W1–W2",  owner: "B", cat: "M3", from: "2026-10-30", to: "2026-11-27" },
+    { label: "Plot derivation",              ids: "W3",      owner: "B", cat: "M3", from: "2026-11-27", to: "2026-12-11" },
+    { label: "Command path and claim UX",    ids: "W4–W6",  owner: "A", cat: "M4", from: "2026-12-11", to: "2026-12-24" }
+  ], {
+    cats: {
+      M1: { label: "Pipeline", c: 1 },
+      M2: { label: "Query surface", c: 2 },
+      M3: { label: "Dashboard cutover", c: 3 },
+      M4: { label: "Commands", c: 4 }
+    },
+    caption: "Two developers",
+    marks: [
+      { at: "2026-09-11", label: "Contracts frozen" },
+      { at: "2026-10-30", label: "API on real data" },
+      { at: "2026-12-24", label: "Cutover complete" }
+    ],
+    bands: [{ from: "2026-09-28", to: "2026-10-12", label: "Reconciliation window" }],
+    today: "2026-10-20"
+  });
+});
+</script>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;div class=&quot;card&quot;&gt;
+  &lt;div id=&quot;gt-plan&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+document.addEventListener(&quot;DOMContentLoaded&quot;, function () {
+  Report.gantt(&quot;#gt-plan&quot;, [
+    { group: &quot;Gateway&quot; },
+    { label: &quot;Sinks, queue handoff, status&quot;, ids: &quot;G1–G6&quot;,  owner: &quot;A&quot;, cat: &quot;M1&quot;, from: &quot;2026-09-07&quot;, to: &quot;2026-09-28&quot; },
+    { label: &quot;Commands, claims, audit log&quot;,  ids: &quot;G7–G11&quot;, owner: &quot;A&quot;, cat: &quot;M4&quot;, from: &quot;2026-09-28&quot;, to: &quot;2026-10-12&quot; },
+    { group: &quot;Ingest and store&quot; },
+    { label: &quot;Schema and migrations&quot;,        ids: &quot;N6&quot;,      owner: &quot;B&quot;, cat: &quot;M1&quot;, from: &quot;2026-09-07&quot;, to: &quot;2026-09-14&quot; },
+    { label: &quot;Ingest worker&quot;,                ids: &quot;I1–I9&quot;,  owner: &quot;B&quot;, cat: &quot;M1&quot;, from: &quot;2026-09-14&quot;, to: &quot;2026-09-28&quot; },
+    { label: &quot;Reconciliation job&quot;,           ids: &quot;R1&quot;,      owner: &quot;B&quot;, cat: &quot;M1&quot;, from: &quot;2026-09-28&quot;, to: &quot;2026-10-02&quot; },
+    { group: &quot;Data API and dashboard&quot; },
+    { label: &quot;Route groups, auth, export&quot;,   ids: &quot;A1–A10&quot;, owner: &quot;B&quot;, cat: &quot;M2&quot;, from: &quot;2026-10-02&quot;, to: &quot;2026-10-30&quot; },
+    { label: &quot;Data access module and flags&quot;, ids: &quot;W1–W2&quot;,  owner: &quot;B&quot;, cat: &quot;M3&quot;, from: &quot;2026-10-30&quot;, to: &quot;2026-11-27&quot; },
+    { label: &quot;Plot derivation&quot;,              ids: &quot;W3&quot;,      owner: &quot;B&quot;, cat: &quot;M3&quot;, from: &quot;2026-11-27&quot;, to: &quot;2026-12-11&quot; },
+    { label: &quot;Command path and claim UX&quot;,    ids: &quot;W4–W6&quot;,  owner: &quot;A&quot;, cat: &quot;M4&quot;, from: &quot;2026-12-11&quot;, to: &quot;2026-12-24&quot; }
+  ], {
+    cats: {
+      M1: { label: &quot;Pipeline&quot;, c: 1 },
+      M2: { label: &quot;Query surface&quot;, c: 2 },
+      M3: { label: &quot;Dashboard cutover&quot;, c: 3 },
+      M4: { label: &quot;Commands&quot;, c: 4 }
+    },
+    caption: &quot;Two developers&quot;,
+    marks: [
+      { at: &quot;2026-09-11&quot;, label: &quot;Contracts frozen&quot; },
+      { at: &quot;2026-10-30&quot;, label: &quot;API on real data&quot; },
+      { at: &quot;2026-12-24&quot;, label: &quot;Cutover complete&quot; }
+    ],
+    bands: [{ from: &quot;2026-09-28&quot;, to: &quot;2026-10-12&quot;, label: &quot;Reconciliation window&quot; }],
+    today: &quot;2026-10-20&quot;
+  });
+});
+&lt;/script&gt;</code></pre>
+</details>
+
+<h2 id="c16"><span class="num">17</span>Code block</h2>
+<p class="lede">Config, schemas, commands. Never a wall — trim to the lines that carry the point.</p>
+<pre><code>services:
+  gateway:
+    image: gateway:1.0
+    environment:
+      QUEUE_URL: postgres://queue</code></pre>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;pre&gt;&lt;code&gt;services:
+  gateway:
+    image: gateway:1.0
+    environment:
+      QUEUE_URL: postgres://queue&lt;/code&gt;&lt;/pre&gt;</code></pre>
+</details>
+
+<h2 id="c17"><span class="num">18</span>Footer</h2>
+<p class="lede">Every report. Provenance and the limits of the claims.</p>
+<footer>
+  <p>Milestone 0 deliverable. Traces to Spec v0 Rev 1.0 by requirement ID. Hours are planning estimates, not a quotation.</p>
+  <p>Confidential.</p>
+</footer>
+<details>
+  <summary class="small" style="cursor:pointer;margin-top:12px">Markup</summary>
+  <pre><code>&lt;footer&gt;
+  &lt;p&gt;Milestone 0 deliverable. Traces to Spec v0 Rev 1.0 by requirement ID. Hours are planning estimates, not a quotation.&lt;/p&gt;
+  &lt;p&gt;Confidential.&lt;/p&gt;
+&lt;/footer&gt;</code></pre>
+</details>
+
+<footer>
+  <p>Base report template, version 1. Extracted from four project reports so that agents do not rebuild the styling on each new document.</p>
+</footer>
+
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script>
+/* ==========================================================================
+   Report base script — v1
+   Optional. A report with no interactive parts can drop this entirely.
+   Everything is opt-in via markup: no element, no behaviour.
+   Inline inside <script> just before </body>.
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  /* ---------- tiny helpers ---------- */
+  const $  = (sel, root) => (root || document).querySelector(sel);
+  const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  /* ---------- 1. THEME ----------------------------------------------------
+     Needs: <button id="theme-toggle">. Falls back to system preference.
+     Storage is best-effort — the toggle still works if it is unavailable.
+  ------------------------------------------------------------------------ */
+  function initTheme() {
+    const btn = $("#theme-toggle");
+    const root = document.documentElement;
+    let saved = null;
+    try { saved = localStorage.getItem("report-theme"); } catch (e) { /* ignore */ }
+    if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved);
+
+    const isDark = () =>
+      root.getAttribute("data-theme") === "dark" ||
+      (!root.hasAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+
+    const paint = () => { if (btn) btn.textContent = isDark() ? "Light" : "Dark"; };
+    paint();
+    if (!btn) return;
+
+    btn.addEventListener("click", () => {
+      const next = isDark() ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem("report-theme", next); } catch (e) { /* ignore */ }
+      paint();
+    });
+  }
+
+  /* ---------- 2. TOOLTIPS -------------------------------------------------
+     Needs: <div id="tip"></div> in the body, and any element carrying
+     data-tip="…". Values may contain markup you generated yourself.
+     For dynamic elements, call window.Report.bindTip(node, html).
+  ------------------------------------------------------------------------ */
+  let tipEl = null;
+  function bindTip(node, html) {
+    if (!tipEl) return;
+    node.addEventListener("mouseenter", () => { tipEl.innerHTML = html; tipEl.style.opacity = "1"; });
+    node.addEventListener("mousemove", (e) => {
+      const pad = 14;
+      const r = tipEl.getBoundingClientRect();
+      let x = e.clientX + pad, y = e.clientY + pad;
+      if (x + r.width  > innerWidth  - 8) x = e.clientX - r.width  - pad;
+      if (y + r.height > innerHeight - 8) y = e.clientY - r.height - pad;
+      tipEl.style.left = x + "px";
+      tipEl.style.top  = y + "px";
+    });
+    node.addEventListener("mouseleave", () => { tipEl.style.opacity = "0"; });
+  }
+  function initTips() {
+    tipEl = $("#tip");
+    if (!tipEl) return;
+    $$("[data-tip]").forEach((n) => bindTip(n, n.getAttribute("data-tip")));
+  }
+
+  /* ---------- 3. SORTABLE TABLES -----------------------------------------
+     Needs: <th data-sort="text"> or <th data-sort="num"> in a <thead>.
+     Sorts <tbody> rows only; <tfoot> totals stay put.
+  ------------------------------------------------------------------------ */
+  function initSort() {
+    $$("table thead th[data-sort]").forEach((th) => {
+      th.addEventListener("click", () => {
+        const table = th.closest("table");
+        const tbody = table.tBodies[0];
+        if (!tbody) return;
+        const idx  = Array.from(th.parentNode.children).indexOf(th);
+        const kind = th.getAttribute("data-sort");
+        const asc  = th.getAttribute("aria-sort") !== "ascending";
+
+        $$("th[data-sort]", table).forEach((o) => o.removeAttribute("aria-sort"));
+        th.setAttribute("aria-sort", asc ? "ascending" : "descending");
+
+        const val = (row) => {
+          const cell = row.children[idx];
+          const raw  = cell ? cell.textContent.trim() : "";
+          if (kind !== "num") return raw.toLowerCase();
+          const n = parseFloat(raw.replace(/[^0-9.\-]/g, ""));
+          return isNaN(n) ? -Infinity : n;
+        };
+        Array.from(tbody.rows)
+          .sort((a, b) => { const x = val(a), y = val(b); return (x > y ? 1 : x < y ? -1 : 0) * (asc ? 1 : -1); })
+          .forEach((r) => tbody.appendChild(r));
+      });
+    });
+  }
+
+  /* ---------- 4. SECTION HIGHLIGHT ---------------------------------------
+     Needs: .agenda a[href="#id"] pointing at h2[id] sections.
+     Marks the agenda card for whichever section is currently on screen.
+  ------------------------------------------------------------------------ */
+  function initScrollspy() {
+    const links = $$('.agenda a[href^="#"]');
+    if (!links.length || !("IntersectionObserver" in window)) return;
+    const map = new Map();
+    links.forEach((a) => {
+      const t = document.getElementById(decodeURIComponent(a.hash.slice(1)));
+      if (t) map.set(t, a);
+    });
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        const a = map.get(en.target);
+        if (a && en.isIntersecting) {
+          links.forEach((l) => (l.style.borderLeftColor = ""));
+          a.style.borderLeftColor = "var(--c0)";
+        }
+      });
+    }, { rootMargin: "-10% 0px -80% 0px" });
+    map.forEach((_a, target) => io.observe(target));
+  }
+
+  /* ---------- 5. GENERATED-ON STAMP --------------------------------------
+     Needs: any element with data-now. Optional; a hard-coded date is fine
+     and is usually better for a document that gets archived.
+  ------------------------------------------------------------------------ */
+  function initStamp() {
+    $$("[data-now]").forEach((n) => {
+      n.textContent = new Date().toLocaleDateString(undefined,
+        { year: "numeric", month: "long", day: "numeric" });
+    });
+  }
+
+  /* ---------- 6. WATERFALL CHART -----------------------------------------
+     Report.waterfall(hostSelectorOrNode, steps, opts)
+
+     steps: array, walked left to right, of either
+       { label: "Claim UX",        delta: 12 }   a movement
+       { label: "Post-audit",      total: true } a bar drawn from zero to the
+                                                 running value so far
+     opts:
+       start    number   opening value the first delta applies to (default 0)
+       unit     string   appended to every figure, e.g. " h"
+       polarity "cost"   a positive delta is bad  → red   (default)
+                "value"  a positive delta is good → green
+       height   number   SVG height in user units (default 400)
+       ticks    number   approximate y-axis tick count (default 5)
+       note     fn(step) extra line of tooltip text
+
+     Renders an <svg> into the host. Bars carry tooltips when #tip exists.
+  ------------------------------------------------------------------------ */
+  function waterfall(host, steps, opts) {
+    const el = typeof host === "string" ? $(host) : host;
+    if (!el || !Array.isArray(steps) || !steps.length) return;
+    opts = opts || {};
+
+    const W = 900, H = opts.height || 400;
+    const M = { t: 28, r: 14, b: 78, l: 62 };
+    const unit = opts.unit || "";
+    const costly = opts.polarity !== "value";
+    const nTicks = opts.ticks || 5;
+
+    const round = (v) => Math.round(v * 100) / 100;
+    const bare = (v) => round(Math.abs(v)).toLocaleString() + unit;
+    const fmtNum = (v) => (v < 0 ? "\u2212" : "") + bare(v);          /* totals and levels */
+    const fmtDelta = (v) => (v > 0 ? "+" : v < 0 ? "\u2212" : "") + bare(v); /* movements */
+
+    /* walk the steps into positioned bars */
+    let run = opts.start || 0;
+    const bars = steps.map((s) => {
+      if (s.total || s.subtotal) {
+        return { label: s.label, kind: "total", lo: Math.min(0, run), hi: Math.max(0, run), value: run, src: s };
+      }
+      const from = run;
+      run = round(run + s.delta);
+      return {
+        label: s.label,
+        kind: s.delta >= 0 ? "up" : "down",
+        lo: Math.min(from, run), hi: Math.max(from, run),
+        value: s.delta, end: run, src: s
+      };
+    });
+
+    /* y scale, snapped to round ticks */
+    let lo = Math.min(0, ...bars.map((b) => b.lo));
+    let hi = Math.max(0, ...bars.map((b) => b.hi));
+    if (hi === lo) hi = lo + 1;
+    const rawStep = (hi - lo) / nTicks;
+    const pow = Math.pow(10, Math.floor(Math.log10(rawStep) || 0));
+    const mult = rawStep / pow;
+    const step = (mult <= 1 ? 1 : mult <= 2 ? 2 : mult <= 2.5 ? 2.5 : mult <= 5 ? 5 : 10) * pow;
+    lo = Math.floor(lo / step) * step;
+    hi = Math.ceil(hi / step) * step;
+
+    const plotH = H - M.t - M.b;
+    const plotW = W - M.l - M.r;
+    const y = (v) => M.t + ((hi - v) / (hi - lo)) * plotH;
+    const band = plotW / bars.length;
+    const bw = Math.min(64, band * 0.6);
+    const cx = (i) => M.l + band * i + band / 2;
+
+    /* label wrapping — at most three lines */
+    const wrap = (text, max) => {
+      const out = [];
+      let line = "";
+      String(text).split(/\s+/).forEach((w) => {
+        if (!line.length) line = w;
+        else if ((line + " " + w).length <= max) line += " " + w;
+        else { out.push(line); line = w; }
+      });
+      if (line) out.push(line);
+      if (out.length > 3) { out.length = 3; out[2] = out[2].slice(0, max - 1) + "\u2026"; }
+      return out;
+    };
+
+    const p = [];
+    p.push('<svg viewBox="0 0 ' + W + " " + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' +
+      esc(opts.label || "Waterfall chart") + '">');
+
+    /* gridlines + y ticks */
+    for (let v = lo; v <= hi + 1e-9; v += step) {
+      const yy = y(v).toFixed(1);
+      p.push('<line class="' + (v === 0 ? "wf-zero" : "wf-grid") + '" x1="' + M.l + '" x2="' + (W - M.r) +
+        '" y1="' + yy + '" y2="' + yy + '"/>');
+      p.push('<text class="wf-tick" x="' + (M.l - 10) + '" y="' + yy + '" text-anchor="end" dominant-baseline="middle">' +
+        esc(round(v).toLocaleString()) + "</text>");
+    }
+
+    /* connectors between consecutive bars */
+    bars.forEach((b, i) => {
+      const next = bars[i + 1];
+      if (!next) return;
+      const yy = y(b.kind === "total" ? b.value : b.end).toFixed(1);
+      p.push('<line class="wf-conn" x1="' + (cx(i) + bw / 2) + '" x2="' + (cx(i + 1) - bw / 2) +
+        '" y1="' + yy + '" y2="' + yy + '"/>');
+    });
+
+    /* bars, value labels, category labels */
+    bars.forEach((b, i) => {
+      let cls = b.kind === "total" ? "wf-total" : b.kind === "up" ? "wf-up" : "wf-down";
+      if (!costly && b.kind !== "total") cls = b.kind === "up" ? "wf-down" : "wf-up";
+
+      const top = y(b.hi);
+      const h = Math.max(2, y(b.lo) - y(b.hi));
+      const x = cx(i) - bw / 2;
+
+      const shown = b.kind === "total" ? fmtNum(b.value) : fmtDelta(b.value);
+      const tipRows =
+        '<span class="t">' + esc(b.label) + "</span>" +
+        '<span class="r">' + (b.kind === "total"
+          ? "Running total <b>" + esc(fmtNum(b.value)) + "</b>"
+          : "Moves the total by <b>" + esc(fmtDelta(b.value)) + "</b> to <b>" + esc(fmtNum(b.end)) + "</b>") +
+        "</span>" +
+        (opts.note && opts.note(b.src) ? '<span class="r">' + opts.note(b.src) + "</span>" : "");
+
+      p.push('<rect class="wf-bar ' + cls + '" x="' + x.toFixed(1) + '" y="' + top.toFixed(1) +
+        '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3" data-tip="' +
+        esc(tipRows) + '"><title>' + esc(b.label + " — " + shown) + "</title></rect>");
+
+      p.push('<text class="wf-val" x="' + cx(i) + '" y="' + (top - 7).toFixed(1) + '" text-anchor="middle">' +
+        esc(shown) + "</text>");
+
+      wrap(b.label, Math.max(10, Math.floor(band / 6))).forEach((line, li) => {
+        p.push('<text class="wf-lab" x="' + cx(i) + '" y="' + (H - M.b + 20 + li * 13) +
+          '" text-anchor="middle">' + esc(line) + "</text>");
+      });
+    });
+
+    p.push("</svg>");
+    el.classList.add("wf");
+    el.innerHTML = p.join("");
+    $$("[data-tip]", el).forEach((n) => bindTip(n, n.getAttribute("data-tip")));
+  }
+
+  /* ---------- 7. GANTT CHART ----------------------------------------------
+     Report.gantt(hostSelectorOrNode, rows, opts)
+
+     rows: array, top to bottom, of
+       { group: "Gateway" }                          a heading row
+       { label, from, to, cat, ids, owner, tip }     a bar
+       { label, at, cat, tip, milestone: true }      a diamond marker
+
+     from / to / at accept either an ISO date string ("2026-09-01") or a
+     number (units since the project start, e.g. week 3.5). Do not mix the
+     two in one chart.
+
+     opts:
+       cats     { KEY: { label, c } }  category → legend text + colour 0-5
+       from,to  domain bounds; defaults to the extent of the data
+       unit     "Week" etc. Label for numeric axes. Ignored for dates.
+       today    a date or number to mark with a vertical rule
+       bands    [{ from, to, label }]  shaded regions behind the bars
+       marks    [{ at, label }]        callouts in the flag lane
+       lines    [{ at }]               dashed vertical rules
+       caption  text above the label column
+       legend   false to suppress the legend
+
+     Bars are labelled inside when they are wide enough, outside when not.
+  ------------------------------------------------------------------------ */
+  function gantt(host, rows, opts) {
+    const el = typeof host === "string" ? $(host) : host;
+    if (!el || !Array.isArray(rows) || !rows.length) return;
+    opts = opts || {};
+
+    const cats = opts.cats || {};
+    const LABEL_PX = 250, MIN_PX = 780;
+    const trackPx = MIN_PX - LABEL_PX;
+
+    /* ---- scale: dates or plain numbers ---- */
+    const isDate = (v) => typeof v === "string";
+    const toNum = (v) => (isDate(v) ? Date.parse(v) : v);
+    const dated = rows.some((r) => isDate(r.from) || isDate(r.at));
+
+    const vals = [];
+    rows.forEach((r) => {
+      if (r.from != null) vals.push(toNum(r.from));
+      if (r.to   != null) vals.push(toNum(r.to));
+      if (r.at   != null) vals.push(toNum(r.at));
+    });
+    (opts.bands || []).forEach((b) => { vals.push(toNum(b.from)); vals.push(toNum(b.to)); });
+    let d0 = opts.from != null ? toNum(opts.from) : Math.min.apply(null, vals);
+    let d1 = opts.to   != null ? toNum(opts.to)   : Math.max.apply(null, vals);
+    if (d1 <= d0) d1 = d0 + 1;
+    const pct = (v) => ((toNum(v) - d0) / (d1 - d0)) * 100;
+
+    const DAY = 86400000;
+    const fmtDate = (ms) => new Date(ms).toLocaleDateString(undefined, { day: "numeric", month: "short" });
+    const fmtVal = (v) => (dated ? fmtDate(toNum(v)) : (opts.unit || "Unit") + " " + v);
+
+    /* ---- ticks ---- */
+    const ticks = [];
+    if (dated) {
+      const span = (d1 - d0) / DAY;
+      if (span > 200) {                              /* quarter starts */
+        const c = new Date(d0); c.setDate(1); c.setMonth(Math.floor(c.getMonth() / 3) * 3);
+        while (c.getTime() <= d1) {
+          if (c.getTime() >= d0) ticks.push({ at: c.getTime(),
+            t: c.toLocaleDateString(undefined, { month: "short" }), d: c.getFullYear() });
+          c.setMonth(c.getMonth() + 3);
+        }
+      } else if (span > 60) {                        /* month starts */
+        const c = new Date(d0); c.setDate(1);
+        while (c.getTime() <= d1) {
+          if (c.getTime() >= d0) ticks.push({ at: c.getTime(),
+            t: c.toLocaleDateString(undefined, { month: "short" }), d: c.getFullYear() });
+          c.setMonth(c.getMonth() + 1);
+        }
+      } else {                                       /* weekly */
+        const c = new Date(d0); c.setHours(0, 0, 0, 0);
+        c.setDate(c.getDate() + ((8 - c.getDay()) % 7));
+        while (c.getTime() <= d1) {
+          ticks.push({ at: c.getTime(), t: fmtDate(c.getTime()), d: "" });
+          c.setDate(c.getDate() + 7);
+        }
+      }
+    } else {
+      const n = Math.min(12, Math.max(4, Math.round((d1 - d0))));
+      const raw = (d1 - d0) / n;
+      const pw = Math.pow(10, Math.floor(Math.log10(raw) || 0));
+      const m = raw / pw;
+      const stp = (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * pw;
+      for (let v = Math.ceil(d0 / stp) * stp; v <= d1 + 1e-9; v += stp) {
+        ticks.push({ at: v, t: String(Math.round(v * 100) / 100), d: "" });
+      }
+    }
+
+    const p = [];
+    p.push('<div class="scroller"><div class="gt-chart">');
+
+    /* ---- axis ---- */
+    p.push('<div class="gt-axis"><div class="gt-caption">' + esc(opts.caption || "") + "</div><div class=\"gt-ticks\">");
+    ticks.forEach((t, i) => {
+      const cls = i === 0 ? " first" : i === ticks.length - 1 ? " last" : "";
+      p.push('<span class="gt-tick' + cls + '" style="left:' + pct(t.at).toFixed(2) + '%">' +
+        esc(t.t) + (t.d ? '<span class="d">' + esc(String(t.d)) + "</span>" : "") + "</span>");
+    });
+    p.push("</div></div>");
+
+    /* ---- flag lane ---- */
+    if ((opts.marks || []).length) {
+      p.push('<div class="gt-flags"><div></div><div class="gt-lane">');
+      opts.marks.forEach((m) => {
+        const x = pct(m.at);
+        const pin = x < 8 ? " pin-left" : x > 92 ? " pin-right" : "";
+        p.push('<span class="gt-flag' + pin + '" style="left:' + x.toFixed(2) + '%">' + esc(m.label) + "</span>");
+      });
+      p.push("</div></div>");
+    }
+
+    /* ---- background layer ---- */
+    p.push('<div class="gt-body"><div class="gt-bg"><div></div><div>');
+    (opts.bands || []).forEach((b) => {
+      const a = pct(b.from), z = pct(b.to);
+      p.push('<span class="gt-band" style="left:' + a.toFixed(2) + '%;width:' + (z - a).toFixed(2) + '%"></span>');
+    });
+    (opts.lines || []).forEach((l) => {
+      p.push('<span class="gt-vline" style="left:' + pct(l.at).toFixed(2) + '%"></span>');
+    });
+    if (opts.today != null) {
+      p.push('<span class="gt-today" style="left:' + pct(opts.today).toFixed(2) + '%"></span>');
+    }
+    p.push('</div></div><div class="gt-rows">');
+
+    /* ---- rows ---- */
+    rows.forEach((r, i) => {
+      if (r.group) {
+        p.push('<div class="gt-row is-head"><div class="gt-group">' + esc(r.group) + "</div></div>");
+        return;
+      }
+      const cat = cats[r.cat] || {};
+      const ci = cat.c != null ? cat.c : 0;
+
+      p.push('<div class="gt-row"><div class="gt-label">' +
+        '<span class="nm">' + esc(r.label) + "</span>" +
+        (r.ids ? '<span class="ids">' + esc(r.ids) + "</span>" : "") +
+        (r.owner ? '<span class="gt-owner">' + esc(r.owner) + "</span>" : "") +
+        '</div><div class="gt-track">');
+
+      const tipHtml =
+        '<span class="t">' + esc(r.label) + "</span>" +
+        (cat.label ? '<span class="r">' + esc(cat.label) + "</span>" : "") +
+        '<span class="r">' + (r.milestone || r.at != null
+          ? esc(fmtVal(r.at))
+          : "<b>" + esc(fmtVal(r.from)) + "</b> to <b>" + esc(fmtVal(r.to)) + "</b>") + "</span>" +
+        (r.owner ? '<span class="r">Owner <b>' + esc(r.owner) + "</b></span>" : "") +
+        (r.tip ? '<span class="r">' + r.tip + "</span>" : "");
+
+      if (r.milestone || (r.at != null && r.from == null)) {
+        p.push('<span class="gt-diamond gt-c' + ci + '" style="left:' + pct(r.at).toFixed(2) +
+          '%" data-tip="' + esc(tipHtml) + '" title="' + esc(r.label) + '"></span>');
+      } else {
+        const a = pct(r.from), w = pct(r.to) - a;
+        const px = (v) => (v / 100) * trackPx;
+        const need = r.label.length * 6.6 + 18;
+        const inside = px(w) > need;
+        const goRight = !inside && px(100 - (a + w)) > need;
+        const goLeft  = !inside && !goRight && px(a) > need;
+
+        p.push('<span class="gt-bar gt-c' + ci +
+          '" style="left:' + a.toFixed(2) + '%;width:' + Math.max(w, 0.6).toFixed(2) + '%"' +
+          ' data-tip="' + esc(tipHtml) + '">' + (inside || (!goRight && !goLeft) ? esc(r.label) : "") + "</span>");
+
+        if (goRight || goLeft) {
+          p.push('<span class="gt-outlabel" style="' +
+            (goRight ? "left:" + (a + w).toFixed(2) + "%;padding-left:8px"
+                     : "right:" + (100 - a).toFixed(2) + "%;padding-right:8px") +
+            '">' + esc(r.label) + "</span>");
+        }
+      }
+      p.push("</div></div>");
+    });
+
+    p.push("</div></div></div></div>");
+
+    /* ---- legend ---- */
+    if (opts.legend !== false && Object.keys(cats).length) {
+      p.push('<div class="legend">');
+      Object.keys(cats).forEach((k) => {
+        const c = cats[k];
+        p.push("<span><i class=\"swatch c" + (c.c != null ? c.c : 0) + "\"></i>" +
+          esc(k + (c.label ? " · " + c.label : "")) + "</span>");
+      });
+      p.push("</div>");
+    }
+
+    el.classList.add("gt");
+    el.innerHTML = p.join("");
+    $$("[data-tip]", el).forEach((n) => bindTip(n, n.getAttribute("data-tip")));
+  }
+
+  /* ---------- boot ---------- */
+  function boot() { initTheme(); initTips(); initSort(); initScrollspy(); initStamp(); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+
+  /* Exposed for report-specific code appended below this block. */
+  window.Report = { $, $$, esc, bindTip, waterfall, gantt };
+})();
+</script>
+</body>
+</html>

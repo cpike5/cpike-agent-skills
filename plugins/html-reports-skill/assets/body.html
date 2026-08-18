@@ -1,0 +1,122 @@
+<!--
+  body.html — starting skeleton for a report body fragment.
+
+  Copy this to a scratch file, fill it in, delete every component the outline
+  did not call for, then assemble:
+
+      python3 scripts/build_report.py --body draft-body.html \
+          --title "Report title" --out reports/report-name.html
+
+  Rules: no literal hex colours, no external references, every chart host id
+  matches the selector its script targets. build_report.py enforces all three.
+  Component markup lives in docs/03-components.md and assets/components.html.
+-->
+<button id="theme-toggle" type="button" aria-label="Toggle colour theme">Dark</button>
+<div class="wrap">
+
+<!-- 1. Masthead — who wrote this, when, on what authority, and what it is not -->
+<header class="masthead">
+  <div class="banner">Draft — not for circulation</div>
+  <p class="eyebrow">Programme · document type</p>
+  <h1>Report title</h1>
+  <p class="sub">One or two sentences on what this document answers and for whom.</p>
+  <div class="meta">
+    <span><b>Prepared by:</b> Name</span>
+    <span><b>Date:</b> 1 January 2026</span>
+    <span><b>Status:</b> Pre-quote review — not a quotation</span>
+  </div>
+</header>
+
+<!-- 2. Agenda — one card per h2, same order, ids matching the sections below -->
+<div class="agenda">
+  <a href="#s1"><span class="k">01</span><span class="v">Findings</span><span class="d">What the review turned up.</span></a>
+  <a href="#s2"><span class="k">02</span><span class="v">Scope</span><span class="d">What is in, what is out.</span></a>
+  <a href="#s3"><span class="k">03</span><span class="v">Recommendation</span><span class="d">What to do next, and who does it.</span></a>
+</div>
+
+<!-- 3. The short version — the findings, readable on their own -->
+<div class="card">
+  <h3 style="margin-top:0">The short version</h3>
+  <ul>
+    <li><b>Lead with the conclusion.</b> Evidence in one clause.</li>
+    <li><b>Bold the claim, not the sentence.</b> A reader who reads only the bold text still gets the findings.</li>
+  </ul>
+</div>
+
+<!-- 4. KPI row — every figure here must also appear in the body with its derivation -->
+<div class="kpis">
+  <div class="kpi"><b>00</b><span>what it counts</span></div>
+  <div class="kpi"><b>00</b><span>what it counts</span></div>
+  <div class="kpi"><b>90–130</b><span class="k">hours</span><span class="n">central ~110</span></div>
+</div>
+
+<!-- 5. Sections -->
+<h2 id="s1"><span class="num">01</span>Findings</h2>
+<p class="lede">A framing sentence for the section.</p>
+<p>Body copy. Identifiers such as <code>src/Thing.cs</code> go in code formatting.</p>
+
+<div class="note risk">
+  <span class="lbl">Risk</span>
+  <p>A point that must not be skimmed past. Name the cause, not the category.</p>
+</div>
+
+<h2 id="s2"><span class="num">02</span>Scope</h2>
+<div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th data-sort="text">Item</th><th data-sort="text">Status</th><th data-sort="num">Hours</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Item</td><td><span class="pill good">In</span></td><td>12</td></tr>
+      <tr><td>Item</td><td><span class="pill muted">Out</span></td><td>—</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="s3"><span class="num">03</span>Recommendation</h2>
+<ul class="checklist">
+  <li><b>Action.</b> <span class="who">Owner</span></li>
+</ul>
+
+<!-- Charts: the host div's id must match the selector in the script below.
+     Delete both the host and its script if the report has no chart. -->
+<figure>
+  <div id="wf-1"></div>
+  <figcaption>Caption: state what the chart proves, not what it contains.</figcaption>
+</figure>
+
+<figure>
+  <div id="gt-1"></div>
+  <figcaption>Caption: state what the schedule proves, not what it contains.</figcaption>
+</figure>
+
+<!-- 6. Footer — provenance, what the document is not, confidentiality -->
+<footer>
+  <p>What this traces to. Hours are planning estimates, not a quotation.</p>
+  <p>Confidential.</p>
+</footer>
+
+</div>
+
+<!-- Tooltip host — required if anything uses data-tip, or any chart is present -->
+<div id="tip" role="tooltip"></div>
+
+<!-- base.js is inlined after the body, so chart calls must wait for DOMContentLoaded -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  Report.waterfall("#wf-1", [
+    { label: "Prior central estimate", total: true },
+    { label: "Name the cause of the movement", delta: 12 },
+    { label: "Post-review central estimate", total: true }
+  ], { start: 80, unit: " h", polarity: "cost" });
+
+  Report.gantt("#gt-1", [
+    { group: "Workstream" },
+    { label: "Task", cat: "M1", from: "2026-01-05", to: "2026-01-26" },
+    { label: "Milestone", cat: "M1", at: "2026-01-26", milestone: true }
+  ], {
+    cats: { M1: { label: "Phase one", c: 0 } },
+    caption: "Scenario name"
+  });
+});
+</script>
