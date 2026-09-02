@@ -176,4 +176,4 @@ again so the Artifact updates in place rather than becoming a second, diverging 
 | `hand-drawn <svg> in the body` (warning) | Expected only for pictures that are not nodes and edges. If it is a schema or a flow, use `Report.graph()`. Either way, rasterize and look. |
 | `no Chromium or Chrome binary found` | No browser in this environment. Say in delivery that the visuals were not visually verified. |
 | Diagram lays out with the chain pushed sideways | A node was pinned with `col`/`row` in a way the derived layering fights. Pin the rest, or drop the pin. |
-| Report reads as dense and hard to follow | The prose skipped `docs/05-plain-language.md`. Split the long sentences, make the voice active, and use one term per concept. |
+| Report reads as dense and hard to follow | The prose skipped `${CLAUDE_PLUGIN_ROOT}/docs/05-plain-language.md`. Split the long sentences, make the voice active, and use one term per concept. |
