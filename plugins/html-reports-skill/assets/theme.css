@@ -2,50 +2,53 @@
    theme.css — project tokens. THE ONLY FILE THAT CHANGES PER PROJECT.
    This is the skill's default palette, used verbatim when no application
    palette could be found. Otherwise regenerate with derive_theme.py.
+
+   The palette is cool-neutral and low-chroma on purpose: a report is read,
+   not glanced at, and colour is spent only where it encodes something.
    ========================================================================== */
 :root {
   color-scheme: light;
 
   /* surfaces + ink */
-  --plane:         #f9f9f7;   /* page background                     */
-  --surface:       #fcfcfb;   /* cards, tables, raised things        */
-  --surface-2:     #f2f1ed;   /* table headers, code, inset things   */
-  --ink:           #0b0b0b;   /* primary text                        */
-  --ink-2:         #52514e;   /* secondary text, lede, body copy     */
-  --ink-muted:     #898781;   /* labels, captions, metadata          */
+  --plane:         #f7f8fa;   /* page background — cool white          */
+  --surface:       #ffffff;   /* cards, raised things                   */
+  --surface-2:     #eef0f3;   /* code, inset things, hover bands        */
+  --ink:           #14171c;   /* primary text — cool near-black         */
+  --ink-2:         #4a5059;   /* secondary text, lede, body copy        */
+  --ink-muted:     #747b86;   /* labels, captions, metadata             */
 
-  /* lines */
-  --grid:          #e1e0d9;   /* table row rules                     */
-  --axis:          #c3c2b7;   /* chart axes, stronger dashed rules   */
-  --border:        rgba(11,11,11,0.10);
-  --border-strong: rgba(11,11,11,0.18);
-  --shadow:        0 1px 2px rgba(11,11,11,0.06), 0 8px 24px rgba(11,11,11,0.05);
+  /* lines — the report is drawn with rules, not boxes */
+  --grid:          #e1e4e9;   /* hairline: table rows, dividers         */
+  --axis:          #c2c7cf;   /* chart axes, dashed rules               */
+  --border:        rgba(20,23,28,0.12);
+  --border-strong: rgba(20,23,28,0.24);
+  --shadow:        0 2px 6px rgba(20,23,28,0.08), 0 12px 32px rgba(20,23,28,0.10); /* floating things only */
 
   /* categorical series — use in order, for milestones/phases/streams/legends */
-  --c0: #2a78d6;  /* blue    */
-  --c1: #eb6834;  /* orange  */
-  --c2: #1baf7a;  /* aqua    */
-  --c3: #eda100;  /* yellow  */
-  --c4: #e87ba4;  /* magenta */
-  --c5: #008300;  /* green   */
+  --c0: #2457a8;  /* navy   */
+  --c1: #13857a;  /* teal   */
+  --c2: #b7791f;  /* amber  */
+  --c3: #6b4fc0;  /* violet */
+  --c4: #b8456a;  /* rose   */
+  --c5: #4b7f52;  /* green  */
 
   /* text colour for anything sitting on a series colour — set by contrast */
   --c0-ink: #ffffff;
   --c1-ink: #ffffff;
-  --c2-ink: #ffffff;
-  --c3-ink: #1a1a19;
-  --c4-ink: #1a1a19;
+  --c2-ink: #1a1a19;
+  --c3-ink: #ffffff;
+  --c4-ink: #ffffff;
   --c5-ink: #ffffff;
 
   /* semantic */
-  --warn:      #d03b3b;
-  --good:      #006300;
-  --flag:      #eda100;
-  --info:      #2a78d6;
-  --tint-warn: rgba(208,59,59,0.10);
-  --tint-good: rgba(0,131,0,0.10);
-  --tint-flag: rgba(237,161,0,0.14);
-  --tint-info: rgba(42,120,214,0.10);
+  --warn:      #b42d2d;
+  --good:      #2b7a4b;
+  --flag:      #b7791f;
+  --info:      #2457a8;
+  --tint-warn: rgba(180,45,45,0.08);
+  --tint-good: rgba(43,122,75,0.09);
+  --tint-flag: rgba(183,121,31,0.11);
+  --tint-info: rgba(36,87,168,0.08);
 
   /* type — system stacks only, never a web font (see docs/02-theming.md).
      --font-display carries headings and the display numerals; set it to a
@@ -56,62 +59,68 @@
   --font-mono:    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* rhythm */
-  --wrap:      1080px;
-  --measure:   72ch;   /* prose line length — body copy never exceeds this */
-  --radius:    10px;
-  --radius-sm: 6px;
+  --wrap:      1040px;
+  --measure:   70ch;   /* prose line length — body copy never exceeds this */
+  --radius:    6px;
+  --radius-sm: 4px;
   --tracking-caps: .12em;
 }
 
 /* Dark values live in one place and are applied by both the media query
-   (system preference) and the [data-theme="dark"] attribute (manual toggle). */
+   (system preference) and the [data-theme="dark"] attribute (manual toggle).
+   Not pure black on pure white: a slate plane and an off-white ink
+   keep long reads comfortable and stop the page looking like a terminal. */
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
     color-scheme: dark;
-    --plane:         #0d0d0d;
-    --surface:       #1a1a19;
-    --surface-2:     #232322;
-    --ink:           #ffffff;
-    --ink-2:         #c3c2b7;
-    --ink-muted:     #898781;
-    --grid:          #2c2c2a;
-    --axis:          #383835;
-    --border:        rgba(255,255,255,0.10);
-    --border-strong: rgba(255,255,255,0.20);
-    --shadow:        0 1px 2px rgba(0,0,0,0.40), 0 8px 24px rgba(0,0,0,0.35);
-    --c0: #3987e5;  --c1: #d95926;  --c2: #199e70;
-    --c3: #c98500;  --c4: #d55181;  --c5: #008300;
-    --warn: #e66767;
-    --good: #0ca30c;
-    --flag: #c98500;
-    --info: #3987e5;
-    --tint-warn: rgba(230,103,103,0.14);
-    --tint-good: rgba(12,163,12,0.14);
-    --tint-flag: rgba(201,133,0,0.18);
-    --tint-info: rgba(57,135,229,0.14);
+    --plane:         #121417;
+    --surface:       #1a1d22;
+    --surface-2:     #23272e;
+    --ink:           #eceef2;
+    --ink-2:         #b3b8c1;
+    --ink-muted:     #848a94;
+    --grid:          #292d34;
+    --axis:          #3b4049;
+    --border:        rgba(236,238,242,0.10);
+    --border-strong: rgba(236,238,242,0.22);
+    --shadow:        0 2px 6px rgba(0,0,0,0.40), 0 12px 32px rgba(0,0,0,0.45);
+    --c0: #6c9be6;  --c1: #3fb3a6;  --c2: #d9a441;
+    --c3: #a08ce0;  --c4: #d97a97;  --c5: #7fb388;
+    --c0-ink: #1a1a19; --c1-ink: #1a1a19; --c2-ink: #1a1a19;
+    --c3-ink: #1a1a19; --c4-ink: #1a1a19; --c5-ink: #1a1a19;
+    --warn: #e26b6b;
+    --good: #5fb87a;
+    --flag: #d9a441;
+    --info: #6c9be6;
+    --tint-warn: rgba(226,107,107,0.13);
+    --tint-good: rgba(95,184,122,0.13);
+    --tint-flag: rgba(217,164,65,0.15);
+    --tint-info: rgba(108,155,230,0.13);
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --plane:         #0d0d0d;
-  --surface:       #1a1a19;
-  --surface-2:     #232322;
-  --ink:           #ffffff;
-  --ink-2:         #c3c2b7;
-  --ink-muted:     #898781;
-  --grid:          #2c2c2a;
-  --axis:          #383835;
-  --border:        rgba(255,255,255,0.10);
-  --border-strong: rgba(255,255,255,0.20);
-  --shadow:        0 1px 2px rgba(0,0,0,0.40), 0 8px 24px rgba(0,0,0,0.35);
-  --c0: #3987e5;  --c1: #d95926;  --c2: #199e70;
-  --c3: #c98500;  --c4: #d55181;  --c5: #008300;
-  --warn: #e66767;
-  --good: #0ca30c;
-  --flag: #c98500;
-  --info: #3987e5;
-  --tint-warn: rgba(230,103,103,0.14);
-  --tint-good: rgba(12,163,12,0.14);
-  --tint-flag: rgba(201,133,0,0.18);
-  --tint-info: rgba(57,135,229,0.14);
+  --plane:         #121417;
+  --surface:       #1a1d22;
+  --surface-2:     #23272e;
+  --ink:           #eceef2;
+  --ink-2:         #b3b8c1;
+  --ink-muted:     #848a94;
+  --grid:          #292d34;
+  --axis:          #3b4049;
+  --border:        rgba(236,238,242,0.10);
+  --border-strong: rgba(236,238,242,0.22);
+  --shadow:        0 2px 6px rgba(0,0,0,0.40), 0 12px 32px rgba(0,0,0,0.45);
+  --c0: #6c9be6;  --c1: #3fb3a6;  --c2: #d9a441;
+  --c3: #a08ce0;  --c4: #d97a97;  --c5: #7fb388;
+  --c0-ink: #1a1a19; --c1-ink: #1a1a19; --c2-ink: #1a1a19;
+  --c3-ink: #1a1a19; --c4-ink: #1a1a19; --c5-ink: #1a1a19;
+  --warn: #e26b6b;
+  --good: #5fb87a;
+  --flag: #d9a441;
+  --info: #6c9be6;
+  --tint-warn: rgba(226,107,107,0.13);
+  --tint-good: rgba(95,184,122,0.13);
+  --tint-flag: rgba(217,164,65,0.15);
+  --tint-info: rgba(108,155,230,0.13);
 }

@@ -59,8 +59,9 @@ Read `${CLAUDE_PLUGIN_ROOT}/docs/01-html-workflow.md` before starting. It covers
 3. **Write the body fragment** to a scratch file — everything between `<body>` and `</body>`.
    Component markup is in `${CLAUDE_PLUGIN_ROOT}/docs/03-components.md`; how to make it read as designed rather
    than defaulted is in `${CLAUDE_PLUGIN_ROOT}/docs/04-editorial.md`; how to write the prose is in
-   `${CLAUDE_PLUGIN_ROOT}/docs/05-plain-language.md`; start from
-   `${CLAUDE_PLUGIN_ROOT}/assets/body.html`.
+   `${CLAUDE_PLUGIN_ROOT}/docs/05-plain-language.md`; start from `${CLAUDE_PLUGIN_ROOT}/assets/body.html`. The stylesheet sets the report
+   like a print page — rules, not boxes; large numerals; no shadows — so use the components as
+   they are and never add inline styles for borders, shadows or colours.
 4. **Assemble** with `${CLAUDE_PLUGIN_ROOT}/scripts/build_report.py`, which inlines the theme, the stylesheet and the
    renderers into one portable file and refuses to write if anything is broken.
 5. **Look at it.** Run `${CLAUDE_PLUGIN_ROOT}/scripts/rasterize.py` on the built file and read the PNGs it writes.
@@ -73,11 +74,32 @@ Read `${CLAUDE_PLUGIN_ROOT}/docs/01-html-workflow.md` before starting. It covers
 **Diagrams are generated, not hand-drawn.** Anything with nodes and edges — a schema, a flow, a
 service map — is `Report.graph(host, nodes, edges)`, which derives every coordinate, arrowhead
 and self-loop from the pairs you declare. Hand-drawn `<svg>` is for pictures that have no nodes
-and edges in them, and it is the one thing in this skill that nothing validates: `docs/03-components.md`
+and edges in them, and it is the one thing in this skill that nothing validates: `${CLAUDE_PLUGIN_ROOT}/docs/03-components.md`
 says what that costs and how to draw an arrowhead that cannot drift.
 
 Never hand-assemble the final HTML, and never link a stylesheet. Reports must survive being
 emailed, archived, and opened from disk in two years. `build_report.py` enforces this.
+
+### When there is no repository
+
+The `.reports/` procedure above assumes a git repository that keeps its theme across many
+reports. In a chat session with no repository — claude.ai, or a one-off analysis — skip it and
+work in the current directory instead:
+
+```bash
+mkdir -p .reports
+cp "$CLAUDE_PLUGIN_ROOT/assets/base.css" "$CLAUDE_PLUGIN_ROOT/assets/base.js" .reports/
+python3 "$CLAUDE_PLUGIN_ROOT/scripts/derive_theme.py" --primary "#7c3aed" > .reports/theme.css
+```
+
+Use the default palette in `${CLAUDE_PLUGIN_ROOT}/assets/theme.css` when there is no application to derive one from,
+and ask the user for a primary colour only if they raise the subject. Everything else in the
+procedure is unchanged. The scripts need Python 3 and the standard library only; `rasterize.py`
+additionally needs a headless browser, and says so and exits if it cannot find one.
+
+Delivery also changes without a repository: there is nowhere to commit the file, so give the
+user the built HTML itself — attach it, or publish it as an Artifact if they asked for a link.
+The section below governs whenever a working tree does exist.
 
 ### Where the report goes
 

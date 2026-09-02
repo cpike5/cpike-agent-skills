@@ -40,8 +40,11 @@ import colorsys
 import sys
 
 DEFAULTS = {
-    "plane": "#f9f9f7", "surface": "#fcfcfb", "surface_2": "#f2f1ed",
-    "ink": "#0b0b0b", "warn": "#d03b3b", "good": "#006300",
+    "plane": "#f7f8fa", "surface": "#ffffff", "surface_2": "#eef0f3",
+    "ink": "#14171c", "warn": "#b42d2d", "good": "#2b7a4b",
+}
+DARK_DEFAULTS = {
+    "plane": "#121417", "surface": "#1a1d22", "ink": "#eceef2",
 }
 DARK_INK = "#1a1a19"
 
@@ -113,7 +116,7 @@ def tune(colour, plane=DEFAULTS["plane"]):
     text reaches 4.5:1, and dark enough to read as a shape against the page.
     Keeps the hue. Two constraints: bar text >= 4.5:1, bar vs plane >= 2.2:1."""
     h, l, s = hls(colour)
-    s = max(0.42, min(0.72, s))
+    s = max(0.40, min(0.64, s))
     order = []
     start = max(0.28, min(0.52, l))
     for d in [i * 0.025 for i in range(0, 12)]:
@@ -202,9 +205,10 @@ def build(args):
     inks = [best_ink(c) for c in cs]
 
     # dark mode: same hues, lifted lightness so they hold up on a dark plane
-    d_plane = args.dark_plane or "#0d0d0d"
-    d_surface = args.dark_surface or "#1a1a19"
-    d_surface_2 = mix(d_surface, "#ffffff", 0.05)
+    d_plane = args.dark_plane or DARK_DEFAULTS["plane"]
+    d_surface = args.dark_surface or DARK_DEFAULTS["surface"]
+    d_ink = DARK_DEFAULTS["ink"]
+    d_surface_2 = mix(d_surface, d_ink, 0.05)
     d_cs = []
     for c in cs:
         h, l, s = hls(c)
@@ -230,20 +234,20 @@ def build(args):
         "  --good:      %s;" % good,
         "  --flag:      %s;" % flag,
         "  --info:      %s;" % info,
-        "  --tint-warn: %s;" % tint(warn, 0.10),
-        "  --tint-good: %s;" % tint(good, 0.10),
-        "  --tint-flag: %s;" % tint(flag, 0.14),
-        "  --tint-info: %s;" % tint(info, 0.10),
+        "  --tint-warn: %s;" % tint(warn, 0.08),
+        "  --tint-good: %s;" % tint(good, 0.09),
+        "  --tint-flag: %s;" % tint(flag, 0.11),
+        "  --tint-info: %s;" % tint(info, 0.08),
     ])
     dark_semantic = "\n".join([
         "    --warn:      %s;" % d_warn,
         "    --good:      %s;" % d_good,
         "    --flag:      %s;" % lighten(flag, 0.04),
         "    --info:      %s;" % lighten(info, 0.06),
-        "    --tint-warn: %s;" % tint(d_warn, 0.14),
-        "    --tint-good: %s;" % tint(d_good, 0.14),
-        "    --tint-flag: %s;" % tint(flag, 0.18),
-        "    --tint-info: %s;" % tint(info, 0.14),
+        "    --tint-warn: %s;" % tint(d_warn, 0.13),
+        "    --tint-good: %s;" % tint(d_good, 0.13),
+        "    --tint-flag: %s;" % tint(flag, 0.15),
+        "    --tint-info: %s;" % tint(info, 0.13),
     ])
 
     light_core = "\n".join([
@@ -251,26 +255,27 @@ def build(args):
         "  --surface:       %s;" % surface,
         "  --surface-2:     %s;" % surface_2,
         "  --ink:           %s;" % ink,
-        "  --ink-2:         %s;" % mix(ink, plane, 0.38),
-        "  --ink-muted:     %s;" % mix(ink, plane, 0.58),
-        "  --grid:          %s;" % mix(plane, ink, 0.12),
-        "  --axis:          %s;" % mix(plane, ink, 0.26),
-        "  --border:        rgba(0,0,0,0.10);",
-        "  --border-strong: rgba(0,0,0,0.18);",
-        "  --shadow:        0 1px 2px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.05);",
+        "  --ink-2:         %s;" % mix(ink, plane, 0.26),
+        "  --ink-muted:     %s;" % mix(ink, plane, 0.50),
+        "  --grid:          %s;" % mix(plane, ink, 0.10),
+        "  --axis:          %s;" % mix(plane, ink, 0.24),
+        "  --border:        %s;" % tint(ink, 0.12),
+        "  --border-strong: %s;" % tint(ink, 0.24),
+        "  --shadow:        %s, %s;" % (
+            "0 2px 6px " + tint(ink, 0.08), "0 12px 32px " + tint(ink, 0.10)),
     ])
     dark_core = "\n".join([
         "    --plane:         %s;" % d_plane,
         "    --surface:       %s;" % d_surface,
         "    --surface-2:     %s;" % d_surface_2,
-        "    --ink:           #ffffff;",
-        "    --ink-2:         %s;" % mix("#ffffff", d_plane, 0.28),
-        "    --ink-muted:     %s;" % mix("#ffffff", d_plane, 0.48),
-        "    --grid:          %s;" % mix(d_plane, "#ffffff", 0.14),
-        "    --axis:          %s;" % mix(d_plane, "#ffffff", 0.22),
-        "    --border:        rgba(255,255,255,0.10);",
-        "    --border-strong: rgba(255,255,255,0.20);",
-        "    --shadow:        0 1px 2px rgba(0,0,0,0.40), 0 8px 24px rgba(0,0,0,0.35);",
+        "    --ink:           %s;" % d_ink,
+        "    --ink-2:         %s;" % mix(d_ink, d_plane, 0.26),
+        "    --ink-muted:     %s;" % mix(d_ink, d_plane, 0.48),
+        "    --grid:          %s;" % mix(d_plane, d_ink, 0.11),
+        "    --axis:          %s;" % mix(d_plane, d_ink, 0.20),
+        "    --border:        %s;" % tint(d_ink, 0.10),
+        "    --border-strong: %s;" % tint(d_ink, 0.22),
+        "    --shadow:        0 2px 6px rgba(0,0,0,0.40), 0 12px 32px rgba(0,0,0,0.45);",
     ])
 
     dark_body = "\n".join([
@@ -328,10 +333,10 @@ def build(args):
 %s
 
   /* rhythm */
-  --wrap:      1080px;
-  --measure:   72ch;
-  --radius:    10px;
-  --radius-sm: 6px;
+  --wrap:      1040px;
+  --measure:   70ch;
+  --radius:    6px;
+  --radius-sm: 4px;
   --tracking-caps: .12em;
 }
 %s""" % (primary, scheme, light_core, series_block(cs, inks), light_semantic, type_block, dark_blocks)
