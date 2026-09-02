@@ -11,6 +11,26 @@ This file covers how the page is arranged. `${CLAUDE_PLUGIN_ROOT}/docs/05-plain-
 how the sentences are written — simplified English, which is the default for every report. Read
 both. Short, active sentences make the devices below work better, not worse.
 
+## The look: rules, not boxes
+
+`base.css` draws a report the way a good print page is set. Hierarchy comes from type — a large
+display headline, display-size numerals in the KPI row, uppercase tracked labels — and from
+hairline rules: one heavy rule under the masthead and over each table, hairlines between rows.
+Almost nothing is enclosed in a box, and nothing casts a shadow except the tooltip, which floats.
+
+Keep it that way when writing the body:
+
+- **Do not wrap things to make them look important.** A `.kpis` row, a table, a `.seq` and a
+  `.checklist` are already designed to sit on the page unboxed. Putting them inside a `.card`
+  adds a border around a component that already has its own rules and reads as clutter.
+- **`.card` is for grouping**, not decoration: "the short version" summary, a set of figures that
+  must be read as one unit. One or two per report is typical.
+- **Never add inline `style` for borders, shadows, radii or colours.** The tokens carry the look
+  in both schemes and in print; an inline `box-shadow` or `border-radius: 12px` is the fastest
+  way back to a dashboard. The only inline style the components expect is `--hue` on a `.sc`.
+- **Colour is spent, not sprinkled.** Waterfall totals are ink; only the movements take colour.
+  Gantt bars and legends use the series in order. Everything else is ink, two greys and a rule.
+
 ## The headline names the document
 
 The masthead `h1` is a title, not a line of commentary. Write what the report is about, the way

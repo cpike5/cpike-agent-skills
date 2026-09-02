@@ -130,13 +130,23 @@ An application palette and a report palette want different things, so the script
   phones at night. Hues are preserved and lightness lifted. Under `--mode dark` that set becomes
   the only set, emitted on `:root` with no media query and no toggle hook.
 - **Type and rhythm tokens.** `--font-display`, `--font-body`, `--font-mono`, plus `--measure`
-  (the prose line length every component respects) and `--tracking-caps`.
+  (the prose line length every component respects), `--radius` / `--radius-sm` (small on
+  purpose — 6px and 4px; a report is a document, not an app) and `--tracking-caps`.
+- **Neutrals derived from the ink.** `--ink-2`, `--ink-muted`, `--grid`, `--axis` and both
+  border tokens are mixes of the app's ink and plane, so the rules and labels carry the app's
+  warmth or coolness rather than a generic grey. `--shadow` is emitted but only the tooltip
+  uses it.
 
 ## Cases needing judgement
 
 **A near-neutral brand colour** (a very dark navy, a near-black) produces a low-chroma series
 where the six colours are distinguishable by hue but similar in value. Pin explicit series
 colours with `--series` if the app has any chart colours at all.
+
+**A very saturated brand colour** is clamped to a calmer saturation band for the series, so a
+neon accent yields bars that can carry a label and sit next to five neighbours. `--c0` will be a
+little quieter than the brand swatch. Pin it with `--series` only if the app's own charts use the
+full-strength colour.
 
 **A brand colour that is already very light** (a pastel, a mint) will be darkened by the
 derivation, so the report's `--c0` will not match the app's brand swatch exactly. This is
