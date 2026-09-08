@@ -1,0 +1,29 @@
+<Project>
+
+  <!--
+    Single source of truth for the product version. MSBuild walks up from each
+    project directory and imports the first Directory.Build.props it finds, so
+    every project in the repo picks this up automatically and nothing else
+    declares a version.
+
+    Release flow: bump VersionPrefix, clear VersionSuffix, commit, tag vX.Y.Z,
+    then set VersionSuffix back to "dev" so builds off main are visibly ahead
+    of the last tag.
+
+    MSBuild derives the rest:
+      Version              = VersionPrefix, plus "-$(VersionSuffix)" when set
+      AssemblyVersion      = VersionPrefix
+      FileVersion          = VersionPrefix
+      InformationalVersion = Version
+
+    NOTE: keep in sync with the Dockerfile — it COPYs this file explicitly into
+    the restore layer so restore and publish agree on the version. Renaming or
+    moving it means updating that COPY.
+  -->
+  <PropertyGroup>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <!-- Empty on a release commit; "dev" between releases. -->
+    <VersionSuffix>dev</VersionSuffix>
+  </PropertyGroup>
+
+</Project>

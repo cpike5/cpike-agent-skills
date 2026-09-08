@@ -1,0 +1,5 @@
+{
+  "name": "project-setup-skill",
+  "description": "Project setup and onboarding knowledge base — CLAUDE.md and SessionStart hooks, the docs tree, CI build gates, versioning and GHCR image publishing, VPS deployment behind nginx, PR conventions, and a real test database — with copy-ready templates",
+  "version": "1.0.0"
+}

@@ -1,0 +1,29 @@
+# .github/dependabot.yml — optional but cheap.
+#
+# Weekly, grouped PRs. Grouping matters: ungrouped Dependabot opens a PR per
+# package and each one burns a CI run and a review, which is how teams end up
+# ignoring it entirely.
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: "/src"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      all-nuget:
+        patterns: ["*"]
+
+  # Keeps the pinned action versions in the workflows above current.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      all-actions:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directory: "/src/<AppName>.Server"
+    schedule:
+      interval: weekly

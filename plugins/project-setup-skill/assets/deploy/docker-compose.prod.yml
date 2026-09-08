@@ -1,0 +1,60 @@
+# /opt/<appname>/docker-compose.yml
+#
+# Production stack. Pulls the image published by .github/workflows/docker-release.yml
+# — it is never built on the VPS. Configuration comes from the sibling .env file,
+# which is the only file on the box holding secrets.
+#
+# The app container always listens on 8080 internally; APP_PORT chooses the host
+# port nginx proxies to (keep it in sync with proxy_pass in the nginx site).
+services:
+  app:
+    image: "ghcr.io/<owner>/<appname>:${APP_TAG:-latest}"
+    restart: unless-stopped
+    ports:
+      # Bind to loopback only: nginx is the sole ingress, so the container port
+      # must not be reachable from the public internet.
+      - "127.0.0.1:${APP_PORT:-5000}:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "${ASPNETCORE_ENVIRONMENT:-Production}"
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=${POSTGRES_DB:-<appname>};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}"
+      # App-specific settings go here. Double underscore maps to the
+      # appsettings.json section separator: Foo__Bar => "Foo": { "Bar": ... }.
+      # Give every one a default (:-) unless the app genuinely cannot start
+      # without it, in which case use (:?message) so compose fails loudly.
+    volumes:
+      # Persisted user uploads. A named volume by default; set UPLOADS_VOLUME to
+      # an absolute host path to keep them in a folder you can back up directly.
+      - "${UPLOADS_VOLUME:-uploads}:/data/uploads"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - <appname>
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-<appname>}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # No ports: — the database is reachable only from the app over the compose
+    # network. Use `docker compose exec db psql` for ad-hoc access.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-<appname>}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - <appname>
+
+networks:
+  <appname>:
+    name: <appname>-net
+    driver: bridge
+
+volumes:
+  pgdata:
+  uploads:
