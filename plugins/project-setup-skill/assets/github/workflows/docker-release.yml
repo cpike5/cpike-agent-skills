@@ -1,0 +1,68 @@
+# .github/workflows/docker-release.yml — publishes the production image.
+#
+# Fires on a published GitHub release, not on a push to main: main is
+# continuously green, but only a tagged release is something you'd deploy.
+# Cutting a release (tag vX.Y.Z) is therefore the single act that makes a new
+# image available to `deploy-<appname>.sh` on the VPS.
+name: Docker Release
+
+on:
+  release:
+    types: [published]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  docker:
+    name: Build & Push Image
+    runs-on: ubuntu-latest
+    # GITHUB_TOKEN is read-only by default; packages:write is what lets it push
+    # to ghcr.io. No PAT or registry secret is needed for the org's own registry.
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Derives the tag set from the release tag: v1.4.2 publishes 1.4.2, 1.4,
+      # 1 and latest. A VPS pinned to APP_TAG=1.4 picks up patches automatically.
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          # Build context is the repository root, not src/ — a Dockerfile can
+          # only COPY from within its context, and the restore layer needs
+          # Directory.Build.props from the root.
+          context: .
+          file: ./src/<AppName>.Server/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # GitHub Actions layer cache: a rebuild that only changes app code
+          # reuses the restore layer instead of re-downloading every package.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

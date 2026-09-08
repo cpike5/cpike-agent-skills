@@ -1,0 +1,43 @@
+# .github/workflows/build.yml — the gate on every PR.
+#
+# One job, two commands: build and test. Keep it that way. A CI pipeline that
+# does more than a contributor can run locally produces failures nobody can
+# reproduce; if a check belongs in CI it belongs in the local dev loop too.
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Supersede an in-flight run when a branch is pushed again — the older run's
+# result is already stale.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore
+        run: dotnet restore src/<AppName>.sln
+
+      - name: Build
+        run: dotnet build src/<AppName>.sln --configuration Release --no-restore
+
+      # --no-build reuses the Release output above rather than rebuilding it,
+      # so the tests run against exactly the binaries that were just verified.
+      - name: Test
+        run: dotnet test src/<AppName>.sln --configuration Release --no-build --verbosity normal

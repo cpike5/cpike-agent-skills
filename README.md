@@ -70,6 +70,12 @@ Project report writing — audits, scope reviews, status updates, findings, esti
 
 **5 docs** — HTML build workflow, theming from the host app's palette, component reference, editorial guidance, and the simplified-English writing rules. Ships `scripts/derive_theme.py`, `scripts/build_report.py` and `scripts/rasterize.py` (screenshots the built report so the visuals get looked at) plus the CSS/JS asset library.
 
+### project-setup-skill (v1.0.0)
+
+Project setup and onboarding — what a repository needs before an agent session is productive in it, and the order to install it in. Covers `CLAUDE.md`, the `SessionStart` hook and the local-dev-environment doc, the CI build gate, versioning and GHCR image publishing, the release and rollback flow, VPS deployment with Docker Compose behind nginx, PR conventions, documentation standards, and the three test layers including a real ephemeral Postgres and deterministic Playwright screenshots.
+
+**7 docs** — onboarding workflow, Claude Code setup, CI/CD, deployment, pull requests, documentation standards, testing. Ships copy-ready `assets/` — `.claude/` settings and .NET/Node `SessionStart` hooks, `build.yml`, `docker-release.yml`, `dependabot.yml`, a PR template, `Dockerfile`, `Directory.Build.props`, the prod compose file, deploy script, nginx site config, `test-db.sh` and `screenshot.mjs`.
+
 ## Repository Structure
 
 ```
@@ -87,6 +93,7 @@ cpike-agent-skills/
 │   ├── mermaid-skill/
 │   ├── observability-skill/
 │   ├── obsidian-skill/
+│   ├── project-setup-skill/
 │   └── roundtable/
 └── CLAUDE.md
 ```
