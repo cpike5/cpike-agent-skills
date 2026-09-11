@@ -1,0 +1,5 @@
+{
+  "name": "handoff-skill",
+  "description": "Generate a short, copy/paste-ready handoff prompt for a fresh agent in a new chat — infers the next phase of work from the session, names the docs to read and the code to explore, and outputs only the prompt",
+  "version": "1.0.0"
+}

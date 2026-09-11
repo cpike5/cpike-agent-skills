@@ -1,0 +1,5 @@
+{
+  "name": "design-feature-skill",
+  "description": "Interactive end-to-end feature design workshop — talk the idea through, explore the codebase and design system, propose the architecture with Mermaid diagrams, build HTML mockups in the app's real design system, and write phased design docs into the repo without writing production code",
+  "version": "1.0.0"
+}

@@ -76,6 +76,18 @@ Project setup and onboarding — what a repository needs before an agent session
 
 **7 docs** — onboarding workflow, Claude Code setup, CI/CD, deployment, pull requests, documentation standards, testing. Ships copy-ready `assets/` — `.claude/` settings and .NET/Node `SessionStart` hooks, `build.yml`, `docker-release.yml`, `dependabot.yml`, a PR template, `Dockerfile`, `Directory.Build.props`, the prod compose file, deploy script, nginx site config, `test-db.sh` and `screenshot.mjs`.
 
+### design-feature-skill (v1.0.0)
+
+Interactive end-to-end feature design session — workshop a half-formed idea with the user, read the codebase and its design system, propose the architecture with Mermaid diagrams, build HTML mockups of the new screens in the app's own visual language, and write the design docs into the repo. No production code is written; the session ends at the docs and hands off from there.
+
+**Skill only** — one SKILL.md covering the eight-phase workflow (talk it through, explore the codebase, learn the design system, architecture, mockups, confirm, write docs, wait), the facilitation posture, and the failure modes to avoid. Pairs with `handoff-skill`.
+
+### handoff-skill (v1.0.0)
+
+Generate a short, copy/paste-ready prompt for a fresh agent in a new chat. Infers the next unit of work from the session — the next phase of a plan, or the start of implementation after a design session — and names the docs to read and the code to explore. Outputs only the prompt, in a fenced code block, with no commentary.
+
+**Skill only** — one SKILL.md covering task inference, the `Task` / `Read` / `Explore` prompt structure, what to leave out, and worked examples. Picks up where `design-feature-skill` leaves off.
+
 ## Repository Structure
 
 ```
@@ -86,8 +98,10 @@ cpike-agent-skills/
 │   ├── agent-sdk-skill/
 │   ├── avalonia-skill/
 │   ├── blazor-skill/
+│   ├── design-feature-skill/
 │   ├── elasticsearch-skill/
 │   ├── frontend-design-skill/
+│   ├── handoff-skill/
 │   ├── html-reports-skill/
 │   ├── huemint-skill/
 │   ├── mermaid-skill/
