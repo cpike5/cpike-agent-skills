@@ -93,6 +93,16 @@
       "name": "project-setup-skill",
       "source": "./plugins/project-setup-skill",
       "description": "Project setup and onboarding knowledge base — CLAUDE.md and SessionStart hooks, the docs tree, CI build gates, versioning and GHCR image publishing, VPS deployment behind nginx, PR conventions, and a real test database — with copy-ready templates"
+    },
+    {
+      "name": "design-feature-skill",
+      "source": "./plugins/design-feature-skill",
+      "description": "Interactive end-to-end feature design workshop — talk the idea through, explore the codebase and design system, propose the architecture with Mermaid diagrams, build HTML mockups in the app's real design system, and write phased design docs into the repo without writing production code"
+    },
+    {
+      "name": "handoff-skill",
+      "source": "./plugins/handoff-skill",
+      "description": "Generate a short, copy/paste-ready handoff prompt for a fresh agent in a new chat — infers the next phase of work from the session, names the docs to read and the code to explore, and outputs only the prompt"
     }
   ]
 }
