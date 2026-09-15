@@ -1,37 +1,32 @@
-# Step 6 — External Integrations (Document F)
+# integrations.md — External Integrations
 
-## 6a. Scan Dependencies
+Show what the system talks to, what it needs to run, and what's optional.
 
-1. Read dependency manifests (`.csproj`, `package.json`, `go.mod`, `requirements.txt`, etc.).
-2. Filter for significant integrations — external service SDKs, database drivers, observability tools. Skip utility packages.
-3. Note versions for forked or pre-release packages.
+## Dependencies
 
-## 6b. Identify External API Clients
+Read the dependency manifests. Keep external service SDKs, database drivers, messaging clients, observability packages, and anything forked or pre-release (note the version for those). Skip utility packages.
 
-1. Check service registration / DI setup for HTTP clients, SDK clients, API wrappers.
-2. For each external service: what SDK is used, what's it for?
+## External API clients
 
-## 6c. Map the Observability Stack
+From DI registration, find HTTP clients, SDK clients, and wrappers. For each: the service, the SDK, what it's used for, and the domain that owns it.
 
-1. Identify required vs optional observability tools.
-2. Note custom instrumentation — meters, trace sources, health checks.
+## Data stores
 
-## 6d. Document Credentials
+Databases, caches, blob storage, search indexes — the provider, the client library, and whether it's required for local development.
 
-1. Cross-reference with Document E — which secrets map to which integration?
-2. List all credentials with config keys and the service they authenticate to.
+## Observability
 
-## Output Format
+Logging sink, tracing, metrics, health checks. Mark each required or optional, and note custom instrumentation (meters, activity sources, health check names) an agent might need to extend.
 
-Tables grouped by:
-- **Core Services** — main external APIs
-- **Data Stores** — database providers
-- **Observability Stack** — monitoring/logging/tracing (required vs optional)
-- **Supporting Libraries** — smaller notable dependencies
-- **Credential Management** — all credentials with config keys
+## Credentials
 
-## Judgement Calls
+Cross-reference the secrets table in `configuration.md`: each credential's config key and the service it authenticates to. Keys and locations only, never values.
 
-- Focus on integrations that affect how you work with the code
-- Distinguish required from optional for observability
-- Version numbers matter for forks and pre-release packages
+## Format
+
+Tables grouped as: Core services, Data stores, Observability (required/optional column), Supporting libraries, Credentials.
+
+## Judgement calls
+
+- Focus on integrations that change how you work with the code — a required Postgres matters more than a JSON library.
+- If a service can be stubbed or disabled for local dev, say how; that's the first thing an agent setting up locally needs.

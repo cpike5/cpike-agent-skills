@@ -62,7 +62,7 @@
     {
       "name": "map-project-skill",
       "source": "./plugins/map-project-skill",
-      "description": "Project architecture mapping knowledge base that generates a 6-document project-map/ folder covering structure, documentation, source architecture, feature domains, configuration, and integrations"
+      "description": "Project architecture mapping skill that generates or refreshes a project-map/ folder — index, structure, documentation, architecture, domains, configuration, integrations, and conventions — for agent and human onboarding"
     },
     {
       "name": "obsidian-skill",
