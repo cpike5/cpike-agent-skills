@@ -1,50 +1,44 @@
 ---
 name: map-project
-description: "Use this skill when mapping a project's architecture, generating a project-map/ folder, creating high-level architecture documentation for agent or human consumption, or when the user asks to map, survey, or document the structure of a codebase. Invoke when: the user says 'map this project', 'generate a project map', 'create architecture docs', 'survey this codebase', or wants a comprehensive overview of a project's structure, domains, configuration, and integrations."
+description: "Generate or refresh a project-map/ folder: a compact set of architecture documents that let an agent (or a new team member) answer 'where is X?' and 'what does this system do?' without reading the whole codebase. Use this skill whenever the user asks to map, survey, or document the structure of a codebase, generate a project map or architecture overview, or onboard agents to a repository — phrases like 'map this project', 'generate a project map', 'create architecture docs', 'survey this codebase', 'refresh the project map'. Also use it when a project-map/ folder already exists and the user wants it updated. Not for documenting a single feature or writing API reference docs. .NET-first (solutions, EF Core, IOptions) with fallbacks for other stacks."
 ---
 
-# /map-project — Project Architecture Mapping
+# /map-project — Project Architecture Map
 
-Generate a `project-map/` folder with 6 documents that give agents (and humans) a complete picture of the project without reading every file.
+Produce a `project-map/` folder at the project root. The map is for discoverability: it answers "where is X?", "what does this system do?", and "where do I add Y?". It does not explain how anything works internally — that's what the code is for.
 
-## Output Documents
+## Output
 
-| Document | File | Content |
-|----------|------|---------|
-| A | `A-top-level-structure.md` | Architecturally significant top-level files and directories |
-| B | `B-documentation-index.md` | Documentation inventory grouped by domain |
-| C | `C-source-architecture.md` | Solution structure, data model, service contracts |
-| D | `D-feature-map.md` | Feature domain map (Mermaid) + per-domain class diagrams |
-| E | `E-configuration.md` | Configuration sources, what goes where, DB-stored settings |
-| F | `F-integrations.md` | External services, dependencies, credentials |
+| File | Answers |
+|------|---------|
+| `project-map/README.md` | Index: one line per document, how to use the map |
+| `project-map/structure.md` | What's at the top level and why it matters |
+| `project-map/documentation.md` | Where existing docs live, grouped by topic |
+| `project-map/architecture.md` | Projects, layering, data model, service contracts |
+| `project-map/domains.md` | Feature domain map (Mermaid) and priority-domain diagrams |
+| `project-map/configuration.md` | Config sources, load order, what goes where |
+| `project-map/integrations.md` | External services, data stores, observability, credentials |
+| `project-map/conventions.md` | How to add an entity, endpoint, service, migration, test |
 
-## Step Reference
+## Reference
 
-| Step | Document | Doc |
-|------|----------|-----|
-| 1. Top-Level Structure | A | 02 |
-| 2. Documentation Index | B | 03 |
-| 3. Source Architecture | C | 04 |
-| 4. Feature Map & Domain Diagrams | D | 05 |
-| 5. Configuration | E | 06 |
-| 6. External Integrations | F | 07 |
+Read first — it covers pre-exploration, refresh mode, parallel exploration, size budget, and the header every document carries:
 
-## Reference Documentation
+- ${CLAUDE_PLUGIN_ROOT}/docs/01-workflow.md
 
-### Always Read First
-- ${CLAUDE_PLUGIN_ROOT}/docs/01-general-workflow.md — Pre-exploration, sequential workflow, output conventions
+Then one doc per output document, read as you reach it:
 
-### Steps (read as needed)
-- ${CLAUDE_PLUGIN_ROOT}/docs/02-top-level-structure.md — Document A: root directory mapping
-- ${CLAUDE_PLUGIN_ROOT}/docs/03-documentation-index.md — Document B: docs inventory
-- ${CLAUDE_PLUGIN_ROOT}/docs/04-source-architecture.md — Document C: solution, data model, service contracts
-- ${CLAUDE_PLUGIN_ROOT}/docs/05-feature-map.md — Document D: Mermaid feature map + domain diagrams
-- ${CLAUDE_PLUGIN_ROOT}/docs/06-configuration.md — Document E: config sources, classes, DB settings
-- ${CLAUDE_PLUGIN_ROOT}/docs/07-integrations.md — Document F: dependencies, APIs, credentials
+- ${CLAUDE_PLUGIN_ROOT}/docs/02-structure.md
+- ${CLAUDE_PLUGIN_ROOT}/docs/03-documentation.md
+- ${CLAUDE_PLUGIN_ROOT}/docs/04-architecture.md
+- ${CLAUDE_PLUGIN_ROOT}/docs/05-domains.md
+- ${CLAUDE_PLUGIN_ROOT}/docs/06-configuration.md
+- ${CLAUDE_PLUGIN_ROOT}/docs/07-integrations.md
+- ${CLAUDE_PLUGIN_ROOT}/docs/08-conventions.md
 
-## General Principles
+## Principles
 
-1. **Optimize for discoverability** — the map answers "where is X?" and "what does this system do?" not "how does X work internally?"
-2. **Use judgement over exhaustiveness** — include what's architecturally significant, skip noise. Ask: would an agent need this to avoid wasting time exploring?
-3. **Group by domain consistently** — use the same domain groupings across all documents so the map is navigable.
-4. **Consult the user on priorities** — they know which parts of the system matter most. Don't map everything to equal depth.
+1. **Map, don't enumerate.** Include what an agent needs to avoid wasted exploration; skip the rest. If a document is growing past its budget, you're listing instead of mapping.
+2. **One taxonomy.** Derive domain groupings from the code's own folder and namespace names, fix them in `architecture.md`, and reuse them verbatim in every later document.
+3. **Priorities come from the user when possible.** In an interactive session, ask which domains matter most before drawing domain diagrams. In a headless run, rank from evidence (fan-in, file counts, recent churn) and record the ranking in `domains.md`.
+4. **CLAUDE.md holds rules; project-map holds the map.** Don't duplicate conventions that CLAUDE.md already states — link to them. Do offer to add a one-line pointer to `project-map/` in CLAUDE.md when the map is done.

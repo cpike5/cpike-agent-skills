@@ -1,40 +1,31 @@
-# Step 5 — Configuration (Document E)
+# configuration.md — Configuration
 
-## 5a. Identify Configuration Sources
+Answer "what goes where and why" — the design rationale is worth more than any key listing.
 
-1. Check the entry point (Program.cs, main.go, etc.) — what config sources are loaded and in what order?
-2. Check the main config file (appsettings.json, .env, config.yaml) — capture section names and purpose, not every key.
-3. Check for env var templates (.env.example) — which are required vs optional?
-4. Check for secrets management — User Secrets, vault references, etc.
+## Sources and load order
 
-## 5b. Map Configuration Classes
+From the entry point (`Program.cs` or equivalent), capture which config sources load and in what order: base file, environment-specific file, user secrets, environment variables, vault, database. Draw it as a short text flow. Note which env var template exists (`.env.example`) and which entries are required versus optional.
 
-1. List configuration/options classes (e.g., `IOptions<T>` in .NET, config structs in Go).
-2. Note the binding pattern — how do classes map to config sections?
-3. Don't enumerate every property — class names and sections are enough.
+## Sections and binding
 
-## 5c. Map Database-Stored Settings (if applicable)
+List config sections by name and purpose — not every key. List the options classes that bind to them and the binding pattern (`services.Configure<T>(config.GetSection("X"))`, `[ConfigurationKeyName]`, validation on start). One code example of the pattern is enough.
 
-1. Find the settings definition registry — what settings exist?
-2. List all defined settings grouped by category: key, type, default, description.
-3. Understand merge behavior — how do DB values combine with file-based config?
+## Secrets
 
-## 5d. Document Design Rationale
+Where secrets live per environment (user secrets locally, env vars or vault in deployment) and the config keys they populate. Names and locations only, never values. `integrations.md` cross-references this table.
 
-Summarize the dividing line:
-- **File/environment**: deployment-time, infrastructure-level, technical
-- **Database**: runtime-tunable, admin-facing, changeable without restart
+## Runtime-tunable settings
 
-## Output Format
+If the project stores settings in a database or a feature-flag service, this is the one place to enumerate them in full: key, type, default, description, grouped by domain. Explain how they merge with file config and whether changes take effect without restart. If the project has no such mechanism, omit this section entirely.
 
-- Design rationale paragraph up front
-- Text-based config flow diagram showing load order
-- Tables for: config sections, secrets, DB-stored settings
-- Code example showing the binding pattern
+## Format
 
-## Judgement Calls
+- Design rationale paragraph first: the dividing line between deployment-time config (files, env) and runtime-tunable config (database, flags).
+- Text flow of load order.
+- Tables for sections, secrets, and runtime settings.
+- A closing "What goes where" table mapping kinds of setting to their home. This table is the most-used part of the document.
 
-- "What goes where and why" is more valuable than exhaustive key listings
-- For file config, section names and purpose > individual keys
-- For DB settings, enumerate them all — there are typically few enough
-- The "What Goes Where" summary table is the most valuable output
+## Judgement calls
+
+- Section names and purpose beat individual keys for file config.
+- If load order has a surprise (env vars overriding a file most people expect to win), say so prominently.
