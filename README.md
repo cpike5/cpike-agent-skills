@@ -88,6 +88,12 @@ Generate a short, copy/paste-ready prompt for a fresh agent in a new chat. Infer
 
 **Skill only** — one SKILL.md covering task inference, the `Task` / `Read` / `Explore` prompt structure, what to leave out, and worked examples. Picks up where `design-feature-skill` leaves off.
 
+### prototype-ui-skill (v1.0.0)
+
+Prototype a feature or UI change as plain HTML/CSS/JS the user can open in a browser before anything is built. Extracts the codebase's design language (tokens, layout shell, components), writes a feature summary and UX spec, delegates the bulky HTML build to a Sonnet sub-agent, then verifies the result against the spec. No production code. Pairs with `design-feature-skill`, which calls it for its mockup step.
+
+**Skill + 3 references + 1 asset** — SKILL.md orchestrates the workflow; `references/` holds the design-language, feature-spec and builder-brief templates; `assets/prototype-builder.md` is a drop-in `model: sonnet` sub-agent definition.
+
 ## Repository Structure
 
 ```
@@ -108,6 +114,7 @@ cpike-agent-skills/
 │   ├── observability-skill/
 │   ├── obsidian-skill/
 │   ├── project-setup-skill/
+│   ├── prototype-ui-skill/
 │   └── roundtable/
 └── CLAUDE.md
 ```
