@@ -1,0 +1,5 @@
+{
+  "name": "prototype-ui-skill",
+  "description": "Produce a plain HTML/CSS/JS prototype of a feature or UI change in the app's own visual language — extract the codebase's design language, write a feature summary and UX spec, delegate the HTML build to a Sonnet sub-agent, and verify the result",
+  "version": "1.0.0"
+}

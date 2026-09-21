@@ -103,6 +103,11 @@
       "name": "handoff-skill",
       "source": "./plugins/handoff-skill",
       "description": "Generate a short, copy/paste-ready handoff prompt for a fresh agent in a new chat — infers the next phase of work from the session, names the docs to read and the code to explore, and outputs only the prompt"
+    },
+    {
+      "name": "prototype-ui-skill",
+      "source": "./plugins/prototype-ui-skill",
+      "description": "Prototype a feature or UI change as self-contained HTML in the app's own visual language — design-language extraction, feature/UX spec, Sonnet builder sub-agent delegation, and verification of the result"
     }
   ]
 }
